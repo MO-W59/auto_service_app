@@ -18,6 +18,7 @@ import validate
 # use dictionaries instead of lists for large inputs?
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
+# clear login boxes after login
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
 # change insert statments into the DB to a list rather than declaring all variables
 # move all json.dumps/loads to main app
