@@ -12,7 +12,8 @@ from data_interface import AppDatabase
 import validate
 
 # vvv--- TODO list ---vvv
-# cut off labels? --> new issue found on laptop --> new/different PyQt5 version?
+# cut off labels? --> new issue found on laptop --> new/different PyQt5 version? --> version is the same --> use the self.label.adjustSize() method
+# lock the size of the app window?
 # use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
 # !!?? use dictionary of functions to eliminate multiple if branches ??!!
 # implement while loops to keep asking for id/vin for searches when the user does not hit cancel but enters an invalid value
