@@ -12,7 +12,9 @@ from data_interface import AppDatabase
 import validate
 
 # vvv--- TODO list ---vvv
+# cut off labels? --> new issue found on laptop --> new/different PyQt5 version?
 # use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
+# !!?? use dictionary of functions to eliminate multiple if branches ??!!
 # implement while loops to keep asking for id/vin for searches when the user does not hit cancel but enters an invalid value
 # ensure the titles of the message/error windows can be read and are not cut off.
 # use dictionaries instead of lists for large inputs?
@@ -32,6 +34,7 @@ import validate
 # iterate over text boxes with a list of checkboxes and use python match feature?
 # set restrictions on class set methods?
 # protect against SQL race condition, options -> thread lock? queue? connection pool?
+# consolidate code as much as possible --> edit customer submit make a update customer edit page function
 # search for bugs
 # fix code formating
 # update doc strings
@@ -47,6 +50,7 @@ import validate
 # disable linter message due to using C extention
 # pylint: disable=c-extension-no-member
 
+# Set up application ui and database
 App = QtWidgets.QApplication(sys.argv)
 App_Main_Window = QtWidgets.QMainWindow()
 App_Ui = UiGarageTrackerMainWindow()
@@ -56,8 +60,9 @@ App_Database = AppDatabase()
 
 def setup_button_handlers():
     """This function connects all the UI buttons (radio buttons not included)
-    with there repective functions."""
+    with their repective functions."""
 
+    # submit, add, remove buttons
     App_Ui.login_page_submit_button.clicked.connect(login_submit)
     App_Ui.new_part_submit_button.clicked.connect(create_part_submit)
     App_Ui.edit_part_submit_button.clicked.connect(edit_part_submit)
@@ -80,26 +85,23 @@ def setup_button_handlers():
         remove_vehicle_from_customer_button
     )
 
+    # Go to functions for action menu (top menu bar)
     App_Ui.action_login.triggered.connect(go_to_login_page)
     App_Ui.action_logout.triggered.connect(logout_user)
     App_Ui.action_new_user.triggered.connect(go_to_new_user_page)
     App_Ui.action_update_password.triggered.connect(go_to_update_password_page)
     App_Ui.action_update_user.triggered.connect(go_to_update_user_page)
     App_Ui.action_search_user.triggered.connect(search_for_user)
-
     App_Ui.action_new_repair.triggered.connect(go_to_new_repair_page)
     App_Ui.action_edit_repair.triggered.connect(go_to_edit_repair_page)
     App_Ui.action_active_repairs.triggered.connect(go_to_active_repairs_page)
     App_Ui.action_display_old_repair.triggered.connect(go_to_old_repair_page)
-
     App_Ui.action_new_part.triggered.connect(go_to_new_part_page)
     App_Ui.action_edit_part.triggered.connect(go_to_edit_part_page)
     App_Ui.action_list_of_parts.triggered.connect(go_to_list_of_parts_page)
-
     App_Ui.action_new_customer.triggered.connect(go_to_new_customer_page)
     App_Ui.action_edit_customer.triggered.connect(go_to_edit_customer_page)
     App_Ui.action_list_of_customers.triggered.connect(go_to_list_of_customers_page)
-
     App_Ui.action_new_vehicle.triggered.connect(go_to_new_vehicle_page)
     App_Ui.action_edit_vehicle.triggered.connect(go_to_edit_vehicle_page)
     App_Ui.action_get_repair_history.triggered.connect(search_repair_history)
@@ -111,9 +113,7 @@ def login_submit():
     to Database."""
 
     if App_Database.get_login_status():
-        App_Ui.show_error("You are already logged in!")
-
-        return
+        return App_Ui.show_error("You are already logged in!")
 
     input_user = App_Ui.username_login_input_box.text()
     input_pass = App_Ui.password_login_input_box.text()
@@ -121,65 +121,49 @@ def login_submit():
     if not validate.is_valid_username(input_user) and validate.is_valid_password(
         input_pass
     ):
-        App_Ui.show_error("Invalid username or password!")
-
-        return
+        return App_Ui.show_error("Invalid username or password!")
 
     if App_Database.is_valid_login_query(input_user, input_pass):
-        App_Ui.show_success("Login successful.")
+        return App_Ui.show_success("Login successful.")
 
-        return
-
-    App_Ui.show_error("Invalid username or password!")
-
-    return
+    return App_Ui.show_error("Invalid username or password!")
 
 
 def create_part_submit():
-    """This function will create a new part for they system and store it in the database."""
+    """Creates new part from inputs and passed to database for storage."""
 
     new_part_id = App_Ui.new_part_part_id_input_box.text()
     new_part_cost = App_Ui.new_part_part_cost_input_box.text()
     new_part_descpition = App_Ui.new_part_description_input_box.text()
 
     if not validate.is_valid_id(new_part_id):
-        App_Ui.show_error("Invaild part id.")
-
-        return
+        return App_Ui.show_error("Invaild part id.")
 
     if not validate.is_valid_dollar_amount(new_part_cost):
-        App_Ui.show_error("Invalid part cost.")
-
-        return
+        return App_Ui.show_error("Invalid part cost.")
 
     if not validate.is_valid_description(new_part_descpition):
-        App_Ui.show_error("Invalid description")
-
-        return
+        return App_Ui.show_error("Invalid description.")
 
     inputs = [new_part_id, new_part_cost, new_part_descpition]
 
     App_Database.insert_parts(inputs)
 
-    App_Ui.show_success("Part input successfully.")
+    return App_Ui.show_success("Part input successfully.")
 
 
 def edit_part_submit():
-    """This function will update part information for the selected part within the database."""
+    """Gets new information for a stored part and passes it to the database for storage."""
 
     part_id = App_Ui.edit_part_id_display_label.text()
     new_part_cost = App_Ui.edit_part_part_cost_input_box.text()
     new_part_description = App_Ui.edit_part_description_input_box.text()
 
     if not validate.is_valid_dollar_amount(new_part_cost):
-        App_Ui.show_error("Invalid part cost.")
-
-        return
+        return App_Ui.show_error("Invalid part cost.")
 
     if not validate.is_valid_description(new_part_description):
-        App_Ui.show_error("Invalid part description.")
-
-        return
+        return App_Ui.show_error("Invalid part description.")
 
     if App_Ui.edit_part_change_cost_check_box.isChecked():
         App_Database.update_part_cost(part_id, new_part_cost)
@@ -187,11 +171,11 @@ def edit_part_submit():
     if App_Ui.edit_part_change_description_check_box.isChecked():
         App_Database.update_part_description(part_id, new_part_description)
 
-    App_Ui.show_success("Part update successful.")
+    return App_Ui.show_success("Part update successful.")
 
 
 def new_vehicle_submit():
-    """This function will create a new vehicle and store it in the database."""
+    """Gets information for a new vehicle and passes it to the database for storage."""
 
     vin = App_Ui.new_vehicle_vin_input_box.text()
     make = App_Ui.new_vehicle_make_input_box.text()
@@ -201,49 +185,35 @@ def new_vehicle_submit():
     engine = App_Ui.new_vehicle_engine_input_box.text()
 
     if not validate.is_valid_vin(vin):
-        App_Ui.show_error("Invalid vin.")
-
-        return
+        return App_Ui.show_error("Invalid vin.")
 
     if App_Database.get_vehicle_data(vin):
-        App_Ui.show_error("There is a vehicle with this VIN already.")
-
-        return
+        return App_Ui.show_error("There is a vehicle with this VIN already.")
 
     if not validate.is_valid_name(make):
-        App_Ui.show_error("Invalid make.")
-
-        return
+        return App_Ui.show_error("Invalid make.")
 
     if not validate.is_valid_name(model):
-        App_Ui.show_error("Invalid model.")
-
-        return
+        return App_Ui.show_error("Invalid model.")
 
     if not validate.is_valid_year(year):
-        App_Ui.show_error("Invalid year.")
-
-        return
+        return App_Ui.show_error("Invalid year.")
 
     if not validate.is_valid_name(color):
-        App_Ui.show_error("Invalid color.")
-
-        return
+        return App_Ui.show_error("Invalid color.")
 
     if not validate.is_valid_id(engine):
-        App_Ui.show_error("Invalid engine.")
-
-        return
+        return App_Ui.show_error("Invalid engine.")
 
     vehicle_data = [vin, model, make, year, color, engine, [], None]
 
     App_Database.insert_vehicle(vehicle_data)
 
-    App_Ui.show_success("Vehicle input successfully.")
+    return App_Ui.show_success("Vehicle input successfully.")
 
 
 def edit_vehicle_submit():
-    """This function will update a selected vehicle within the database."""
+    """Gets new information for a vehicle and passes it to the database for storage."""
 
     current_vin = App_Ui.edit_vehicle_vin_display_label.text()
     new_make = App_Ui.edit_vehicle_make_input_box.text()
@@ -254,33 +224,23 @@ def edit_vehicle_submit():
 
     if App_Ui.edit_vehicle_change_make_check_box.isChecked():
         if not validate.is_valid_name(new_make):
-            App_Ui.show_error("Invalid make.")
-
-            return
+            return App_Ui.show_error("Invalid make.")
 
     if App_Ui.edit_vehicle_change_model_check_box.isChecked():
         if not validate.is_valid_name(new_model):
-            App_Ui.show_error("Invalid model.")
-
-            return
+            return App_Ui.show_error("Invalid model.")
 
     if App_Ui.edit_vehicle_change_year_check_box.isChecked():
         if not validate.is_valid_year(new_year):
-            App_Ui.show_error("Invalid year.")
-
-            return
+            return App_Ui.show_error("Invalid year.")
 
     if App_Ui.edit_vehicle_change_color_check_box.isChecked():
         if not validate.is_valid_name(new_color):
-            App_Ui.show_error("Invalid color.")
-
-            return
+            return App_Ui.show_error("Invalid color.")
 
     if App_Ui.edit_vehicle_change_engine_check_box.isChecked():
         if not validate.is_valid_name(new_engine):
-            App_Ui.show_error("Invalid engine")
-
-            return
+            return App_Ui.show_error("Invalid engine")
 
     if App_Ui.edit_vehicle_change_make_check_box.isChecked():
         App_Database.update_vehicle_make(current_vin, new_make)
@@ -297,11 +257,11 @@ def edit_vehicle_submit():
     if App_Ui.edit_vehicle_change_engine_check_box.isChecked():
         App_Database.update_vehicle_engine(current_vin, new_engine)
 
-    App_Ui.show_success("Vehicle update successful.")
+    return App_Ui.show_success("Vehicle update successful.")
 
 
 def new_customer_submit():
-    """This function will create a new customer and store it in the database."""
+    """Gets new customer data and passes it to the database for storage."""
 
     target_table = "customers"
     customer_name = App_Ui.new_customer_name_input_box.text()
@@ -309,19 +269,13 @@ def new_customer_submit():
     customer_phone = App_Ui.new_customer_phone_input_box.text()
 
     if not validate.is_valid_name(customer_name):
-        App_Ui.show_error("Invalid name.")
-
-        return
+        return App_Ui.show_error("Invalid name.")
 
     if not validate.is_valid_address(customer_address):
-        App_Ui.show_error("Invalid address")
-
-        return
+        return App_Ui.show_error("Invalid address")
 
     if not validate.is_valid_phone_number(customer_phone):
-        App_Ui.show_error("Invalid phone number.")
-
-        return
+        return App_Ui.show_error("Invalid phone number.")
 
     customer_id = App_Database.gen_id(target_table)
 
@@ -337,11 +291,11 @@ def new_customer_submit():
 
     App_Database.insert_customer(inputs)
 
-    App_Ui.show_success("New customer input succesfully.")
+    return App_Ui.show_success("New customer input succesfully.")
 
 
 def edit_customer_submit():
-    """This function will update a customer's information within the database."""
+    """Gets new information for a customer and passes it to the database for storage."""
 
     customer_id = App_Ui.edit_customer_id_display_label.text()
     new_name = App_Ui.edit_customer_name_input_box.text()
@@ -350,21 +304,15 @@ def edit_customer_submit():
 
     if App_Ui.edit_customer_change_name_check_box.isChecked():
         if not validate.is_valid_name(new_name):
-            App_Ui.show_error("Invalid name.")
-
-            return
+            return App_Ui.show_error("Invalid name.")
 
     if App_Ui.edit_customer_change_address_check_box.isChecked():
         if not validate.is_valid_address(new_address):
-            App_Ui.show_error("Invalid address.")
-
-            return
+            return App_Ui.show_error("Invalid address.")
 
     if App_Ui.edit_customer_change_phone_check_box.isChecked():
         if not validate.is_valid_phone_number(new_phone):
-            App_Ui.show_error("Invalid phone.")
-
-            return
+            return App_Ui.show_error("Invalid phone.")
 
     if App_Ui.edit_customer_change_name_check_box.isChecked():
         App_Database.update_customer_name(customer_id, new_name)
@@ -379,13 +327,15 @@ def edit_customer_submit():
 
     customer_data = App_Database.get_customer_data(customer_id)
 
-    App_Ui.edit_customer_name_display_label.setText(customer_data[1])
-    App_Ui.edit_customer_address_text_browser.setText(customer_data[2])
-    App_Ui.edit_customer_phone_display_label.setText(customer_data[3])
+    return (
+        App_Ui.edit_customer_name_display_label.setText(customer_data[1]),
+        App_Ui.edit_customer_address_text_browser.setText(customer_data[2]),
+        App_Ui.edit_customer_phone_display_label.setText(customer_data[3]),
+    )
 
 
 def new_user_submit():
-    """This function wll create a new user (employee object) and store it in the database."""
+    """Gets information for a new user and passes it to the database for storage."""
 
     new_user = App_Ui.username_new_user_input_box.text()
     new_pass = App_Ui.password_new_user_input_box.text()
@@ -401,29 +351,19 @@ def new_user_submit():
         or not validate.is_valid_password(new_pass)
         or not validate.is_valid_password(confirm_new_pass)
     ):
-        App_Ui.show_error("Invalid username or password!")
-
-        return
+        return App_Ui.show_error("Invalid username or password!")
 
     if App_Database.is_username_in_use(new_user):
-        App_Ui.show_error("Username already in use.")
-
-        return
+        return App_Ui.show_error("Username already in use.")
 
     if not new_pass == confirm_new_pass:
-        App_Ui.show_error("Passwords do not match!")
-
-        return
+        return App_Ui.show_error("Passwords do not match!")
 
     if not validate.is_valid_name(new_name):
-        App_Ui.show_error("Invalid name!")
-
-        return
+        return App_Ui.show_error("Invalid name!")
 
     if not validate.is_valid_team(new_team):
-        App_Ui.show_error("Invalid team!")
-
-        return
+        return App_Ui.show_error("Invalid team!")
 
     if App_Ui.new_user_tech_radio_button.isChecked():
         target_table = "technicians"
@@ -431,9 +371,7 @@ def new_user_submit():
         section_or_lane = App_Ui.new_user_section_input_box.text()
 
         if not validate.is_valid_name(section_or_lane):
-            App_Ui.show_error("Invalid section!")
-
-            return
+            return App_Ui.show_error("Invalid section!")
 
     if App_Ui.new_user_service_writer_radio_button.isChecked():
         target_table = "service_writers"
@@ -441,9 +379,7 @@ def new_user_submit():
         section_or_lane = App_Ui.new_user_lane_input_box.text()
 
         if not validate.is_valid_lane(section_or_lane):
-            App_Ui.show_error("Invalid lane!")
-
-            return
+            return App_Ui.show_error("Invalid lane!")
 
         int(section_or_lane)
 
@@ -464,11 +400,11 @@ def new_user_submit():
 
     App_Database.insert_user(inputs)
 
-    App_Ui.show_success("User input successfuly.")
+    return App_Ui.show_success("User input successfuly.")
 
 
 def new_repair_submit():
-    """This function will create a new repair and store it in the database."""
+    """Gets information for a new repair and passes it to the database for storage."""
 
     service_writer_id = App_Ui.new_repair_service_id_input_box.text()
     technician_id = App_Ui.new_repair_tech_id_input_box.text()
@@ -477,41 +413,27 @@ def new_repair_submit():
     problem_description = App_Ui.new_repair_description_input_box.toPlainText()
 
     if not validate.is_valid_id(service_writer_id):
-        App_Ui.show_error("Invalid service writer id.")
-
-        return
+        return App_Ui.show_error("Invalid service writer id.")
 
     if not validate.is_valid_id(technician_id):
-        App_Ui.show_error("Invalid technician id.")
-
-        return
+        return App_Ui.show_error("Invalid technician id.")
 
     if not validate.is_valid_vin(vin):
-        App_Ui.show_error("Invalid vin number.")
-
-        return
+        return App_Ui.show_error("Invalid vin number.")
 
     if not App_Database.get_vehicle_data(vin):
-        App_Ui.show_error(
+        return App_Ui.show_error(
             "A vehicle must be in the database to create a repair for it."
         )
 
-        return
-
     if not validate.is_valid_description(problem_description):
-        App_Ui.show_error("Invalid problem description.")
-
-        return
+        return App_Ui.show_error("Invalid problem description.")
 
     if not App_Database.vehicle_is_owned(vin):
-        App_Ui.show_error("The vehicle must first be owned by a customer.")
-
-        return
+        return App_Ui.show_error("The vehicle must first be owned by a customer.")
 
     if App_Database.has_active_repair(vin):
-        App_Ui.show_error("This vehicle already has an active repair.")
-
-        return
+        return App_Ui.show_error("This vehicle already has an active repair.")
 
     constructing_suffix = []
     constructing_suffix[:0] = drop_off_date
@@ -524,9 +446,7 @@ def new_repair_submit():
     repair_id = vin + repair_id_suffix
 
     if App_Database.search_for_repair(repair_id):
-        App_Ui.show_error("That Repair ID is already in use.")
-
-        return
+        return App_Ui.show_error("That Repair ID is already in use.")
 
     inputs = [
         repair_id,
@@ -547,11 +467,11 @@ def new_repair_submit():
 
     App_Database.update_vehicle_active_repair(vin, repair_id)
 
-    App_Ui.show_success("New repair input successfuly.")
+    return App_Ui.show_success("New repair input successfuly.")
 
 
 def update_password_submit():
-    """This function will update a user's (employee object) password within the database."""
+    """Gets a new password for the user and passes it to the database for storage."""
 
     user = App_Ui.update_password_username_input_box.text()
     old_pass = App_Ui.old_password_input_box.text()
@@ -559,28 +479,20 @@ def update_password_submit():
     confirm_new_pass = App_Ui.confirm_new_password_input_box.text()
 
     if not validate.is_valid_username(user) or not validate.is_valid_password(old_pass):
-        App_Ui.show_error("Invalid username or password!")
-
-        return
+        return App_Ui.show_error("Invalid username or password!")
 
     if new_pass != confirm_new_pass:
-        App_Ui.show_error("New passwords do not match!")
-
-        return
+        return App_Ui.show_error("New passwords do not match!")
 
     if not validate.is_valid_password(new_pass):
-        App_Ui.show_error("New password is invalid!")
-
-        return
+        return App_Ui.show_error("New password is invalid!")
 
     if App_Database.update_pass(user, old_pass, new_pass):
-        App_Ui.show_success("Password update successful.")
-
-        return
+        return App_Ui.show_success("Password update successful.")
 
 
 def edit_repair_submit():
-    """This function will update a repairs information within the database."""
+    """Gets new information for a repair and passes it to the database for storage."""
 
     new_service_writer_id = App_Ui.edit_repair_service_id_input_box.text()
     new_tech_id = App_Ui.edit_repair_tech_id_input_box.text()
@@ -593,28 +505,20 @@ def edit_repair_submit():
 
     if App_Ui.change_writer_check_box.isChecked():
         if not validate.is_valid_id(new_service_writer_id):
-            App_Ui.show_error("Invalid service writer ID.")
-
-            return
+            return App_Ui.show_error("Invalid service writer ID.")
 
     if App_Ui.change_tech_check_box.isChecked():
         if not validate.is_valid_id(new_tech_id):
-            App_Ui.show_error("Invalid technician ID.")
-
-            return
+            return App_Ui.show_error("Invalid technician ID.")
 
     if App_Ui.change_labor_check_box.isChecked():
         if not validate.is_valid_dollar_amount(new_labor_amount):
-            App_Ui.show_error("Invalid labor value.")
-
-            return
+            return App_Ui.show_error("Invalid labor value.")
 
     if not validate.is_valid_description(
         problem_description
     ) or not validate.is_valid_description(repair_description):
-        App_Ui.show_error("Invalid description entered.")
-
-        return
+        return App_Ui.show_error("Invalid description entered.")
 
     if App_Ui.change_writer_check_box.isChecked():
         App_Database.update_repair_service_writer(
@@ -627,7 +531,7 @@ def edit_repair_submit():
     if App_Ui.change_labor_check_box.isChecked():
         App_Database.update_labor_cost(repair_id, new_labor_amount)
 
-        total_cost = calcualte_total_cost(repair_id)
+        total_cost = calculate_total_cost(repair_id)
 
         App_Database.update_total_repair_cost(repair_id, total_cost)
 
@@ -638,12 +542,13 @@ def edit_repair_submit():
 
     repair_data = App_Database.search_for_repair(repair_id)
 
-    App_Ui.update_edit_repair_displays(repair_data)
+    return App_Ui.update_edit_repair_displays(repair_data)
 
 
 def finish_repair_submit():
-    """This function will update within the database that a repair has been finished
-    and moves it to the vehicles history information."""
+    """Gathers repair information, sets a completion date, passes that to the database for storage,
+    then has the database update employee assignments and moves the user to view the completed
+    repair page in the gui."""
 
     pass_confirm = App_Ui.confirm_repair_complete()
     compelting_repair_id = App_Ui.edit_repair_repair_id_display_label.text()
@@ -651,14 +556,10 @@ def finish_repair_submit():
     tech_id = App_Ui.edit_repair_tech_id_display_label.text()
 
     if not validate.is_valid_password(pass_confirm):
-        App_Ui.show_error("Invalid password.")
-
-        return
+        return App_Ui.show_error("Invalid password.")
 
     if not App_Database.is_current_users_password(pass_confirm):
-        App_Ui.show_error("Invalid password.")
-
-        return
+        return App_Ui.show_error("Invalid password.")
 
     compelted_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
@@ -679,40 +580,32 @@ def finish_repair_submit():
 
     App_Ui.update_old_repair_displays(repair_data, parts_list)
 
-    App_Ui.widget_stack.setCurrentIndex(7)
+    return App_Ui.widget_stack.setCurrentIndex(7)
 
 
 def update_user_submit():
-    """This function will update a user's (employee object) information within the database."""
+    """Gets information to update a user then passes it to the database for storage."""
 
     input_pass = App_Ui.update_user_password_input_box.text()
     target_id = App_Ui.update_user_user_id_display_label.text()
 
     if not validate.is_valid_password:
-        App_Ui.show_error("Invalid password.")
-
-        return
+        return App_Ui.show_error("Invalid password.")
 
     if not App_Database.is_current_users_password(input_pass):
-        App_Ui.show_error("Invalid password.")
-
-        return
+        return App_Ui.show_error("Invalid password.")
 
     if App_Ui.update_user_change_name_check_box.isChecked():
         new_name = App_Ui.update_user_name_input_box.text()
 
         if not validate.is_valid_name(new_name):
-            App_Ui.show_error("Invalid name input.")
-
-            return
+            return App_Ui.show_error("Invalid name input.")
 
     if App_Ui.update_user_change_team_check_box.isChecked():
         new_team = App_Ui.update_user_team_input_box.text()
 
         if not validate.is_valid_team(new_team):
-            App_Ui.show_error("Invalid team input.")
-
-            return
+            return App_Ui.show_error("Invalid team input.")
 
     if (
         App_Ui.update_user_tech_radio_button.isChecked()
@@ -721,9 +614,7 @@ def update_user_submit():
         new_lane_or_section = App_Ui.update_user_section_input_box.text()
 
         if not validate.is_valid_name(new_lane_or_section):
-            App_Ui.show_error("Invalid section input.")
-
-            return
+            return App_Ui.show_error("Invalid section input.")
 
     if (
         App_Ui.update_user_service_writer_radio_button.isChecked()
@@ -732,9 +623,7 @@ def update_user_submit():
         new_lane_or_section = App_Ui.update_user_lane_input_box.text()
 
         if not validate.is_valid_lane(new_lane_or_section):
-            App_Ui.show_error("Invalid lane input.")
-
-            return
+            return App_Ui.show_error("Invalid lane input.")
 
     if App_Ui.update_user_change_name_check_box.isChecked():
         App_Database.update_user_name(target_id, new_name)
@@ -758,27 +647,24 @@ def update_user_submit():
 
     user_data = App_Database.search_for_user(target_id)
 
-    App_Ui.show_user_search(user_data)
+    return App_Ui.show_user_search(user_data)
 
 
 def add_part_to_repair():
-    """This function will update a repair by adding a part to that repair,
-    then update the database."""
+    """Gets a part as input and sends it to the database to add to the current repair."""
 
     part_to_add = App_Ui.show_part_id_search_request_add()
     repair_id = App_Ui.edit_repair_repair_id_display_label.text()
 
+    # if the user clicked the cancel button
     if part_to_add is False:
         return
 
     if not validate.is_valid_id(part_to_add):
-        App_Ui.show_error("Invalid Part ID.")
-        return
+        return App_Ui.show_error("Invalid Part ID.")
 
     if not App_Database.get_part_data(part_to_add):
-        App_Ui.show_error("Part not found.")
-
-        return
+        return App_Ui.show_error("Part not found.")
 
     App_Database.update_required_parts_add(repair_id, part_to_add)
     parts_list = construct_repair_parts_list(repair_id)
@@ -786,7 +672,7 @@ def add_part_to_repair():
     parts_cost = calculate_parts_cost(repair_id)
     App_Database.update_repair_parts_cost(repair_id, parts_cost)
 
-    total_cost = calcualte_total_cost(repair_id)
+    total_cost = calculate_total_cost(repair_id)
     App_Database.update_total_repair_cost(repair_id, total_cost)
 
     repair_data = App_Database.search_for_repair(repair_id)
@@ -795,17 +681,18 @@ def add_part_to_repair():
     App_Ui.edit_repair_part_cost_display_label.setText(str(repair_data[3]))
     App_Ui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
-    App_Ui.show_success("Part added successfuly.")
+    return App_Ui.show_success("Part added successfuly.")
 
 
 def construct_repair_parts_list(repair_id):
-    """This function will construct a string containing the parts needed to complete
-    a repair."""
+    """Constructs a string containing the parts needed to complete
+    a repair based of repair id and data from database."""
 
     parts_list = ""
 
     repair_data = App_Database.search_for_repair(repair_id)
 
+    # use json loads to get a list from the database return value
     part_id_list = json.loads(repair_data[8])
 
     for part_id in part_id_list:
@@ -818,8 +705,9 @@ def construct_repair_parts_list(repair_id):
     return parts_list
 
 
-def calcualte_total_cost(repair_id):
-    """This function will calculate the total cost of a repair."""
+def calculate_total_cost(repair_id):
+    """Gets information from database based on passed repair id and then
+    calculates the total cost of a repair with that data."""
 
     repair_data = App_Database.search_for_repair(repair_id)
 
@@ -833,7 +721,7 @@ def calcualte_total_cost(repair_id):
 
 
 def calculate_parts_cost(repair_id):
-    """This function will calculate the parts cost of a repair."""
+    """Gets information from the data base to calculate the total cost of parts."""
 
     parts_cost = 0.0
 
@@ -850,38 +738,34 @@ def calculate_parts_cost(repair_id):
 
 
 def remove_part_from_repair():
-    """This function will update a repair by removing a part from that repair,
-    then update the database."""
+    """Gets information on what part to remoe from the repair then passes
+    that information to the database for update."""
 
     part_id_to_remove = App_Ui.show_part_id_search_request_remove()
     repair_id = App_Ui.edit_repair_repair_id_display_label.text()
 
+    # if the user hit the cancel button
     if part_id_to_remove is False:
         return
 
     if not validate.is_valid_id(part_id_to_remove):
-        App_Ui.show_error("Invalid Part ID.")
-        return
+        return App_Ui.show_error("Invalid Part ID.")
 
     if not App_Database.get_part_data(part_id_to_remove):
-        App_Ui.show_error("Part not found.")
-
-        return
+        return App_Ui.show_error("Part not found.")
 
     try:
         App_Database.update_required_parts_remove(repair_id, part_id_to_remove)
 
     except ValueError:
-        App_Ui.show_error("Repair does not have that part currently listed.")
-
-        return
+        return App_Ui.show_error("Repair does not have that part currently listed.")
 
     parts_list = construct_repair_parts_list(repair_id)
 
     parts_cost = calculate_parts_cost(repair_id)
     App_Database.update_repair_parts_cost(repair_id, parts_cost)
 
-    total_cost = calcualte_total_cost(repair_id)
+    total_cost = calculate_total_cost(repair_id)
     App_Database.update_total_repair_cost(repair_id, total_cost)
 
     repair_data = App_Database.search_for_repair(repair_id)
@@ -890,33 +774,30 @@ def remove_part_from_repair():
     App_Ui.edit_repair_total_repair_cost_display_label.setText(str(repair_data[1]))
     App_Ui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
-    App_Ui.show_success("Part successfuly removed.")
+    return App_Ui.show_success("Part successfuly removed.")
 
 
 def add_vehicle_to_customer_button():
-    """This function will update a customer by adding a vehicle object to their owned list,
-    then update the database."""
+    """Gets a vin and passes it to the database to add to a customers vehicle list."""
 
     vin_to_add = App_Ui.show_vin_search_request()
 
+    # if the user hit the cancel button
     if vin_to_add is False:
         return
 
     if not validate.is_valid_vin(vin_to_add):
-        App_Ui.show_error("Invalid VIN.")
-        return
+        return App_Ui.show_error("Invalid VIN.")
 
     if not App_Database.get_vehicle_data(vin_to_add):
-        App_Ui.show_error("Vehicle not found.")
-
-        return
+        return App_Ui.show_error("Vehicle not found.")
 
     customer_id = App_Ui.edit_customer_id_display_label.text()
 
     if App_Database.vehicle_is_owned(vin_to_add):
-        App_Ui.show_error("This or a different customer already owns that vehicle.")
-
-        return
+        return App_Ui.show_error(
+            "This or a different customer already owns that vehicle."
+        )
 
     App_Database.add_vehicle_to_customer(customer_id, vin_to_add)
 
@@ -933,26 +814,24 @@ def add_vehicle_to_customer_button():
 
     App_Ui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
-    App_Ui.show_success("Vehicle added.")
+    return App_Ui.show_success("Vehicle added.")
 
 
 def remove_vehicle_from_customer_button():
-    """This function will update a customer by removing a vehicle object from their owned list,
-    then update the database."""
+    """Gets a vin from the user and passes it to the database to remove it to that
+    customers vehicle list."""
 
     vin_to_remove = App_Ui.show_vin_search_request()
 
+    # If the user clicked the cancel button
     if vin_to_remove is False:
         return
 
     if not validate.is_valid_vin(vin_to_remove):
-        App_Ui.show_error("Invalid VIN.")
-        return
+        return App_Ui.show_error("Invalid VIN.")
 
     if not App_Database.get_vehicle_data(vin_to_remove):
-        App_Ui.show_error("Vehicle not found.")
-
-        return
+        return App_Ui.show_error("Vehicle not found.")
 
     customer_id = App_Ui.edit_customer_id_display_label.text()
 
@@ -960,9 +839,7 @@ def remove_vehicle_from_customer_button():
         App_Database.remove_vehicle_from_customer(customer_id, vin_to_remove)
 
     except ValueError:
-        App_Ui.show_error("Customer does not have ownership of that vehicle.")
-
-        return
+        return App_Ui.show_error("Customer does not have ownership of that vehicle.")
 
     customer_data = App_Database.get_customer_data(customer_id)
 
@@ -977,70 +854,63 @@ def remove_vehicle_from_customer_button():
 
     App_Ui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
-    App_Ui.show_success("Vehicle removed.")
+    return App_Ui.show_success("Vehicle removed.")
 
 
 def go_to_login_page():
-    """This function will show the login page to the user."""
+    """Takes user to login page."""
 
     App_Ui.widget_stack.setCurrentIndex(0)
 
 
 def logout_user():
-    """This function will log the current user out of the program."""
+    """Passes false to the login status in the database if the user is logged in,
+    then moves them to the login page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("Unable to logout, you are currently not logged in.")
-
-        return
+        return App_Ui.show_error("Unable to logout, you are currently not logged in.")
 
     App_Database.set_login_status(False)
 
     App_Ui.show_success("Logout successful.")
 
-    App_Ui.widget_stack.setCurrentIndex(0)
+    return App_Ui.widget_stack.setCurrentIndex(0)
 
 
 def go_to_new_user_page():
-    """This function will show the new user page to the user."""
+    """Takes the user to the new user page."""
 
     App_Ui.widget_stack.setCurrentIndex(1)
 
 
 def go_to_update_password_page():
-    """This function will show the update password page to the user."""
+    """Takes the user to the update password page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
+        return App_Ui.show_error("You must be logged in to access this page.")
 
-        return
-
-    App_Ui.widget_stack.setCurrentIndex(2)
+    return App_Ui.widget_stack.setCurrentIndex(2)
 
 
 def search_for_user():
-    """This function will show the requested user information to the user."""
+    """Gets a user id and passes it to the database to get that users data."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this function.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this function.")
 
     id_to_search = App_Ui.show_user_id_search_request()
 
+    # If the user clicked cancel
     if id_to_search is False:
         return
 
     if not validate.is_valid_id(id_to_search):
-        App_Ui.show_error("Invalid User ID.")
-        return
+        return App_Ui.show_error("Invalid User ID.")
 
     user_data = App_Database.search_for_user(id_to_search)
 
     if not user_data:
-        App_Ui.show_error("User not found!")
-
-        return
+        return App_Ui.show_error("User not found!")
 
     repair_data = json.loads(user_data[6])
 
@@ -1054,76 +924,67 @@ def search_for_user():
     for repair in repair_data:
         informaion_to_display = informaion_to_display + f"{repair}\n\n"
 
-    App_Ui.show_user_search(informaion_to_display)
+    return App_Ui.show_user_search(informaion_to_display)
 
 
 def go_to_update_user_page():
-    """This function will show the update user page to the user."""
+    """Takes the user to the update user page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     id_to_update = App_Ui.show_user_id_search_request()
 
+    # If the user clicked cancel
     if id_to_update is False:
         return
 
     if not validate.is_valid_id(id_to_update):
-        App_Ui.show_error("Invalid User ID.")
-        return
+        return App_Ui.show_error("Invalid User ID.")
 
     user_data = App_Database.search_for_user(id_to_update)
 
     if not user_data:
-        App_Ui.show_error("User not found!")
-
-        return
+        return App_Ui.show_error("User not found!")
 
     App_Ui.update_user_update_displays(user_data)
 
-    App_Ui.widget_stack.setCurrentIndex(3)
+    return App_Ui.widget_stack.setCurrentIndex(3)
 
 
 def go_to_new_repair_page():
-    """This function will show the new repair page to the user."""
+    """Takes the user to the new repair page and gets current date to display."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     drop_off_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
     App_Ui.new_repair_current_date_display.setText(drop_off_date)
 
-    App_Ui.widget_stack.setCurrentIndex(4)
+    return App_Ui.widget_stack.setCurrentIndex(4)
 
 
 def go_to_edit_repair_page():
-    """This function will show the edit repair page to the user."""
+    """Takes the user to the edit repair page, gets information from the database
+    based on entered repair id to populate the page with data."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     requested_repair_id = App_Ui.show_repair_id_search_request()
 
+    # If the user clicked cancel
     if requested_repair_id is False:
         return
 
     if not validate.is_valid_id(requested_repair_id):
-        App_Ui.show_error("Invalid Repair ID.")
-        return
+        return App_Ui.show_error("Invalid Repair ID.")
 
     repair_data = App_Database.search_for_repair(requested_repair_id)
 
     if not repair_data:
-        App_Ui.show_error("Repair not found.")
-
-        return
+        return App_Ui.show_error("Repair not found.")
 
     App_Ui.update_edit_repair_displays(repair_data)
 
@@ -1131,16 +992,15 @@ def go_to_edit_repair_page():
 
     App_Ui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
-    App_Ui.widget_stack.setCurrentIndex(5)
+    return App_Ui.widget_stack.setCurrentIndex(5)
 
 
 def go_to_active_repairs_page():
-    """This function will show the list of active repairs page to the user."""
+    """Takes the user to the active repairs page and gets all active repairs
+    from the database to populate the page.."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     repair_data = App_Database.get_all_repairs()
 
@@ -1156,92 +1016,82 @@ def go_to_active_repairs_page():
 
     App_Ui.update_active_repair_list(list_of_repairs)
 
-    App_Ui.widget_stack.setCurrentIndex(6)
+    return App_Ui.widget_stack.setCurrentIndex(6)
 
 
 def go_to_old_repair_page():
-    """This function will show the queried repair to the user on the old repair page."""
+    """Gets a repair id and passes it to the database to get information on an
+    old repair, then populates the page with its data."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     repair_id = App_Ui.show_repair_id_search_request()
 
+    # If the user clicked cancel
     if repair_id is False:
         return
 
     if not validate.is_valid_id(repair_id):
-        App_Ui.show_error("Invalid Repair ID.")
-        return
+        return App_Ui.show_error("Invalid Repair ID.")
 
     repair_data = App_Database.search_for_repair(repair_id)
 
     if not repair_data:
-        App_Ui.show_error("Repair not found.")
-
-        return
+        return App_Ui.show_error("Repair not found.")
 
     if repair_data[5] is None:
-        App_Ui.show_error("That repair is still underway.")
-
-        return
+        return App_Ui.show_error("That repair is still underway.")
 
     list_of_parts = construct_repair_parts_list(repair_id)
 
     App_Ui.update_old_repair_displays(repair_data, list_of_parts)
 
-    App_Ui.widget_stack.setCurrentIndex(7)
+    return App_Ui.widget_stack.setCurrentIndex(7)
 
 
 def go_to_new_part_page():
-    """This function will show the new part page to the user."""
+    """Takes the user to the new parts page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
+        return App_Ui.show_error("You must be logged in to access this page.")
 
-        return
-
-    App_Ui.widget_stack.setCurrentIndex(8)
+    return App_Ui.widget_stack.setCurrentIndex(8)
 
 
 def go_to_edit_part_page():
-    """This function will show the edit part page to the user."""
+    """Gets a part id to edit and passes it to the database to get
+    that part's information then passes the data to the GUI to update
+    the page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     part_id = App_Ui.show_part_id_search_request()
 
+    # If user clicked cancel
     if part_id is False:
         return
 
     if not validate.is_valid_id(part_id):
-        App_Ui.show_error("Invalid Part ID.")
-        return
+        return App_Ui.show_error("Invalid Part ID.")
 
     part_data = App_Database.get_part_data(part_id)
 
     if not part_data:
-        App_Ui.show_error("Part not found.")
-
-        return
+        return App_Ui.show_error("Part not found.")
 
     App_Ui.update_edit_part_page(part_data)
 
-    App_Ui.widget_stack.setCurrentIndex(9)
+    return App_Ui.widget_stack.setCurrentIndex(9)
 
 
 def go_to_list_of_parts_page():
-    """This function will show the list of parts page to the user."""
+    """Takes the user to the list of parts page and pulls all
+    part data from the database to pass the data to the GUI."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     parts_data = App_Database.get_all_parts_in_database()
 
@@ -1255,44 +1105,41 @@ def go_to_list_of_parts_page():
 
     App_Ui.list_of_parts_text_browser.setText(parts_list)
 
-    App_Ui.widget_stack.setCurrentIndex(10)
+    return App_Ui.widget_stack.setCurrentIndex(10)
 
 
 def go_to_new_customer_page():
-    """This function will show the new customer page to the user."""
+    """Takes the user to the new customer page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
+        return App_Ui.show_error("You must be logged in to access this page.")
 
-        return
-
-    App_Ui.widget_stack.setCurrentIndex(11)
+    return App_Ui.widget_stack.setCurrentIndex(11)
 
 
 def go_to_edit_customer_page():
-    """This function will show the new customer page to the user."""
+    """Gets a customer id and takes them to the edit customer page
+    uses the id to get customer information from the database and passes
+    it to the GUI to update the page data."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     customer_id = App_Ui.show_customer_id_search_request()
 
+    # if the user clicked cancel
     if customer_id is False:
         return
 
     if not validate.is_valid_id(customer_id):
-        App_Ui.show_error("Invalid Customer ID.")
-        return
+        return App_Ui.show_error("Invalid Customer ID.")
 
     customer_data = App_Database.get_customer_data(customer_id)
 
     if not customer_data:
-        App_Ui.show_error("Customer not found.")
+        return App_Ui.show_error("Customer not found.")
 
-        return
-
+    # Use json loads to get a list from database return
     list_of_vins = json.loads(customer_data[4])
 
     vehicle_data = []
@@ -1304,16 +1151,15 @@ def go_to_edit_customer_page():
 
     App_Ui.update_edit_customer_page(customer_data, list_of_vehicles)
 
-    App_Ui.widget_stack.setCurrentIndex(12)
+    return App_Ui.widget_stack.setCurrentIndex(12)
 
 
 def go_to_list_of_customers_page():
-    """This function will show the list of customer page to the user."""
+    """Takes the user to the list of customers page, gets information from database on
+    all customers and passes it to the GUI to populate data on the page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     customer_data = App_Database.get_all_customers()
 
@@ -1321,11 +1167,11 @@ def go_to_list_of_customers_page():
 
     App_Ui.list_of_customers_text_browser.setText(customer_list)
 
-    App_Ui.widget_stack.setCurrentIndex(13)
+    return App_Ui.widget_stack.setCurrentIndex(13)
 
 
 def construct_list_of_customers(customer_data):
-    """Constructs a string to display in the ui containing all customers in the
+    """Constructs a string to display in the ui containing all passed customers from the
     database."""
 
     customer_list = ""
@@ -1340,69 +1186,62 @@ def construct_list_of_customers(customer_data):
 
 
 def go_to_new_vehicle_page():
-    """This function will show the new vehicle page to the user."""
+    """Takes the user to the new vehicles page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
+        return App_Ui.show_error("You must be logged in to access this page.")
 
-        return
-
-    App_Ui.widget_stack.setCurrentIndex(14)
+    return App_Ui.widget_stack.setCurrentIndex(14)
 
 
 def go_to_edit_vehicle_page():
-    """This function will show the edit vehicle page to the user."""
+    """Gets a vin and takes the user to the edit vehicle page passes vin to database
+    to get that vehicles data and passes that data to the GUI to populate the page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     vin = App_Ui.show_vin_search_request()
 
+    # If the user clicked cancel
     if vin is False:
         return
 
     if not validate.is_valid_vin(vin):
-        App_Ui.show_error("Invalid VIN.")
-        return
+        return App_Ui.show_error("Invalid VIN.")
 
     vehicle_data = App_Database.get_vehicle_data(vin)
 
     if not vehicle_data:
-        App_Ui.show_error("Vehicle not found.")
-
-        return
+        return App_Ui.show_error("Vehicle not found.")
 
     App_Ui.update_edit_vehicle_page(vehicle_data)
 
-    App_Ui.widget_stack.setCurrentIndex(15)
+    return App_Ui.widget_stack.setCurrentIndex(15)
 
 
 def search_repair_history():
-    """This function will show the queried vehicle's history to the user."""
+    """Gets a vin and passes it to the database to get that vehicle's repair history
+    then passes it to the GUI to populate the message window."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this function.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this function.")
 
     vin_to_search = App_Ui.show_vin_search_request()
 
+    # If the user clicked cancel
     if vin_to_search is False:
         return
 
     if not validate.is_valid_vin(vin_to_search):
-        App_Ui.show_error("Invalid VIN.")
-        return
+        return App_Ui.show_error("Invalid VIN.")
 
     vehicle_data = App_Database.get_vehicle_data(vin_to_search)
 
     if not vehicle_data:
-        App_Ui.show_error("Vehicle not found.")
+        return App_Ui.show_error("Vehicle not found.")
 
-        return
-
+    # use json loads to get a list from database return
     repair_history = json.loads(vehicle_data[6])
 
     repair_info = f"VIN : {vin_to_search}\n\n--- Pior Repair IDs ---\n\n"
@@ -1410,16 +1249,15 @@ def search_repair_history():
     for repair in repair_history:
         repair_info = repair_info + (f"{repair}\n\n")
 
-    App_Ui.show_vehicle_repair_history(repair_info)
+    return App_Ui.show_vehicle_repair_history(repair_info)
 
 
 def go_to_list_of_vehicles_page():
-    """This function will show the list of vehicles page to the user."""
+    """Takes the user to the list of vehicles page, gets all vehicle data from
+    the database and passes it to the GUI to populate the page."""
 
     if not App_Database.get_login_status():
-        App_Ui.show_error("You must be logged in to access this page.")
-
-        return
+        return App_Ui.show_error("You must be logged in to access this page.")
 
     vehicle_data = App_Database.get_all_vehicles()
 
@@ -1427,11 +1265,11 @@ def go_to_list_of_vehicles_page():
 
     App_Ui.list_of_vehicles_text_browser.setText(vehicle_list)
 
-    App_Ui.widget_stack.setCurrentIndex(16)
+    return App_Ui.widget_stack.setCurrentIndex(16)
 
 
 def construct_vehicles_list(vehicle_data):
-    """Constructs a formated string for vehicle data for display."""
+    """Constructs a formated string of passed vehicle data for display."""
 
     vehicle_list = ""
 
@@ -1446,7 +1284,8 @@ def construct_vehicles_list(vehicle_data):
 
 
 def main():
-    """Main function of the program, displays the window to the user."""
+    """Main function of the program, calls setup of button handlers, shows the main app window
+    and instucts system to exit when GUI is closed."""
 
     setup_button_handlers()
     App_Main_Window.show()
