@@ -55,14 +55,14 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.password_login_input_box.setObjectName("password_login_input_box")
 
         self.username_login_label = QtWidgets.QLabel(self.login_page)
-        self.username_login_label.setGeometry(QtCore.QRect(370, 265, 101, 21))
+        self.username_login_label.setGeometry(QtCore.QRect(370, 270, 101, 21))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.username_login_label.setFont(font)
         self.username_login_label.setObjectName("username_login_label")
 
         self.password_login_label = QtWidgets.QLabel(self.login_page)
-        self.password_login_label.setGeometry(QtCore.QRect(370, 355, 101, 21))
+        self.password_login_label.setGeometry(QtCore.QRect(370, 360, 101, 21))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.password_login_label.setFont(font)
@@ -1888,10 +1888,8 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.username_login_label.setText(_translate("app_main_window", "Username"))
-        self.username_login_label.adjustSize()
 
         self.password_login_label.setText(_translate("app_main_window", "Password"))
-        self.password_login_label.adjustSize()
 
         self.login_page_submit_button.setText(_translate("app_main_window", "Submit"))
 
