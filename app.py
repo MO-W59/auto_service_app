@@ -6,7 +6,7 @@ import sys
 import json
 import datetime
 from passlib.hash import sha512_crypt
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 from gui import UiGarageTrackerMainWindow
 from data_interface import AppDatabase
 import validate
@@ -1291,7 +1291,7 @@ def main():
 
     setup_button_handlers()
     App_Main_Window.show()
-    sys.exit(App.exec_())
+    sys.exit(App.exec())
 
 
 if __name__ == "__main__":

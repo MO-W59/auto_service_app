@@ -16,7 +16,7 @@
 # After UI code production by PyQt5 UI code generator the code was spaced and linted.
 # Only minor changes following that.
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets
 
 # disable linter message due to using C extention
 # pylint: disable=c-extension-no-member
@@ -1788,64 +1788,64 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         app_main_window.setStatusBar(self.status_bar)
 
-        self.action_login = QtWidgets.QAction(app_main_window)
+        self.action_login = QtGui.QAction(app_main_window)
         self.action_login.setObjectName("action_login")
 
-        self.action_logout = QtWidgets.QAction(app_main_window)
+        self.action_logout = QtGui.QAction(app_main_window)
         self.action_logout.setObjectName("action_logout")
 
-        self.action_new_user = QtWidgets.QAction(app_main_window)
+        self.action_new_user = QtGui.QAction(app_main_window)
         self.action_new_user.setObjectName("action_new_user")
 
-        self.action_new_repair = QtWidgets.QAction(app_main_window)
+        self.action_new_repair = QtGui.QAction(app_main_window)
         self.action_new_repair.setObjectName("action_new_repair")
 
-        self.action_edit_repair = QtWidgets.QAction(app_main_window)
+        self.action_edit_repair = QtGui.QAction(app_main_window)
         self.action_edit_repair.setObjectName("action_edit_repair")
 
-        self.action_new_part = QtWidgets.QAction(app_main_window)
+        self.action_new_part = QtGui.QAction(app_main_window)
         self.action_new_part.setObjectName("action_new_part")
 
-        self.action_edit_part = QtWidgets.QAction(app_main_window)
+        self.action_edit_part = QtGui.QAction(app_main_window)
         self.action_edit_part.setObjectName("action_edit_part")
 
-        self.action_new_customer = QtWidgets.QAction(app_main_window)
+        self.action_new_customer = QtGui.QAction(app_main_window)
         self.action_new_customer.setObjectName("action_new_customer")
 
-        self.action_edit_customer = QtWidgets.QAction(app_main_window)
+        self.action_edit_customer = QtGui.QAction(app_main_window)
         self.action_edit_customer.setObjectName("action_edit_customer")
 
-        self.action_new_vehicle = QtWidgets.QAction(app_main_window)
+        self.action_new_vehicle = QtGui.QAction(app_main_window)
         self.action_new_vehicle.setObjectName("action_new_vehicle")
 
-        self.action_edit_vehicle = QtWidgets.QAction(app_main_window)
+        self.action_edit_vehicle = QtGui.QAction(app_main_window)
         self.action_edit_vehicle.setObjectName("action_edit_vehicle")
 
-        self.action_update_password = QtWidgets.QAction(app_main_window)
+        self.action_update_password = QtGui.QAction(app_main_window)
         self.action_update_password.setObjectName("action_update_password")
 
-        self.action_active_repairs = QtWidgets.QAction(app_main_window)
+        self.action_active_repairs = QtGui.QAction(app_main_window)
         self.action_active_repairs.setObjectName("action_active_repairs")
 
-        self.action_list_of_parts = QtWidgets.QAction(app_main_window)
+        self.action_list_of_parts = QtGui.QAction(app_main_window)
         self.action_list_of_parts.setObjectName("action_list_of_parts")
 
-        self.action_get_repair_history = QtWidgets.QAction(app_main_window)
+        self.action_get_repair_history = QtGui.QAction(app_main_window)
         self.action_get_repair_history.setObjectName("action_get_repair_history")
 
-        self.action_list_of_customers = QtWidgets.QAction(app_main_window)
+        self.action_list_of_customers = QtGui.QAction(app_main_window)
         self.action_list_of_customers.setObjectName("action_list_of_customers")
 
-        self.action_list_of_vehicles = QtWidgets.QAction(app_main_window)
+        self.action_list_of_vehicles = QtGui.QAction(app_main_window)
         self.action_list_of_vehicles.setObjectName("action_list_of_vehicles")
 
-        self.action_display_old_repair = QtWidgets.QAction(app_main_window)
+        self.action_display_old_repair = QtGui.QAction(app_main_window)
         self.action_display_old_repair.setObjectName("action_display_old_repair")
 
-        self.action_search_user = QtWidgets.QAction(app_main_window)
+        self.action_search_user = QtGui.QAction(app_main_window)
         self.action_search_user.setObjectName("action_search_user")
 
-        self.action_update_user = QtWidgets.QAction(app_main_window)
+        self.action_update_user = QtGui.QAction(app_main_window)
         self.action_update_user.setObjectName("action_update_user")
 
         self.menu_users.addAction(self.action_login)
@@ -2462,20 +2462,20 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         separate window."""
 
         error_window = QtWidgets.QMessageBox()
-        error_window.setIcon(QtWidgets.QMessageBox.Critical)
+        error_window.setIcon(QtWidgets.QMessageBox.Icon.Critical)
         error_window.setText(error)
         error_window.setWindowTitle("ERROR!")
-        error_window.exec_()
+        error_window.exec()
 
     def show_success(self, message):
         """This function will display the passed error message to the user in a
         separate window."""
 
         success_window = QtWidgets.QMessageBox()
-        success_window.setIcon(QtWidgets.QMessageBox.NoIcon)
+        success_window.setIcon(QtWidgets.QMessageBox.Icon.NoIcon)
         success_window.setText(message)
         success_window.setWindowTitle("Success")
-        success_window.exec_()
+        success_window.exec()
 
     def show_user_id_search_request(self):
         """This function will display an input box to the user to obtain the information
@@ -2590,19 +2590,19 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         """This function will display the passed user data to the user."""
 
         result_window = QtWidgets.QMessageBox()
-        result_window.setIcon(QtWidgets.QMessageBox.NoIcon)
+        result_window.setIcon(QtWidgets.QMessageBox.Icon.NoIcon)
         result_window.setText(information_to_display)
         result_window.setWindowTitle("Search Result")
-        result_window.exec_()
+        result_window.exec()
 
     def show_vehicle_repair_history(self, repair_info):
         """Shows a message window to the user containing the requested vehicles repair history."""
 
         result_window = QtWidgets.QMessageBox()
-        result_window.setIcon(QtWidgets.QMessageBox.NoIcon)
+        result_window.setIcon(QtWidgets.QMessageBox.Icon.NoIcon)
         result_window.setText(repair_info)
         result_window.setWindowTitle("Repair History")
-        result_window.exec_()
+        result_window.exec()
 
     def update_active_repair_list(self, list_of_repairs):
         """This function will display the active repairs repair data to the user."""
