@@ -32,9 +32,8 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         super().__init__()
 
         app_main_window.setObjectName("app_main_window")
-        app_main_window.resize(950, 950)
+        app_main_window.setFixedSize(950, 950)
         app_main_window.setAutoFillBackground(False)
-
         app_main_window.setStyleSheet("background-color: rgb(30, 30, 30); color: white")
 
         self.centralwidget = QtWidgets.QWidget(app_main_window)
@@ -128,7 +127,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.new_user_note_label.setWordWrap(True)
         self.new_user_note_label.setObjectName("new_user_note_label")
         self.new_user_note2_label = QtWidgets.QLabel(self.new_user_page)
-        self.new_user_note2_label.setGeometry(QtCore.QRect(640, 570, 111, 61))
+        self.new_user_note2_label.setGeometry(QtCore.QRect(640, 570, 111, 80))
         self.new_user_note2_label.setWordWrap(True)
         self.new_user_note2_label.setObjectName("new_user_note2_label")
 
@@ -233,7 +232,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.update_password_note2_label = QtWidgets.QLabel(self.update_password_page)
-        self.update_password_note2_label.setGeometry(QtCore.QRect(390, 740, 111, 61))
+        self.update_password_note2_label.setGeometry(QtCore.QRect(390, 740, 111, 80))
         self.update_password_note2_label.setWordWrap(True)
         self.update_password_note2_label.setObjectName("update_password_note2_label")
 
