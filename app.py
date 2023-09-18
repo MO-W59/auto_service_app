@@ -12,10 +12,10 @@ from data_interface import AppDatabase
 import validate
 
 # vvv--- TODO list ---vvv
+# hide password text in password input boxes
 # Enable submition of information when hitting the enter key
 # use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
 # !!?? use dictionary of functions to eliminate multiple if branches ??!!
-# implement while loops to keep asking for id/vin for searches when the user does not hit cancel but enters an invalid value
 # ensure the titles of the message/error windows can be read and are not cut off.
 # use dictionaries instead of lists for large inputs?
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
@@ -36,10 +36,9 @@ import validate
 # protect against SQL race condition, options -> thread lock? queue? connection pool?
 # consolidate code as much as possible --> edit customer submit make a update customer edit page function
 # search for bugs
-# fix code formating
-# update doc strings
+# update doc strings to describe things better
 # change naming conventions to uniform naming conventions
-# place comments
+# place comments where needed because you didnt do it at time of writing
 # handle too many lines in module linter flags
 
 
@@ -653,18 +652,26 @@ def update_user_submit():
 def add_part_to_repair():
     """Gets a part as input and sends it to the database to add to the current repair."""
 
-    part_to_add = App_Ui.show_part_id_search_request_add()
     repair_id = App_Ui.edit_repair_repair_id_display_label.text()
 
-    # if the user clicked the cancel button
-    if part_to_add is False:
-        return
+    while True:
+        part_to_add = App_Ui.show_part_id_search_request_add()
 
-    if not validate.is_valid_id(part_to_add):
-        return App_Ui.show_error("Invalid Part ID.")
+        # if the user clicked the cancel button
+        if part_to_add is False:
+            return
 
-    if not App_Database.get_part_data(part_to_add):
-        return App_Ui.show_error("Part not found.")
+        if not validate.is_valid_id(part_to_add):
+            App_Ui.show_error("Invalid Part ID.")
+
+            continue
+
+        if not App_Database.get_part_data(part_to_add):
+            App_Ui.show_error("Part not found.")
+
+            continue
+
+        break
 
     App_Database.update_required_parts_add(repair_id, part_to_add)
     parts_list = construct_repair_parts_list(repair_id)
@@ -741,24 +748,34 @@ def remove_part_from_repair():
     """Gets information on what part to remoe from the repair then passes
     that information to the database for update."""
 
-    part_id_to_remove = App_Ui.show_part_id_search_request_remove()
     repair_id = App_Ui.edit_repair_repair_id_display_label.text()
 
-    # if the user hit the cancel button
-    if part_id_to_remove is False:
-        return
+    while True:
+        part_id_to_remove = App_Ui.show_part_id_search_request_remove()
 
-    if not validate.is_valid_id(part_id_to_remove):
-        return App_Ui.show_error("Invalid Part ID.")
+        # if the user hit the cancel button
+        if part_id_to_remove is False:
+            return
 
-    if not App_Database.get_part_data(part_id_to_remove):
-        return App_Ui.show_error("Part not found.")
+        if not validate.is_valid_id(part_id_to_remove):
+            App_Ui.show_error("Invalid Part ID.")
 
-    try:
-        App_Database.update_required_parts_remove(repair_id, part_id_to_remove)
+            continue
 
-    except ValueError:
-        return App_Ui.show_error("Repair does not have that part currently listed.")
+        if not App_Database.get_part_data(part_id_to_remove):
+            App_Ui.show_error("Part not found.")
+
+            continue
+
+        try:
+            App_Database.update_required_parts_remove(repair_id, part_id_to_remove)
+
+        except ValueError:
+            App_Ui.show_error("Repair does not have that part currently listed.")
+
+            continue
+
+        break
 
     parts_list = construct_repair_parts_list(repair_id)
 
@@ -780,24 +797,31 @@ def remove_part_from_repair():
 def add_vehicle_to_customer_button():
     """Gets a vin and passes it to the database to add to a customers vehicle list."""
 
-    vin_to_add = App_Ui.show_vin_search_request()
-
-    # if the user hit the cancel button
-    if vin_to_add is False:
-        return
-
-    if not validate.is_valid_vin(vin_to_add):
-        return App_Ui.show_error("Invalid VIN.")
-
-    if not App_Database.get_vehicle_data(vin_to_add):
-        return App_Ui.show_error("Vehicle not found.")
-
     customer_id = App_Ui.edit_customer_id_display_label.text()
 
-    if App_Database.vehicle_is_owned(vin_to_add):
-        return App_Ui.show_error(
-            "This or a different customer already owns that vehicle."
-        )
+    while True:
+        vin_to_add = App_Ui.show_vin_search_request()
+
+        # if the user hit the cancel button
+        if vin_to_add is False:
+            return
+
+        if not validate.is_valid_vin(vin_to_add):
+            App_Ui.show_error("Invalid VIN.")
+
+            continue
+
+        if not App_Database.get_vehicle_data(vin_to_add):
+            App_Ui.show_error("Vehicle not found.")
+
+            continue
+
+        if App_Database.vehicle_is_owned(vin_to_add):
+            App_Ui.show_error("This or a different customer already owns that vehicle.")
+
+            continue
+
+        break
 
     App_Database.add_vehicle_to_customer(customer_id, vin_to_add)
 
@@ -821,25 +845,34 @@ def remove_vehicle_from_customer_button():
     """Gets a vin from the user and passes it to the database to remove it to that
     customers vehicle list."""
 
-    vin_to_remove = App_Ui.show_vin_search_request()
-
-    # If the user clicked the cancel button
-    if vin_to_remove is False:
-        return
-
-    if not validate.is_valid_vin(vin_to_remove):
-        return App_Ui.show_error("Invalid VIN.")
-
-    if not App_Database.get_vehicle_data(vin_to_remove):
-        return App_Ui.show_error("Vehicle not found.")
-
     customer_id = App_Ui.edit_customer_id_display_label.text()
 
-    try:
-        App_Database.remove_vehicle_from_customer(customer_id, vin_to_remove)
+    while True:
+        vin_to_remove = App_Ui.show_vin_search_request()
 
-    except ValueError:
-        return App_Ui.show_error("Customer does not have ownership of that vehicle.")
+        # If the user clicked the cancel button
+        if vin_to_remove is False:
+            return
+
+        if not validate.is_valid_vin(vin_to_remove):
+            App_Ui.show_error("Invalid VIN.")
+
+            continue
+
+        if not App_Database.get_vehicle_data(vin_to_remove):
+            App_Ui.show_error("Vehicle not found.")
+
+            continue
+
+        try:
+            App_Database.remove_vehicle_from_customer(customer_id, vin_to_remove)
+
+        except ValueError:
+            App_Ui.show_error("Customer does not have ownership of that vehicle.")
+
+            continue
+
+        break
 
     customer_data = App_Database.get_customer_data(customer_id)
 
@@ -898,19 +931,26 @@ def search_for_user():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this function.")
 
-    id_to_search = App_Ui.show_user_id_search_request()
+    while True:
+        id_to_search = App_Ui.show_user_id_search_request()
 
-    # If the user clicked cancel
-    if id_to_search is False:
-        return
+        # If the user clicked cancel
+        if id_to_search is False:
+            return
 
-    if not validate.is_valid_id(id_to_search):
-        return App_Ui.show_error("Invalid User ID.")
+        if not validate.is_valid_id(id_to_search):
+            App_Ui.show_error("Invalid User ID.")
 
-    user_data = App_Database.search_for_user(id_to_search)
+            continue
 
-    if not user_data:
-        return App_Ui.show_error("User not found!")
+        user_data = App_Database.search_for_user(id_to_search)
+
+        if not user_data:
+            App_Ui.show_error("User not found!")
+
+            continue
+
+        break
 
     repair_data = json.loads(user_data[6])
 
@@ -933,19 +973,26 @@ def go_to_update_user_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    id_to_update = App_Ui.show_user_id_search_request()
+    while True:
+        id_to_update = App_Ui.show_user_id_search_request()
 
-    # If the user clicked cancel
-    if id_to_update is False:
-        return
+        # If the user clicked cancel
+        if id_to_update is False:
+            return
 
-    if not validate.is_valid_id(id_to_update):
-        return App_Ui.show_error("Invalid User ID.")
+        if not validate.is_valid_id(id_to_update):
+            App_Ui.show_error("Invalid User ID.")
 
-    user_data = App_Database.search_for_user(id_to_update)
+            continue
 
-    if not user_data:
-        return App_Ui.show_error("User not found!")
+        user_data = App_Database.search_for_user(id_to_update)
+
+        if not user_data:
+            App_Ui.show_error("User not found!")
+
+            continue
+
+        break
 
     App_Ui.update_user_update_displays(user_data)
 
@@ -972,19 +1019,26 @@ def go_to_edit_repair_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    requested_repair_id = App_Ui.show_repair_id_search_request()
+    while True:
+        requested_repair_id = App_Ui.show_repair_id_search_request()
 
-    # If the user clicked cancel
-    if requested_repair_id is False:
-        return
+        # If the user clicked cancel
+        if requested_repair_id is False:
+            return
 
-    if not validate.is_valid_id(requested_repair_id):
-        return App_Ui.show_error("Invalid Repair ID.")
+        if not validate.is_valid_id(requested_repair_id):
+            App_Ui.show_error("Invalid Repair ID.")
 
-    repair_data = App_Database.search_for_repair(requested_repair_id)
+            continue
 
-    if not repair_data:
-        return App_Ui.show_error("Repair not found.")
+        repair_data = App_Database.search_for_repair(requested_repair_id)
+
+        if not repair_data:
+            App_Ui.show_error("Repair not found.")
+
+            continue
+
+        break
 
     App_Ui.update_edit_repair_displays(repair_data)
 
@@ -1026,22 +1080,31 @@ def go_to_old_repair_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    repair_id = App_Ui.show_repair_id_search_request()
+    while True:
+        repair_id = App_Ui.show_repair_id_search_request()
 
-    # If the user clicked cancel
-    if repair_id is False:
-        return
+        # If the user clicked cancel
+        if repair_id is False:
+            return
 
-    if not validate.is_valid_id(repair_id):
-        return App_Ui.show_error("Invalid Repair ID.")
+        if not validate.is_valid_id(repair_id):
+            App_Ui.show_error("Invalid Repair ID.")
 
-    repair_data = App_Database.search_for_repair(repair_id)
+            continue
 
-    if not repair_data:
-        return App_Ui.show_error("Repair not found.")
+        repair_data = App_Database.search_for_repair(repair_id)
 
-    if repair_data[5] is None:
-        return App_Ui.show_error("That repair is still underway.")
+        if not repair_data:
+            App_Ui.show_error("Repair not found.")
+
+            continue
+
+        if repair_data[5] is None:
+            App_Ui.show_error("That repair is still underway.")
+
+            continue
+
+        break
 
     list_of_parts = construct_repair_parts_list(repair_id)
 
@@ -1067,19 +1130,26 @@ def go_to_edit_part_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    part_id = App_Ui.show_part_id_search_request()
+    while True:
+        part_id = App_Ui.show_part_id_search_request()
 
-    # If user clicked cancel
-    if part_id is False:
-        return
+        # If user clicked cancel
+        if part_id is False:
+            return
 
-    if not validate.is_valid_id(part_id):
-        return App_Ui.show_error("Invalid Part ID.")
+        if not validate.is_valid_id(part_id):
+            App_Ui.show_error("Invalid Part ID.")
 
-    part_data = App_Database.get_part_data(part_id)
+            continue
 
-    if not part_data:
-        return App_Ui.show_error("Part not found.")
+        part_data = App_Database.get_part_data(part_id)
+
+        if not part_data:
+            App_Ui.show_error("Part not found.")
+
+            continue
+
+        break
 
     App_Ui.update_edit_part_page(part_data)
 
@@ -1125,19 +1195,26 @@ def go_to_edit_customer_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    customer_id = App_Ui.show_customer_id_search_request()
+    while True:
+        customer_id = App_Ui.show_customer_id_search_request()
 
-    # if the user clicked cancel
-    if customer_id is False:
-        return
+        # if the user clicked cancel
+        if customer_id is False:
+            return
 
-    if not validate.is_valid_id(customer_id):
-        return App_Ui.show_error("Invalid Customer ID.")
+        if not validate.is_valid_id(customer_id):
+            App_Ui.show_error("Invalid Customer ID.")
 
-    customer_data = App_Database.get_customer_data(customer_id)
+            continue
 
-    if not customer_data:
-        return App_Ui.show_error("Customer not found.")
+        customer_data = App_Database.get_customer_data(customer_id)
+
+        if not customer_data:
+            App_Ui.show_error("Customer not found.")
+
+            continue
+
+        break
 
     # Use json loads to get a list from database return
     list_of_vins = json.loads(customer_data[4])
@@ -1201,19 +1278,26 @@ def go_to_edit_vehicle_page():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this page.")
 
-    vin = App_Ui.show_vin_search_request()
+    while True:
+        vin = App_Ui.show_vin_search_request()
 
-    # If the user clicked cancel
-    if vin is False:
-        return
+        # If the user clicked cancel
+        if vin is False:
+            return
 
-    if not validate.is_valid_vin(vin):
-        return App_Ui.show_error("Invalid VIN.")
+        if not validate.is_valid_vin(vin):
+            App_Ui.show_error("Invalid VIN.")
 
-    vehicle_data = App_Database.get_vehicle_data(vin)
+            continue
 
-    if not vehicle_data:
-        return App_Ui.show_error("Vehicle not found.")
+        vehicle_data = App_Database.get_vehicle_data(vin)
+
+        if not vehicle_data:
+            App_Ui.show_error("Vehicle not found.")
+
+            continue
+
+        break
 
     App_Ui.update_edit_vehicle_page(vehicle_data)
 
@@ -1227,20 +1311,26 @@ def search_repair_history():
     if not App_Database.get_login_status():
         return App_Ui.show_error("You must be logged in to access this function.")
 
-    vin_to_search = App_Ui.show_vin_search_request()
+    while True:
+        vin_to_search = App_Ui.show_vin_search_request()
 
-    # If the user clicked cancel
-    if vin_to_search is False:
-        return
+        # If the user clicked cancel
+        if vin_to_search is False:
+            return
 
-    if not validate.is_valid_vin(vin_to_search):
-        return App_Ui.show_error("Invalid VIN.")
+        if not validate.is_valid_vin(vin_to_search):
+            App_Ui.show_error("Invalid VIN.")
 
-    vehicle_data = App_Database.get_vehicle_data(vin_to_search)
+            continue
 
-    if not vehicle_data:
-        return App_Ui.show_error("Vehicle not found.")
+        vehicle_data = App_Database.get_vehicle_data(vin_to_search)
 
+        if not vehicle_data:
+            App_Ui.show_error("Vehicle not found.")
+
+            continue
+
+        break
     # use json loads to get a list from database return
     repair_history = json.loads(vehicle_data[6])
 
