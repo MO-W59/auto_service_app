@@ -50,6 +50,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.username_login_input_box.setObjectName("username_login_input_box")
 
         self.password_login_input_box = QtWidgets.QLineEdit(self.login_page)
+        self.password_login_input_box.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.password_login_input_box.setGeometry(QtCore.QRect(370, 390, 171, 31))
         self.password_login_input_box.setObjectName("password_login_input_box")
 
@@ -72,6 +73,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         font = QtGui.QFont()
         font.setPointSize(12)
         self.login_page_submit_button.setFont(font)
+        self.login_page_submit_button.setAutoDefault(True)
         self.login_page_submit_button.setObjectName("login_page_submit_button")
 
         self.widget_stack.addWidget(self.login_page)
@@ -92,6 +94,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.password_new_user_input_box = QtWidgets.QLineEdit(self.new_user_page)
         self.password_new_user_input_box.setGeometry(QtCore.QRect(610, 310, 171, 31))
+        self.password_new_user_input_box.setEchoMode(
+            QtWidgets.QLineEdit.EchoMode.Password
+        )
         self.password_new_user_input_box.setObjectName("password_new_user_input_box")
 
         self.password_new_user_label = QtWidgets.QLabel(self.new_user_page)
@@ -106,6 +111,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
         self.confirm_password_new_user_input_box.setGeometry(
             QtCore.QRect(610, 400, 171, 31)
+        )
+        self.confirm_password_new_user_input_box.setEchoMode(
+            QtWidgets.QLineEdit.EchoMode.Password
         )
         self.confirm_password_new_user_input_box.setObjectName(
             "confirm_password_new_user_input_box"
@@ -218,6 +226,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.new_password_input_box = QtWidgets.QLineEdit(self.update_password_page)
         self.new_password_input_box.setGeometry(QtCore.QRect(370, 480, 171, 31))
+        self.new_password_input_box.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.new_password_input_box.setObjectName("new_password_input_box")
 
         self.update_password_username_label = QtWidgets.QLabel(
@@ -260,6 +269,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.old_password_input_box = QtWidgets.QLineEdit(self.update_password_page)
         self.old_password_input_box.setGeometry(QtCore.QRect(370, 390, 171, 31))
+        self.old_password_input_box.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.old_password_input_box.setObjectName("old_password_input_box")
 
         self.old_password_label = QtWidgets.QLabel(self.update_password_page)
@@ -281,6 +291,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
         self.confirm_new_password_input_box.setGeometry(QtCore.QRect(370, 570, 171, 31))
         self.confirm_new_password_input_box.setText("")
+        self.confirm_new_password_input_box.setEchoMode(
+            QtWidgets.QLineEdit.EchoMode.Password
+        )
         self.confirm_new_password_input_box.setObjectName(
             "confirm_new_password_input_box"
         )
@@ -303,6 +316,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.update_user_password_input_box = QtWidgets.QLineEdit(self.update_user_page)
         self.update_user_password_input_box.setGeometry(QtCore.QRect(390, 650, 171, 31))
+        self.update_user_password_input_box.setEchoMode(
+            QtWidgets.QLineEdit.EchoMode.Password
+        )
         self.update_user_password_input_box.setObjectName(
             "update_user_password_input_box"
         )
