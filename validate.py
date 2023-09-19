@@ -170,13 +170,13 @@ def is_valid_dollar_amount(value):
     """This function will validate a passed value to check if it is a valid
     dollar amount."""
 
-    if not value or value < 0:
-        return False
-
     try:
-        float(value)
+        value = float(value)
 
     except ValueError:
+        return False
+
+    if not value or value < 0:
         return False
 
     return True

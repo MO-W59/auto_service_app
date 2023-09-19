@@ -1,4 +1,4 @@
-"""This module contains all the logic to handle user operations in the application."""
+"""This module contains all the logic to handle user events in the application."""
 
 import json
 from passlib.hash import sha512_crypt
@@ -114,8 +114,13 @@ def update_password_submit(database, gui):
     if not validate.is_valid_password(new_pass):
         return gui.show_error("New password is invalid!")
 
+    if old_pass == new_pass:
+        return gui.show_error("New password can not be the same as the old password!")
+
     if database.update_pass(username, old_pass, new_pass):
         return gui.show_success("Password update successful.")
+
+    return gui.show_error("Invalid username or password!")
 
 
 def update_user_submit(database, gui):
