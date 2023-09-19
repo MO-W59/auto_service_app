@@ -423,7 +423,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.need_password_label = QtWidgets.QLabel(self.update_user_page)
-        self.need_password_label.setGeometry(QtCore.QRect(390, 590, 171, 16))
+        self.need_password_label.setGeometry(QtCore.QRect(390, 590, 180, 16))
         self.need_password_label.setObjectName("need_password_label")
 
         self.update_user_user_id_label = QtWidgets.QLabel(self.update_user_page)
@@ -2637,7 +2637,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.update_user_lane_display_label.setText("N/A")
 
         if user_data[0].startswith("w"):
-            self.update_user_lane_display_label.setText(user_data[5])
+            self.update_user_lane_display_label.setText(str(user_data[5]))
             self.update_user_section_display_label.setText("N/A")
 
     def update_edit_repair_displays(self, repair_data):

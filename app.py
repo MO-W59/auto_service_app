@@ -12,6 +12,8 @@ import validate
 import user
 
 # vvv--- TODO list ---vvv
+# Migrate repairs, parts, vehicle, customers logic to new modules
+# Check update password for bugs --> can update to same password currently used.
 # Enable submition of information when hitting the enter key
 # use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
 # !!?? use dictionary of functions to eliminate multiple if branches ??!!
@@ -61,10 +63,22 @@ def setup_button_handlers():
     with their repective functions."""
 
     # submit, add, remove buttons
+    # user items
     # login page
     App_Ui.login_page_submit_button.clicked.connect(login_submit)
-    App_Ui.username_login_input_box.returnPressed.connect(login_submit)
     App_Ui.password_login_input_box.returnPressed.connect(login_submit)
+
+    # new user page
+    App_Ui.new_user_page_submit_button.clicked.connect(new_user_submit)
+    App_Ui.confirm_password_new_user_input_box.returnPressed.connect(new_user_submit)
+
+    # update password page
+    App_Ui.update_password_submit_button.clicked.connect(update_password_submit)
+    App_Ui.confirm_new_password_input_box.returnPressed.connect(update_password_submit)
+
+    # update user page
+    App_Ui.update_user_page_submit_button.clicked.connect(update_user_submit)
+    App_Ui.update_user_password_input_box.returnPressed.connect(update_user_submit)
 
     App_Ui.new_part_submit_button.clicked.connect(create_part_submit)
     App_Ui.edit_part_submit_button.clicked.connect(edit_part_submit)
@@ -72,12 +86,9 @@ def setup_button_handlers():
     App_Ui.edit_vehicle_submit_button.clicked.connect(edit_vehicle_submit)
     App_Ui.new_customer_submit_button.clicked.connect(new_customer_submit)
     App_Ui.edit_customer_submit_button.clicked.connect(edit_customer_submit)
-    App_Ui.new_user_page_submit_button.clicked.connect(new_user_submit)
     App_Ui.new_repair_page_submit_button.clicked.connect(new_repair_submit)
-    App_Ui.update_password_submit_button.clicked.connect(update_password_submit)
     App_Ui.edit_repair_page_submit_complete_button.clicked.connect(finish_repair_submit)
     App_Ui.edit_repair_page_submit_update_button.clicked.connect(edit_repair_submit)
-    App_Ui.update_user_page_submit_button.clicked.connect(update_user_submit)
     App_Ui.edit_repair_add_part_button.clicked.connect(add_part_to_repair)
     App_Ui.edit_repair_remove_part_button.clicked.connect(remove_part_from_repair)
     App_Ui.edit_customer_add_vehicle_button.clicked.connect(
@@ -115,24 +126,6 @@ def login_submit():
     to Database."""
 
     user.login_submit(App_Database, App_Ui)
-
-
-#
-#   if App_Database.get_login_status():
-#       return App_Ui.show_error("You are already logged in!")
-#
-#   input_user = App_Ui.username_login_input_box.text()
-#   input_pass = App_Ui.password_login_input_box.text()
-#
-#   if not validate.is_valid_username(input_user) and validate.is_valid_password(
-#       input_pass
-#   ):
-#       return App_Ui.show_error("Invalid username or password!")
-#
-#   if App_Database.is_valid_login_query(input_user, input_pass):
-#       return App_Ui.show_success("Login successful.")
-#
-#   return App_Ui.show_error("Invalid username or password!")
 
 
 def create_part_submit():
@@ -346,72 +339,6 @@ def new_user_submit():
     user.new_user_submit(App_Database, App_Ui)
 
 
-#    new_user = App_Ui.username_new_user_input_box.text()
-#    new_pass = App_Ui.password_new_user_input_box.text()
-#    confirm_new_pass = App_Ui.confirm_password_new_user_input_box.text()
-#    new_name = App_Ui.new_user_name_input_box.text()
-#    new_team = App_Ui.new_user_team_input_box.text()
-#    section_or_lane = None
-#    target_table = None
-#    assigned_repairs = []
-#
-#    if (
-#        not validate.is_valid_username(new_user)
-#        or not validate.is_valid_password(new_pass)
-#        or not validate.is_valid_password(confirm_new_pass)
-#    ):
-#        return App_Ui.show_error("Invalid username or password!")
-#
-#    if App_Database.is_username_in_use(new_user):
-#        return App_Ui.show_error("Username already in use.")
-#
-#    if not new_pass == confirm_new_pass:
-#        return App_Ui.show_error("Passwords do not match!")
-#
-#    if not validate.is_valid_name(new_name):
-#        return App_Ui.show_error("Invalid name!")
-#
-#    if not validate.is_valid_team(new_team):
-#        return App_Ui.show_error("Invalid team!")
-#
-#    if App_Ui.new_user_tech_radio_button.isChecked():
-#        target_table = "technicians"
-#
-#        section_or_lane = App_Ui.new_user_section_input_box.text()
-#
-#        if not validate.is_valid_name(section_or_lane):
-#            return App_Ui.show_error("Invalid section!")
-#
-#    if App_Ui.new_user_service_writer_radio_button.isChecked():
-#        target_table = "service_writers"
-#
-#        section_or_lane = App_Ui.new_user_lane_input_box.text()
-#
-#        if not validate.is_valid_lane(section_or_lane):
-#            return App_Ui.show_error("Invalid lane!")
-#
-#        int(section_or_lane)
-#
-#    hashed_pass = sha512_crypt.hash(new_pass)
-#
-#    user_id = App_Database.gen_id(target_table)
-#
-#    inputs = [
-#        target_table,
-#        user_id,
-#        new_user,
-#        hashed_pass,
-#        new_name,
-#        new_team,
-#        section_or_lane,
-#        assigned_repairs,
-#    ]
-#
-#    App_Database.insert_user(inputs)
-#
-#    return App_Ui.show_success("User input successfuly.")
-
-
 def new_repair_submit():
     """Gets information for a new repair and passes it to the database for storage."""
 
@@ -482,24 +409,7 @@ def new_repair_submit():
 def update_password_submit():
     """Gets a new password for the user and passes it to the database for storage."""
 
-    username = App_Ui.update_password_username_input_box.text()
-    old_pass = App_Ui.old_password_input_box.text()
-    new_pass = App_Ui.new_password_input_box.text()
-    confirm_new_pass = App_Ui.confirm_new_password_input_box.text()
-
-    if not validate.is_valid_username(username) or not validate.is_valid_password(
-        old_pass
-    ):
-        return App_Ui.show_error("Invalid username or password!")
-
-    if new_pass != confirm_new_pass:
-        return App_Ui.show_error("New passwords do not match!")
-
-    if not validate.is_valid_password(new_pass):
-        return App_Ui.show_error("New password is invalid!")
-
-    if App_Database.update_pass(username, old_pass, new_pass):
-        return App_Ui.show_success("Password update successful.")
+    user.update_password_submit(App_Database, App_Ui)
 
 
 def edit_repair_submit():
@@ -597,68 +507,7 @@ def finish_repair_submit():
 def update_user_submit():
     """Gets information to update a user then passes it to the database for storage."""
 
-    input_pass = App_Ui.update_user_password_input_box.text()
-    target_id = App_Ui.update_user_user_id_display_label.text()
-
-    if not validate.is_valid_password:
-        return App_Ui.show_error("Invalid password.")
-
-    if not App_Database.is_current_users_password(input_pass):
-        return App_Ui.show_error("Invalid password.")
-
-    if App_Ui.update_user_change_name_check_box.isChecked():
-        new_name = App_Ui.update_user_name_input_box.text()
-
-        if not validate.is_valid_name(new_name):
-            return App_Ui.show_error("Invalid name input.")
-
-    if App_Ui.update_user_change_team_check_box.isChecked():
-        new_team = App_Ui.update_user_team_input_box.text()
-
-        if not validate.is_valid_team(new_team):
-            return App_Ui.show_error("Invalid team input.")
-
-    if (
-        App_Ui.update_user_tech_radio_button.isChecked()
-        and App_Ui.update_user_change_section_check_box.isChecked()
-    ):
-        new_lane_or_section = App_Ui.update_user_section_input_box.text()
-
-        if not validate.is_valid_name(new_lane_or_section):
-            return App_Ui.show_error("Invalid section input.")
-
-    if (
-        App_Ui.update_user_service_writer_radio_button.isChecked()
-        and App_Ui.update_user_change_lane_check_box.isChecked()
-    ):
-        new_lane_or_section = App_Ui.update_user_lane_input_box.text()
-
-        if not validate.is_valid_lane(new_lane_or_section):
-            return App_Ui.show_error("Invalid lane input.")
-
-    if App_Ui.update_user_change_name_check_box.isChecked():
-        App_Database.update_user_name(target_id, new_name)
-
-    if App_Ui.update_user_change_team_check_box.isChecked():
-        App_Database.update_user_team(target_id, new_team)
-
-    if (
-        App_Ui.update_user_change_section_check_box.isChecked()
-        and App_Ui.update_user_tech_radio_button.isChecked()
-    ):
-        App_Database.update_user_section(target_id, new_lane_or_section)
-
-    if (
-        App_Ui.update_user_service_writer_radio_button.isChecked()
-        and App_Ui.update_user_change_lane_check_box.isChecked()
-    ):
-        App_Database.update_user_lane(target_id, new_lane_or_section)
-
-    App_Ui.show_success("Update successful, click ok to see updated data.")
-
-    user_data = App_Database.search_for_user(target_id)
-
-    return App_Ui.show_user_search(user_data)
+    user.update_user_submit(App_Database, App_Ui)
 
 
 def add_part_to_repair():
@@ -905,110 +754,38 @@ def remove_vehicle_from_customer_button():
 def go_to_login_page():
     """Takes user to login page."""
 
-    App_Ui.widget_stack.setCurrentIndex(0)
+    user.go_to_login_page(App_Ui)
 
 
 def logout_user():
     """Passes false to the login status in the database if the user is logged in,
     then moves them to the login page."""
 
-    if not App_Database.get_login_status():
-        return App_Ui.show_error("Unable to logout, you are currently not logged in.")
-
-    App_Database.set_login_status(False)
-
-    App_Ui.show_success("Logout successful.")
-
-    return App_Ui.widget_stack.setCurrentIndex(0)
+    user.logout_user(App_Database, App_Ui)
 
 
 def go_to_new_user_page():
     """Takes the user to the new user page."""
 
-    App_Ui.widget_stack.setCurrentIndex(1)
+    user.go_to_new_user_page(App_Ui)
 
 
 def go_to_update_password_page():
     """Takes the user to the update password page."""
 
-    if not App_Database.get_login_status():
-        return App_Ui.show_error("You must be logged in to access this page.")
-
-    return App_Ui.widget_stack.setCurrentIndex(2)
+    user.go_to_update_password_page(App_Database, App_Ui)
 
 
 def search_for_user():
     """Gets a user id and passes it to the database to get that users data."""
 
-    if not App_Database.get_login_status():
-        return App_Ui.show_error("You must be logged in to access this function.")
-
-    while True:
-        id_to_search = App_Ui.show_user_id_search_request()
-
-        # If the user clicked cancel
-        if id_to_search is False:
-            return
-
-        if not validate.is_valid_id(id_to_search):
-            App_Ui.show_error("Invalid User ID.")
-
-            continue
-
-        user_data = App_Database.search_for_user(id_to_search)
-
-        if not user_data:
-            App_Ui.show_error("User not found!")
-
-            continue
-
-        break
-
-    repair_data = json.loads(user_data[6])
-
-    informaion_to_display = (
-        f"User ID : {user_data[0]}\nUsername : {user_data[1]}\n"
-        f"Name : {user_data[3]}\nTeam : {user_data[4]}\n"
-        f"Lane/Section : {user_data[5]}\n\n"
-        f"--- Assigned Repairs ---\n\n"
-    )
-
-    for repair in repair_data:
-        informaion_to_display = informaion_to_display + f"{repair}\n\n"
-
-    return App_Ui.show_user_search(informaion_to_display)
+    user.search_for_user(App_Database, App_Ui)
 
 
 def go_to_update_user_page():
     """Takes the user to the update user page."""
 
-    if not App_Database.get_login_status():
-        return App_Ui.show_error("You must be logged in to access this page.")
-
-    while True:
-        id_to_update = App_Ui.show_user_id_search_request()
-
-        # If the user clicked cancel
-        if id_to_update is False:
-            return
-
-        if not validate.is_valid_id(id_to_update):
-            App_Ui.show_error("Invalid User ID.")
-
-            continue
-
-        user_data = App_Database.search_for_user(id_to_update)
-
-        if not user_data:
-            App_Ui.show_error("User not found!")
-
-            continue
-
-        break
-
-    App_Ui.update_user_update_displays(user_data)
-
-    return App_Ui.widget_stack.setCurrentIndex(3)
+    user.go_to_update_user_page(App_Database, App_Ui)
 
 
 def go_to_new_repair_page():
