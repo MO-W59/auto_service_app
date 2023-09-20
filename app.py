@@ -61,12 +61,6 @@ def setup_button_handlers():
     Gui.login_page_submit_button.clicked.connect(
         lambda: users.login_submit(Database, Gui)
     )
-    #    Gui.username_login_input_box.returnPressed.connect(
-    #        lambda: users.login_submit(Database, Gui)
-    #    )
-    #    Gui.password_login_input_box.returnPressed.connect(
-    #        lambda: users.login_submit(Database, Gui)
-    #    )
 
     # new user page
     Gui.new_user_page_submit_button.clicked.connect(
@@ -208,6 +202,46 @@ class MainWindow(UiGarageTrackerMainWindow, QtWidgets.QMainWindow):
 
         if event.key() == QtCore.Qt.Key.Key_Escape.value:
             self.close()
+
+        if event.key() == QtCore.Qt.Key.Key_Return.value:
+            index = Gui.widget_stack.currentIndex()
+
+            match index:
+                case 0:
+                    users.login_submit(Database, Gui)
+
+                case 1:
+                    users.new_user_submit(Database, Gui)
+
+                case 2:
+                    users.update_password_submit(Database, Gui)
+
+                case 3:
+                    users.update_user_submit(Database, Gui)
+
+                case 4:
+                    repairs.new_repair_submit(Database, Gui)
+
+                case 5:
+                    repairs.edit_repair_submit(Database, Gui)
+
+                case 8:
+                    parts.create_part_submit(Database, Gui)
+
+                case 9:
+                    parts.edit_part_submit(Database, Gui)
+
+                case 11:
+                    customers.new_customer_submit(Database, Gui)
+
+                case 12:
+                    customers.edit_customer_submit(Database, Gui)
+
+                case 14:
+                    vehicles.new_vehicle_submit(Database, Gui)
+
+                case 15:
+                    vehicles.edit_vehicle_submit(Database, Gui)
 
 
 # Set up application ui and database
