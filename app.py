@@ -13,7 +13,6 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# Enable submition of information when hitting the enter key (buttons autoDefault, textbox returnkey press)
 # use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
 # !!?? use dictionary of functions to eliminate multiple if branches ??!!
 # ensure the titles of the message/error windows can be read and are not cut off.
@@ -190,11 +189,12 @@ def setup_button_handlers():
     )
 
 
-class MainWindow(UiGarageTrackerMainWindow, QtWidgets.QMainWindow):
-    """Implements new child GUi view for key event handling."""
+class MainWindow(UiGarageTrackerMainWindow):
+    """Creates a GUI from the UiGarageTracker template created by
+    PyQt Designer and adds return and esc key press support."""
 
-    def __init__(self, parent=None):
-        QtWidgets.QMainWindow.__init__(self, parent=parent)
+    def __init__(self):
+        super().__init__()
         self.setup_ui(self)
 
     # disable linter message for invalid name, this is a PyQt variable
