@@ -197,6 +197,8 @@ class MainWindow(UiGarageTrackerMainWindow, QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent=parent)
         self.setup_ui(self)
 
+    # disable linter message for invalid name, this is a PyQt variable
+    # pylint: disable=invalid-name
     def keyPressEvent(self, event):
         """Event handler for key press events."""
 
