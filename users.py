@@ -37,25 +37,32 @@ def new_user_submit(database, gui):
     section_or_lane = None
     target_table = None
     assigned_repairs = []
+    has_error = False
+    errors = ""
 
     if (
         not validate.is_valid_username(new_user)
         or not validate.is_valid_password(new_pass)
         or not validate.is_valid_password(confirm_new_pass)
     ):
-        return gui.show_error("Invalid username or password!")
+        has_error = True
+        errors += "Invalid username or password!\n\n"
 
     if database.is_username_in_use(new_user):
-        return gui.show_error("Username already in use.")
+        has_error = True
+        errors += "Username already in use!\n\n"
 
     if not new_pass == confirm_new_pass:
-        return gui.show_error("Passwords do not match!")
+        has_error = True
+        errors += "Passwords do not match!\n\n"
 
     if not validate.is_valid_name(new_name):
-        return gui.show_error("Invalid name!")
+        has_error = True
+        errors += "Invalid name!\n\n"
 
     if not validate.is_valid_team(new_team):
-        return gui.show_error("Invalid team!")
+        has_error = True
+        errors += "Invalid team!\n\n"
 
     if gui.new_user_tech_radio_button.isChecked():
         target_table = "technicians"
@@ -63,7 +70,8 @@ def new_user_submit(database, gui):
         section_or_lane = gui.new_user_section_input_box.text()
 
         if not validate.is_valid_name(section_or_lane):
-            return gui.show_error("Invalid section!")
+            has_error = True
+            errors += "Invalid section!\n\n"
 
     if gui.new_user_service_writer_radio_button.isChecked():
         target_table = "service_writers"
@@ -71,9 +79,13 @@ def new_user_submit(database, gui):
         section_or_lane = gui.new_user_lane_input_box.text()
 
         if not validate.is_valid_lane(section_or_lane):
-            return gui.show_error("Invalid lane!")
+            has_error = True
+            errors += "Invalid lane!\n\n"
 
-        int(section_or_lane)
+    if has_error:
+        return gui.show_error(errors)
+
+    int(section_or_lane)
 
     hashed_pass = sha512_crypt.hash(new_pass)
 
