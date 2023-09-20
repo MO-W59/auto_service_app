@@ -21,136 +21,93 @@ class AppDatabase:
     def create_tables(self):
         """This function will create the tables in the database if they do not already exist."""
 
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='customers'; """
-        ).fetchall()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS customers 
+            (customer_id text, 
+            name text, 
+            address text, 
+            phone_number text, 
+            list_of_vehicles text);"""
+        )
 
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE customers (
-                                    customer_id text,
-                                    name text,
-                                    address text,
-                                    phone_number text,
-                                    list_of_vehicles text)"""
-            )
+        self.connection.commit()
 
-            self.connection.commit()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS service_writers 
+                (employee_id text,
+                username text,
+                password text,
+                name text,
+                team text,
+                lane integer,
+                assigned_repairs text);"""
+        )
 
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='service_writers'; """
-        ).fetchall()
+        self.connection.commit()
 
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE service_writers (
-                                    employee_id text,
-                                    username text,
-                                    password text,
-                                    name text,
-                                    team text,
-                                    lane integer,
-                                    assigned_repairs text)"""
-            )
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS technicians
+            (employee_id text,
+            username text,
+            password text,
+            name text,
+            team text,
+            section text,
+            assigned_repairs text);"""
+        )
 
-            self.connection.commit()
+        self.connection.commit()
 
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='technicians'; """
-        ).fetchall()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS parts
+            (part_id text,
+            part_cost real,
+            part_description text);"""
+        )
 
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE technicians (
-                                    employee_id text,
-                                    username text,
-                                    password text,
-                                    name text,
-                                    team text,
-                                    section text,
-                                    assigned_repairs text)"""
-            )
+        self.connection.commit()
 
-            self.connection.commit()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS repairs
+            (repair_id text,
+            total_cost real,
+            labor real,
+            parts_cost real,
+            drop_off_date text,
+            repair_completed_date text,
+            problem_description text,
+            repair_description text,
+            required_parts text,
+            technician text,
+            service_writer text,
+            vehicle text);"""
+        )
 
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='parts'; """
-        ).fetchall()
+        self.connection.commit()
 
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE parts (
-                                    part_id text,
-                                    part_cost real,
-                                    part_description text)"""
-            )
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS vehicles
+            (vin text,
+            model text,
+            make text,
+            year text,
+            color text,
+            engine text,
+            repair_history text,
+            repair_request text);"""
+        )
 
-            self.connection.commit()
+        self.connection.commit()
 
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='repairs'; """
-        ).fetchall()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS counter_ids
+            (writer_count integer,
+            tech_count integer,
+            customer_count integer);"""
+        )
 
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE repairs (
-                                    repair_id text,
-                                    total_cost real,
-                                    labor real,
-                                    parts_cost real,
-                                    drop_off_date text,
-                                    repair_completed_date text,
-                                    problem_description text,
-                                    repair_description text,
-                                    required_parts text,
-                                    technician text,
-                                    service_writer text,
-                                    vehicle text)"""
-            )
-
-            self.connection.commit()
-
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='vehicles'; """
-        ).fetchall()
-
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE vehicles (
-                                    vin text,
-                                    model text,
-                                    make text,
-                                    year text,
-                                    color text,
-                                    engine text,
-                                    repair_history text,
-                                    repair_request text)"""
-            )
-
-            self.connection.commit()
-
-        checked_list = self.cursor.execute(
-            """SELECT name FROM sqlite_master WHERE type='table'
-                    AND name='counter_ids'; """
-        ).fetchall()
-
-        if checked_list == []:
-            self.cursor.execute(
-                """CREATE TABLE counter_ids (
-                                    writer_count integer,
-                                    tech_count integer,
-                                    customer_count integer)"""
-            )
-
-            self.cursor.execute("""INSERT INTO counter_ids VALUES (1, 1, 1)""")
-
-            self.connection.commit()
+        self.cursor.execute("""INSERT INTO counter_ids VALUES (1, 1, 1)""")
+        self.connection.commit()
 
     def gen_id(self, target_table):
         """This function will read the counter_ids table in the database and return a string with

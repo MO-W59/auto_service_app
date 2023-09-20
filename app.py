@@ -13,7 +13,6 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# use "CREATE TABLE IF NOT EXISTS table_name (...);" instead of empty list checking?
 # !!?? use dictionary of functions to eliminate multiple if branches ??!!
 # ensure the titles of the message/error windows can be read and are not cut off.
 # use dictionaries instead of lists for large inputs?
