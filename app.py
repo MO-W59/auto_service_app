@@ -3,7 +3,7 @@ listeners and links them to the handlers in their repective modules."""
 
 
 import sys
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtCore
 from gui import UiGarageTrackerMainWindow
 from data_interface import AppDatabase
 import users
@@ -49,13 +49,6 @@ import customers
 # disable linter message due to using C extention
 # pylint: disable=c-extension-no-member
 
-# Set up application ui and database
-App = QtWidgets.QApplication(sys.argv)
-App_Main_Window = QtWidgets.QMainWindow()
-Gui = UiGarageTrackerMainWindow()
-Gui.setup_ui(App_Main_Window)
-Database = AppDatabase()
-
 
 def setup_button_handlers():
     """This function connects all the UI buttons (radio buttons not included)
@@ -68,9 +61,12 @@ def setup_button_handlers():
     Gui.login_page_submit_button.clicked.connect(
         lambda: users.login_submit(Database, Gui)
     )
-    Gui.password_login_input_box.returnPressed.connect(
-        lambda: users.login_submit(Database, Gui)
-    )
+    #    Gui.username_login_input_box.returnPressed.connect(
+    #        lambda: users.login_submit(Database, Gui)
+    #    )
+    #    Gui.password_login_input_box.returnPressed.connect(
+    #        lambda: users.login_submit(Database, Gui)
+    #    )
 
     # new user page
     Gui.new_user_page_submit_button.clicked.connect(
@@ -200,12 +196,32 @@ def setup_button_handlers():
     )
 
 
+class MainWindow(UiGarageTrackerMainWindow, QtWidgets.QMainWindow):
+    """Implements new child GUi view for key event handling."""
+
+    def __init__(self, parent=None):
+        QtWidgets.QMainWindow.__init__(self, parent=parent)
+        self.setup_ui(self)
+
+    def keyPressEvent(self, event):
+        """Event handler for key press events."""
+
+        if event.key() == QtCore.Qt.Key.Key_Escape.value:
+            self.close()
+
+
+# Set up application ui and database
+App = QtWidgets.QApplication(sys.argv)
+Gui = MainWindow()
+Database = AppDatabase()
+
+
 def main():
     """Main function of the program, calls setup of button handlers, shows the main app window
     and instucts system to exit when GUI is closed."""
 
     setup_button_handlers()
-    App_Main_Window.show()
+    Gui.show()
     sys.exit(App.exec())
 
 
