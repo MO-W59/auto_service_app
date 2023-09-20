@@ -73,7 +73,6 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         font = QtGui.QFont()
         font.setPointSize(12)
         self.login_page_submit_button.setFont(font)
-        self.login_page_submit_button.setAutoDefault(True)
         self.login_page_submit_button.setObjectName("login_page_submit_button")
 
         self.widget_stack.addWidget(self.login_page)

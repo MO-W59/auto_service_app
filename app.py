@@ -54,37 +54,21 @@ def setup_button_handlers():
     with their repective functions."""
 
     # submit, add, remove buttons
-
-    # user items
-    # login page
+    # user buttons
     Gui.login_page_submit_button.clicked.connect(
         lambda: users.login_submit(Database, Gui)
     )
-
-    # new user page
     Gui.new_user_page_submit_button.clicked.connect(
         lambda: users.new_user_submit(Database, Gui)
     )
-    Gui.confirm_password_new_user_input_box.returnPressed.connect(
-        lambda: users.new_user_submit(Database, Gui)
-    )
-
-    # update password page
     Gui.update_password_submit_button.clicked.connect(
         lambda: users.update_password_submit(Database, Gui)
     )
-    Gui.confirm_new_password_input_box.returnPressed.connect(
-        lambda: users.update_password_submit(Database, Gui)
-    )
-
-    # update user page
     Gui.update_user_page_submit_button.clicked.connect(
         lambda: users.update_user_submit(Database, Gui)
     )
-    Gui.update_user_password_input_box.returnPressed.connect(
-        lambda: users.update_user_submit(Database, Gui)
-    )
 
+    # repair buttons
     Gui.new_repair_page_submit_button.clicked.connect(
         lambda: repairs.new_repair_submit(Database, Gui)
     )
@@ -101,6 +85,7 @@ def setup_button_handlers():
         lambda: repairs.remove_part_from_repair(Database, Gui)
     )
 
+    # part buttons
     Gui.new_part_submit_button.clicked.connect(
         lambda: parts.create_part_submit(Database, Gui)
     )
@@ -108,6 +93,7 @@ def setup_button_handlers():
         lambda: parts.edit_part_submit(Database, Gui)
     )
 
+    # customer buttons
     Gui.new_customer_submit_button.clicked.connect(
         lambda: customers.new_customer_submit(Database, Gui)
     )
@@ -121,6 +107,7 @@ def setup_button_handlers():
         lambda: customers.remove_vehicle_from_customer_button(Database, Gui)
     )
 
+    # vehicle buttons
     Gui.new_vehicle_submit_button.clicked.connect(
         lambda: vehicles.new_vehicle_submit(Database, Gui)
     )
@@ -129,6 +116,7 @@ def setup_button_handlers():
     )
 
     # Go to functions for action menu (top menu bar)
+    # user actions
     Gui.action_login.triggered.connect(lambda: users.go_to_login_page(Gui))
     Gui.action_logout.triggered.connect(lambda: users.logout_user(Database, Gui))
     Gui.action_new_user.triggered.connect(lambda: users.go_to_new_user_page(Gui))
@@ -142,6 +130,7 @@ def setup_button_handlers():
         lambda: users.search_for_user(Database, Gui)
     )
 
+    # repair actions
     Gui.action_new_repair.triggered.connect(
         lambda: repairs.go_to_new_repair_page(Database, Gui)
     )
@@ -155,6 +144,7 @@ def setup_button_handlers():
         lambda: repairs.go_to_old_repair_page(Database, Gui)
     )
 
+    # part actions
     Gui.action_new_part.triggered.connect(
         lambda: parts.go_to_new_part_page(Database, Gui)
     )
@@ -165,6 +155,7 @@ def setup_button_handlers():
         lambda: parts.go_to_list_of_parts_page(Database, Gui)
     )
 
+    # customer actions
     Gui.action_new_customer.triggered.connect(
         lambda: customers.go_to_new_customer_page(Database, Gui)
     )
@@ -175,6 +166,7 @@ def setup_button_handlers():
         lambda: customers.go_to_list_of_customers_page(Database, Gui)
     )
 
+    # vehicle actions
     Gui.action_new_vehicle.triggered.connect(
         lambda: vehicles.go_to_new_vehicle_page(Database, Gui)
     )
@@ -200,7 +192,8 @@ class MainWindow(UiGarageTrackerMainWindow):
     # disable linter message for invalid name, this is a PyQt variable
     # pylint: disable=invalid-name
     def keyPressEvent(self, event):
-        """Event handler for key press events."""
+        """Event handler for key press events. Escape exits the program, return calls the
+        current index then is matched with proper module function."""
 
         if event.key() == QtCore.Qt.Key.Key_Escape.value:
             self.close()
