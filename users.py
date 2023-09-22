@@ -153,7 +153,7 @@ def update_user_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
-    # run throuh dispatcher for updates
+    # run through dispatcher for updates
 
     for checkbox in checkbox_dispatcher.values():
         if checkbox["checked"]():
