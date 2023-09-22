@@ -13,27 +13,31 @@ def new_vehicle_submit(database, gui):
     year = gui.new_vehicle_year_input_box.text()
     color = gui.new_vehicle_color_input_box.text()
     engine = gui.new_vehicle_engine_input_box.text()
+    errors = ""
 
     if not validate.is_valid_vin(vin):
-        return gui.show_error("Invalid vin.")
+        errors += "Invalid vin!"
 
     if database.get_vehicle_data(vin):
-        return gui.show_error("There is a vehicle with this VIN already.")
+        errors += "There is a vehicle with this VIN already!"
 
     if not validate.is_valid_name(make):
-        return gui.show_error("Invalid make.")
+        errors += "Invalid make!"
 
     if not validate.is_valid_name(model):
-        return gui.show_error("Invalid model.")
+        errors += "Invalid model!"
 
     if not validate.is_valid_year(year):
-        return gui.show_error("Invalid year.")
+        errors += "Invalid year!"
 
     if not validate.is_valid_name(color):
-        return gui.show_error("Invalid color.")
+        errors += "Invalid color!"
 
     if not validate.is_valid_id(engine):
-        return gui.show_error("Invalid engine.")
+        errors += "Invalid engine!"
+
+    if errors != "":
+        gui.show_error(errors)
 
     vehicle_data = [vin, model, make, year, color, engine, [], None]
 
@@ -46,48 +50,75 @@ def edit_vehicle_submit(database, gui):
     """Gets new information for a vehicle and passes it to the database for storage."""
 
     current_vin = gui.edit_vehicle_vin_display_label.text()
-    new_make = gui.edit_vehicle_make_input_box.text()
-    new_model = gui.edit_vehicle_model_input_box.text()
-    new_year = gui.edit_vehicle_year_input_box.text()
-    new_color = gui.edit_vehicle_color_input_box.text()
-    new_engine = gui.edit_vehicle_engine_input_box.text()
+    checkbox_dispatcher = edit_vehicle_dispatcher(database, gui)
+    errors = ""
 
-    if gui.edit_vehicle_change_make_check_box.isChecked():
-        if not validate.is_valid_name(new_make):
-            return gui.show_error("Invalid make.")
+    # run through dispatcher for errors
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            if not checkbox["validator"](checkbox["input"]()):
+                errors += checkbox["error"]
 
-    if gui.edit_vehicle_change_model_check_box.isChecked():
-        if not validate.is_valid_name(new_model):
-            return gui.show_error("Invalid model.")
+    # if errors display and return
 
-    if gui.edit_vehicle_change_year_check_box.isChecked():
-        if not validate.is_valid_year(new_year):
-            return gui.show_error("Invalid year.")
+    if errors != "":
+        return gui.show_error(errors)
 
-    if gui.edit_vehicle_change_color_check_box.isChecked():
-        if not validate.is_valid_name(new_color):
-            return gui.show_error("Invalid color.")
+    # run through dispatcher for updates
 
-    if gui.edit_vehicle_change_engine_check_box.isChecked():
-        if not validate.is_valid_name(new_engine):
-            return gui.show_error("Invalid engine")
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            checkbox["updater"](current_vin, checkbox["input"]())
 
-    if gui.edit_vehicle_change_make_check_box.isChecked():
-        database.update_vehicle_make(current_vin, new_make)
-
-    if gui.edit_vehicle_change_model_check_box.isChecked():
-        database.update_vehicle_model(current_vin, new_model)
-
-    if gui.edit_vehicle_change_year_check_box.isChecked():
-        database.update_vehicle_year(current_vin, new_year)
-
-    if gui.edit_vehicle_change_color_check_box.isChecked():
-        database.update_vehicle_color(current_vin, new_color)
-
-    if gui.edit_vehicle_change_engine_check_box.isChecked():
-        database.update_vehicle_engine(current_vin, new_engine)
+    # show success
 
     return gui.show_success("Vehicle update successful.")
+
+
+def edit_vehicle_dispatcher(database, gui):
+    """Creates the dictionary of dictionaries that contain the checkbox checked value in
+    question, related validate function, related update function, related input variable
+    and error message to use when updating user information."""
+
+    checkbox_dispatcher = {
+        gui.edit_vehicle_change_make_check_box: {
+            "checked": gui.edit_vehicle_change_make_check_box.isChecked,
+            "validator": validate.is_valid_name,
+            "input": gui.edit_vehicle_make_input_box.text,
+            "error": "Invalid make!\n\n",
+            "updater": database.update_vehicle_make,
+        },
+        gui.edit_vehicle_change_model_check_box: {
+            "checked": gui.edit_vehicle_change_model_check_box.isChecked,
+            "validator": validate.is_valid_name,
+            "input": gui.edit_vehicle_model_input_box.text,
+            "error": "Invalid model!\n\n",
+            "updater": database.update_vehicle_model,
+        },
+        gui.edit_vehicle_change_year_check_box: {
+            "checked": gui.edit_vehicle_change_year_check_box.isChecked,
+            "validator": validate.is_valid_year,
+            "input": gui.edit_vehicle_year_input_box.text,
+            "error": "Invalid year!\n\n",
+            "updater": database.update_vehicle_year,
+        },
+        gui.edit_vehicle_change_color_check_box: {
+            "checked": gui.edit_vehicle_change_color_check_box.isChecked,
+            "validator": validate.is_valid_name,
+            "input": gui.edit_vehicle_color_input_box.text,
+            "error": "Invalid color!\n\n",
+            "updater": database.update_vehicle_color,
+        },
+        gui.edit_vehicle_change_engine_check_box: {
+            "checked": gui.edit_vehicle_change_engine_check_box.isChecked,
+            "validator": validate.is_valid_name,
+            "input": gui.edit_vehicle_engine_input_box.text,
+            "error": "Invalid engine!\n\n",
+            "updater": database.update_vehicle_engine,
+        },
+    }
+
+    return checkbox_dispatcher
 
 
 def go_to_new_vehicle_page(database, gui):
@@ -111,7 +142,7 @@ def go_to_edit_vehicle_page(database, gui):
 
         # If the user clicked cancel
         if vin is False:
-            return
+            return None
 
         if not validate.is_valid_vin(vin):
             gui.show_error("Invalid VIN.")
@@ -144,7 +175,7 @@ def search_repair_history(database, gui):
 
         # If the user clicked cancel
         if vin_to_search is False:
-            return
+            return None
 
         if not validate.is_valid_vin(vin_to_search):
             gui.show_error("Invalid VIN.")

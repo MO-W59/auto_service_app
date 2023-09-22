@@ -163,6 +163,8 @@ class AppDatabase:
 
             return created_id
 
+        return None
+
     def is_valid_login_query(self, input_user, input_pass):
         """This function searches the database for the queried user to see if
         the password matches, then sets the login status to true and sets
@@ -360,6 +362,8 @@ class AppDatabase:
 
             return self.connection.commit()
 
+        return None
+
     def update_user_team(self, user_id, new_team):
         """This function will update a user's team in the database."""
 
@@ -384,6 +388,8 @@ class AppDatabase:
             )
 
             return self.connection.commit()
+
+        return None
 
     def update_user_lane(self, user_id, new_lane):
         """This function will update a user's lane in the database. (service writers)"""
@@ -1118,5 +1124,8 @@ class AppDatabase:
         vehicle_data = self.cursor.execute(
             """SELECT * FROM vehicles WHERE vin = (?)""", (vin,)
         ).fetchone()
+
+        if vehicle_data is None:
+            return False
 
         return vehicle_data[7]

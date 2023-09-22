@@ -13,29 +13,28 @@ def new_repair_submit(database, gui):
     vin = gui.new_repair_vin_input_box.text()
     drop_off_date = gui.new_repair_current_date_display.text()
     problem_description = gui.new_repair_description_input_box.toPlainText()
+    errors = ""
 
     if not validate.is_valid_id(service_writer_id):
-        return gui.show_error("Invalid service writer id.")
+        errors += "Invalid service writer id.\n\n"
 
     if not validate.is_valid_id(technician_id):
-        return gui.show_error("Invalid technician id.")
+        errors += "Invalid technician id.\n\n"
 
     if not validate.is_valid_vin(vin):
-        return gui.show_error("Invalid vin number.")
+        errors += "Invalid vin number.\n\n"
 
     if not database.get_vehicle_data(vin):
-        return gui.show_error(
-            "A vehicle must be in the database to create a repair for it."
-        )
+        errors += "A vehicle must be in the database to create a repair for it.\n\n"
 
     if not validate.is_valid_description(problem_description):
-        return gui.show_error("Invalid problem description.")
+        errors += "Invalid problem description.\n\n"
 
     if not database.vehicle_is_owned(vin):
-        return gui.show_error("The vehicle must first be owned by a customer.")
+        errors += "The vehicle must first be owned by a customer.\n\n"
 
     if database.has_active_repair(vin):
-        return gui.show_error("This vehicle already has an active repair.")
+        errors += "This vehicle already has an active repair.\n\n"
 
     constructing_suffix = []
     constructing_suffix[:0] = drop_off_date
@@ -48,7 +47,10 @@ def new_repair_submit(database, gui):
     repair_id = vin + repair_id_suffix
 
     if database.search_for_repair(repair_id):
-        return gui.show_error("That Repair ID is already in use.")
+        errors += "That Repair ID is already in use.\n\n"
+
+    if errors != "":
+        return gui.show_error(errors)
 
     inputs = [
         repair_id,
@@ -83,23 +85,27 @@ def edit_repair_submit(database, gui):
     repair_id = gui.edit_repair_repair_id_display_label.text()
     old_tech_id = gui.edit_repair_tech_id_display_label.text()
     old_writer_id = gui.edit_repair_service_id_display_label.text()
+    errors = ""
 
     if gui.change_writer_check_box.isChecked():
         if not validate.is_valid_id(new_service_writer_id):
-            return gui.show_error("Invalid service writer ID.")
+            errors += "Invalid service writer ID!"
 
     if gui.change_tech_check_box.isChecked():
         if not validate.is_valid_id(new_tech_id):
-            return gui.show_error("Invalid technician ID.")
+            errors += "Invalid technician ID!"
 
     if gui.change_labor_check_box.isChecked():
         if not validate.is_valid_dollar_amount(new_labor_amount):
-            return gui.show_error("Invalid labor value.")
+            errors += "Invalid labor value!"
 
     if not validate.is_valid_description(
         problem_description
     ) or not validate.is_valid_description(repair_description):
-        return gui.show_error("Invalid description entered.")
+        errors += "Invalid description entered!"
+
+    if errors != "":
+        return gui.show_error(errors)
 
     if gui.change_writer_check_box.isChecked():
         database.update_repair_service_writer(
@@ -137,10 +143,10 @@ def finish_repair_submit(database, gui):
     tech_id = gui.edit_repair_tech_id_display_label.text()
 
     if not validate.is_valid_password(pass_confirm):
-        return gui.show_error("Invalid password.")
+        return gui.show_error("Invalid password!")
 
     if not database.is_current_users_password(pass_confirm):
-        return gui.show_error("Invalid password.")
+        return gui.show_error("Invalid password!")
 
     compelted_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
@@ -174,7 +180,7 @@ def add_part_to_repair(database, gui):
 
         # if the user clicked the cancel button
         if part_to_add is False:
-            return
+            return None
 
         if not validate.is_valid_id(part_to_add):
             gui.show_error("Invalid Part ID.")
@@ -217,7 +223,7 @@ def remove_part_from_repair(database, gui):
 
         # if the user hit the cancel button
         if part_id_to_remove is False:
-            return
+            return None
 
         if not validate.is_valid_id(part_id_to_remove):
             gui.show_error("Invalid Part ID.")
@@ -281,7 +287,7 @@ def go_to_edit_repair_page(database, gui):
 
         # If the user clicked cancel
         if requested_repair_id is False:
-            return
+            return None
 
         if not validate.is_valid_id(requested_repair_id):
             gui.show_error("Invalid Repair ID.")

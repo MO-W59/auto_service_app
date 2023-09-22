@@ -13,12 +13,13 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# !!?? use dictionary of functions to eliminate multiple if branches ??!!
-# ensure the titles of the message/error windows can be read and are not cut off.
+# ensure the titles of the message/error windows and other labels can be read and are not cut off.
 # use dictionaries instead of lists for large inputs?
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
-# clear login boxes after login
+# add remove user functionality
+# clear login boxes after login --> other pages too where applicable
+# update the update user page after the user updates user data --> ie. refresh data after user submits update
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
 # change insert statments into the DB to a list rather than declaring all variables
 # move all json.dumps/loads to main app

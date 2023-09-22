@@ -32,12 +32,16 @@ def edit_part_submit(database, gui):
     part_id = gui.edit_part_id_display_label.text()
     new_part_cost = gui.edit_part_part_cost_input_box.text()
     new_part_description = gui.edit_part_description_input_box.text()
+    errors = ""
 
     if not validate.is_valid_dollar_amount(new_part_cost):
-        return gui.show_error("Invalid part cost.")
+        errors += "Invalid part cost."
 
     if not validate.is_valid_description(new_part_description):
-        return gui.show_error("Invalid part description.")
+        errors += "Invalid part description."
+
+    if errors != "":
+        return gui.show_error(errors)
 
     if gui.edit_part_change_cost_check_box.isChecked():
         database.update_part_cost(part_id, new_part_cost)
@@ -70,7 +74,7 @@ def go_to_edit_part_page(database, gui):
 
         # If user clicked cancel
         if part_id is False:
-            return
+            return None
 
         if not validate.is_valid_id(part_id):
             gui.show_error("Invalid Part ID.")

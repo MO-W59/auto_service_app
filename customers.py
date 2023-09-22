@@ -11,15 +11,19 @@ def new_customer_submit(database, gui):
     customer_name = gui.new_customer_name_input_box.text()
     customer_address = gui.new_customer_address_input_box.toPlainText()
     customer_phone = gui.new_customer_phone_input_box.text()
+    errors = ""
 
     if not validate.is_valid_name(customer_name):
-        return gui.show_error("Invalid name.")
+        errors += "Invalid name!"
 
     if not validate.is_valid_address(customer_address):
-        return gui.show_error("Invalid address")
+        errors += "Invalid address!"
 
     if not validate.is_valid_phone_number(customer_phone):
-        return gui.show_error("Invalid phone number.")
+        errors += "Invalid phone number!"
+
+    if errors != "":
+        return gui.show_error(errors)
 
     customer_id = database.gen_id(target_table)
 
@@ -45,18 +49,22 @@ def edit_customer_submit(database, gui):
     new_name = gui.edit_customer_name_input_box.text()
     new_address = gui.edit_customer_address_input_box.toPlainText()
     new_phone = gui.edit_customer_phone_input_box.text()
+    errors = ""
 
     if gui.edit_customer_change_name_check_box.isChecked():
         if not validate.is_valid_name(new_name):
-            return gui.show_error("Invalid name.")
+            errors += "Invalid name!"
 
     if gui.edit_customer_change_address_check_box.isChecked():
         if not validate.is_valid_address(new_address):
-            return gui.show_error("Invalid address.")
+            errors += "Invalid address!"
 
     if gui.edit_customer_change_phone_check_box.isChecked():
         if not validate.is_valid_phone_number(new_phone):
-            return gui.show_error("Invalid phone.")
+            errors += "Invalid phone!"
+
+    if errors != "":
+        return gui.show_error(errors)
 
     if gui.edit_customer_change_name_check_box.isChecked():
         database.update_customer_name(customer_id, new_name)
@@ -88,7 +96,7 @@ def add_vehicle_to_customer_button(database, gui):
 
         # if the user hit the cancel button
         if vin_to_add is False:
-            return
+            return None
 
         if not validate.is_valid_vin(vin_to_add):
             gui.show_error("Invalid VIN.")
@@ -136,7 +144,7 @@ def remove_vehicle_from_customer_button(database, gui):
 
         # If the user clicked the cancel button
         if vin_to_remove is False:
-            return
+            return None
 
         if not validate.is_valid_vin(vin_to_remove):
             gui.show_error("Invalid VIN.")
@@ -196,7 +204,7 @@ def go_to_edit_customer_page(database, gui):
 
         # if the user clicked cancel
         if customer_id is False:
-            return
+            return None
 
         if not validate.is_valid_id(customer_id):
             gui.show_error("Invalid Customer ID.")

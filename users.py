@@ -37,7 +37,6 @@ def new_user_submit(database, gui):
     section_or_lane = None
     target_table = None
     assigned_repairs = []
-    has_error = False
     errors = ""
 
     if (
@@ -45,23 +44,18 @@ def new_user_submit(database, gui):
         or not validate.is_valid_password(new_pass)
         or not validate.is_valid_password(confirm_new_pass)
     ):
-        has_error = True
         errors += "Invalid username or password!\n\n"
 
     if database.is_username_in_use(new_user):
-        has_error = True
         errors += "Username already in use!\n\n"
 
     if not new_pass == confirm_new_pass:
-        has_error = True
         errors += "Passwords do not match!\n\n"
 
     if not validate.is_valid_name(new_name):
-        has_error = True
         errors += "Invalid name!\n\n"
 
     if not validate.is_valid_team(new_team):
-        has_error = True
         errors += "Invalid team!\n\n"
 
     if gui.new_user_tech_radio_button.isChecked():
@@ -70,7 +64,6 @@ def new_user_submit(database, gui):
         section_or_lane = gui.new_user_section_input_box.text()
 
         if not validate.is_valid_name(section_or_lane):
-            has_error = True
             errors += "Invalid section!\n\n"
 
     if gui.new_user_service_writer_radio_button.isChecked():
@@ -79,10 +72,9 @@ def new_user_submit(database, gui):
         section_or_lane = gui.new_user_lane_input_box.text()
 
         if not validate.is_valid_lane(section_or_lane):
-            has_error = True
             errors += "Invalid lane!\n\n"
 
-    if has_error:
+    if errors != "":
         return gui.show_error(errors)
 
     int(section_or_lane)
@@ -114,25 +106,26 @@ def update_password_submit(database, gui):
     old_pass = gui.old_password_input_box.text()
     new_pass = gui.new_password_input_box.text()
     confirm_new_pass = gui.confirm_new_password_input_box.text()
+    errors = ""
 
     if not validate.is_valid_username(username) or not validate.is_valid_password(
         old_pass
     ):
-        return gui.show_error("Invalid username or password!")
+        errors += "Invalid username or password!"
 
     if new_pass != confirm_new_pass:
-        return gui.show_error("New passwords do not match!")
+        errors += "New passwords do not match!"
 
     if not validate.is_valid_password(new_pass):
-        return gui.show_error("New password is invalid!")
+        errors += "New password is invalid!"
 
     if old_pass == new_pass:
-        return gui.show_error("New password can not be the same as the old password!")
+        errors += "New password can not be the same as the old password!"
 
     if database.update_pass(username, old_pass, new_pass):
         return gui.show_success("Password update successful.")
 
-    return gui.show_error("Invalid username or password!")
+    return gui.show_error(errors)
 
 
 def update_user_submit(database, gui):
@@ -140,60 +133,33 @@ def update_user_submit(database, gui):
 
     input_pass = gui.update_user_password_input_box.text()
     target_id = gui.update_user_user_id_display_label.text()
+    checkbox_dispatcher = update_user_dispatcher(database, gui)
+    errors = ""
 
-    if not validate.is_valid_password:
-        return gui.show_error("Invalid password.")
+    if not validate.is_valid_password(
+        input_pass
+    ) or not database.is_current_users_password(input_pass):
+        errors += "Invalid password!\n\n"
 
-    if not database.is_current_users_password(input_pass):
-        return gui.show_error("Invalid password.")
+    # run through dispatcher for errors
 
-    if gui.update_user_change_name_check_box.isChecked():
-        new_name = gui.update_user_name_input_box.text()
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            if not checkbox["validator"](checkbox["input"]()):
+                errors += checkbox["error"]
 
-        if not validate.is_valid_name(new_name):
-            return gui.show_error("Invalid name input.")
+    # if errors display errors and return
 
-    if gui.update_user_change_team_check_box.isChecked():
-        new_team = gui.update_user_team_input_box.text()
+    if errors != "":
+        return gui.show_error(errors)
 
-        if not validate.is_valid_team(new_team):
-            return gui.show_error("Invalid team input.")
+    # run throuh dispatcher for updates
 
-    if (
-        gui.update_user_tech_radio_button.isChecked()
-        and gui.update_user_change_section_check_box.isChecked()
-    ):
-        new_lane_or_section = gui.update_user_section_input_box.text()
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            checkbox["updater"](target_id, checkbox["input"]())
 
-        if not validate.is_valid_name(new_lane_or_section):
-            return gui.show_error("Invalid section input.")
-
-    if (
-        gui.update_user_service_writer_radio_button.isChecked()
-        and gui.update_user_change_lane_check_box.isChecked()
-    ):
-        new_lane_or_section = gui.update_user_lane_input_box.text()
-
-        if not validate.is_valid_lane(new_lane_or_section):
-            return gui.show_error("Invalid lane input.")
-
-    if gui.update_user_change_name_check_box.isChecked():
-        database.update_user_name(target_id, new_name)
-
-    if gui.update_user_change_team_check_box.isChecked():
-        database.update_user_team(target_id, new_team)
-
-    if (
-        gui.update_user_change_section_check_box.isChecked()
-        and gui.update_user_tech_radio_button.isChecked()
-    ):
-        database.update_user_section(target_id, new_lane_or_section)
-
-    if (
-        gui.update_user_service_writer_radio_button.isChecked()
-        and gui.update_user_change_lane_check_box.isChecked()
-    ):
-        database.update_user_lane(target_id, new_lane_or_section)
+    # show success
 
     gui.show_success("Update successful, click ok to see updated data.")
 
@@ -201,7 +167,62 @@ def update_user_submit(database, gui):
 
     information_to_display = user_string(user_data)
 
+    gui.update_user_update_displays(user_data)
+
     return gui.show_user_search(information_to_display)
+
+
+def update_user_dispatcher(database, gui):
+    """Creates the dictionary of dictionaries that contain the checkbox checked value in
+    question, related validate function, related update function, related input variable
+    and error message to use when updating user information."""
+
+    checkbox_dispatcher = {
+        gui.update_user_change_name_check_box: {
+            "checked": gui.update_user_change_name_check_box.isChecked,
+            "validator": validate.is_valid_name,
+            "input": gui.update_user_name_input_box.text,
+            "error": "Invalid name!\n\n",
+            "updater": database.update_user_name,
+        },
+        gui.update_user_change_team_check_box: {
+            "checked": gui.update_user_change_team_check_box.isChecked,
+            "validator": validate.is_valid_team,
+            "input": gui.update_user_team_input_box.text,
+            "error": "Invalid team!\n\n",
+            "updater": database.update_user_team,
+        },
+        gui.update_user_change_section_check_box: {
+            "checked": lambda: all(
+                list(
+                    (
+                        gui.update_user_tech_radio_button.isChecked(),
+                        gui.update_user_change_section_check_box.isChecked(),
+                    )
+                )
+            ),
+            "validator": validate.is_valid_name,
+            "input": gui.update_user_section_input_box.text,
+            "error": "Invalid section!\n\n",
+            "updater": database.update_user_section,
+        },
+        gui.update_user_change_lane_check_box: {
+            "checked": lambda: all(
+                list(
+                    (
+                        gui.update_user_service_writer_radio_button.isChecked(),
+                        gui.update_user_change_lane_check_box.isChecked(),
+                    )
+                )
+            ),
+            "validator": validate.is_valid_lane,
+            "input": gui.update_user_lane_input_box.text,
+            "error": "Invalid lane!\n\n",
+            "updater": database.update_user_lane,
+        },
+    }
+
+    return checkbox_dispatcher
 
 
 def go_to_login_page(gui):
@@ -250,7 +271,7 @@ def search_for_user(database, gui):
 
         # If the user clicked cancel
         if id_to_search is False:
-            return
+            return None
 
         if not validate.is_valid_id(id_to_search):
             gui.show_error("Invalid User ID.")
@@ -282,7 +303,7 @@ def go_to_update_user_page(database, gui):
 
         # If the user clicked cancel
         if id_to_update is False:
-            return
+            return None
 
         if not validate.is_valid_id(id_to_update):
             gui.show_error("Invalid User ID.")
