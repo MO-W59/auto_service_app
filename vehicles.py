@@ -16,28 +16,28 @@ def new_vehicle_submit(database, gui):
     errors = ""
 
     if not validate.is_valid_vin(vin):
-        errors += "Invalid vin!"
+        errors += "Invalid vin!\n\n"
 
     if database.get_vehicle_data(vin):
-        errors += "There is a vehicle with this VIN already!"
+        errors += "There is a vehicle with this VIN already!\n\n"
 
     if not validate.is_valid_name(make):
-        errors += "Invalid make!"
+        errors += "Invalid make!\n\n"
 
     if not validate.is_valid_name(model):
-        errors += "Invalid model!"
+        errors += "Invalid model!\n\n"
 
     if not validate.is_valid_year(year):
-        errors += "Invalid year!"
+        errors += "Invalid year!\n\n"
 
     if not validate.is_valid_name(color):
-        errors += "Invalid color!"
+        errors += "Invalid color!\n\n"
 
     if not validate.is_valid_id(engine):
-        errors += "Invalid engine!"
+        errors += "Invalid engine!\n\n"
 
     if errors != "":
-        gui.show_error(errors)
+        return gui.show_error(errors)
 
     vehicle_data = [vin, model, make, year, color, engine, [], None]
 

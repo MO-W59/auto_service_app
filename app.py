@@ -14,7 +14,6 @@ import customers
 
 # vvv--- TODO list ---vvv
 # ensure the titles of the message/error windows and other labels can be read and are not cut off.
-# move new lines in error strings to begining of error message.
 # check to make sure elimination of if statements and showing all errors at once does not let unvalididated input get passed to the database
 # use dictionaries instead of lists for large inputs?
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?

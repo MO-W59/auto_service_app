@@ -17,10 +17,10 @@ def new_customer_submit(database, gui):
         errors += "Invalid name!"
 
     if not validate.is_valid_address(customer_address):
-        errors += "Invalid address!"
+        errors += "\n\nInvalid address!"
 
     if not validate.is_valid_phone_number(customer_phone):
-        errors += "Invalid phone number!"
+        errors += "\n\nInvalid phone number!"
 
     if errors != "":
         return gui.show_error(errors)
@@ -53,15 +53,15 @@ def edit_customer_submit(database, gui):
 
     if gui.edit_customer_change_name_check_box.isChecked():
         if not validate.is_valid_name(new_name):
-            errors += "Invalid name!"
+            errors += "Invalid name!\n\n"
 
     if gui.edit_customer_change_address_check_box.isChecked():
         if not validate.is_valid_address(new_address):
-            errors += "Invalid address!"
+            errors += "Invalid address!\n\n"
 
     if gui.edit_customer_change_phone_check_box.isChecked():
         if not validate.is_valid_phone_number(new_phone):
-            errors += "Invalid phone!"
+            errors += "Invalid phone!\n\n"
 
     if errors != "":
         return gui.show_error(errors)
