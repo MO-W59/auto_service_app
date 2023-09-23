@@ -1254,7 +1254,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_part_page
         )
         self.edit_part_change_description_check_box.setGeometry(
-            QtCore.QRect(370, 480, 111, 17)
+            QtCore.QRect(370, 480, 125, 17)
         )
         self.edit_part_change_description_check_box.setObjectName(
             "edit_part_change_description_check_box"
@@ -1406,7 +1406,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_customer_page
         )
         self.edit_customer_change_name_check_box.setGeometry(
-            QtCore.QRect(100, 210, 91, 17)
+            QtCore.QRect(100, 210, 100, 17)
         )
         self.edit_customer_change_name_check_box.setObjectName(
             "edit_customer_change_name_check_box"
@@ -1426,7 +1426,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_customer_page
         )
         self.edit_customer_change_phone_check_box.setGeometry(
-            QtCore.QRect(100, 640, 131, 17)
+            QtCore.QRect(100, 640, 145, 17)
         )
         self.edit_customer_change_phone_check_box.setObjectName(
             "edit_customer_change_phone_check_box"
@@ -1687,7 +1687,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.edit_vehicle_color_label.setObjectName("edit_vehicle_color_label")
 
         self.edit_vehicle_vin_display_label = QtWidgets.QLabel(self.edit_vehicle_page)
-        self.edit_vehicle_vin_display_label.setGeometry(QtCore.QRect(380, 170, 120, 21))
+        self.edit_vehicle_vin_display_label.setGeometry(QtCore.QRect(380, 170, 180, 21))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.edit_vehicle_vin_display_label.setFont(font)
@@ -1699,7 +1699,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_vehicle_page
         )
         self.edit_vehicle_change_make_check_box.setGeometry(
-            QtCore.QRect(380, 240, 91, 17)
+            QtCore.QRect(380, 240, 100, 17)
         )
         self.edit_vehicle_change_make_check_box.setObjectName(
             "edit_vehicle_change_make_check_box"
@@ -1709,7 +1709,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_vehicle_page
         )
         self.edit_vehicle_change_model_check_box.setGeometry(
-            QtCore.QRect(380, 350, 91, 17)
+            QtCore.QRect(380, 350, 100, 17)
         )
         self.edit_vehicle_change_model_check_box.setObjectName(
             "edit_vehicle_change_model_check_box"
@@ -1719,7 +1719,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_vehicle_page
         )
         self.edit_vehicle_change_year_check_box.setGeometry(
-            QtCore.QRect(380, 460, 91, 17)
+            QtCore.QRect(380, 460, 95, 17)
         )
         self.edit_vehicle_change_year_check_box.setObjectName(
             "edit_vehicle_change_year_check_box"
@@ -1729,7 +1729,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_vehicle_page
         )
         self.edit_vehicle_change_color_check_box.setGeometry(
-            QtCore.QRect(380, 570, 85, 17)
+            QtCore.QRect(380, 570, 100, 17)
         )
         self.edit_vehicle_change_color_check_box.setObjectName(
             "edit_vehicle_change_color_check_box"

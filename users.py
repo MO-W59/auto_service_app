@@ -74,10 +74,11 @@ def new_user_submit(database, gui):
         if not validate.is_valid_lane(section_or_lane):
             errors += "Invalid lane!\n\n"
 
+        else:
+            section_or_lane = int(section_or_lane)
+
     if errors != "":
         return gui.show_error(errors)
-
-    int(section_or_lane)
 
     hashed_pass = sha512_crypt.hash(new_pass)
 
@@ -108,24 +109,30 @@ def update_password_submit(database, gui):
     confirm_new_pass = gui.confirm_new_password_input_box.text()
     errors = ""
 
-    if not validate.is_valid_username(username) or not validate.is_valid_password(
-        old_pass
+    if (
+        not validate.is_valid_username(username)
+        or not validate.is_valid_password(old_pass)
+        or not database.is_current_users_password(old_pass)
     ):
-        errors += "Invalid username or password!"
+        errors += "Invalid username or password!\n\n"
 
     if new_pass != confirm_new_pass:
-        errors += "New passwords do not match!"
+        errors += "New passwords do not match!\n\n"
 
     if not validate.is_valid_password(new_pass):
-        errors += "New password is invalid!"
+        errors += "New password is invalid!\n\n"
 
     if old_pass == new_pass:
-        errors += "New password can not be the same as the old password!"
+        errors += "New password can not be the same as the old password!\n\n"
+
+    if errors != "":
+        return gui.show_error(errors)
+
+    if not database.is_current_users_password(old_pass):
+        return gui.show_error("Invalid username or password!")
 
     if database.update_pass(username, old_pass, new_pass):
         return gui.show_success("Password update successful.")
-
-    return gui.show_error(errors)
 
 
 def update_user_submit(database, gui):

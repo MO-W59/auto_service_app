@@ -89,20 +89,20 @@ def edit_repair_submit(database, gui):
 
     if gui.change_writer_check_box.isChecked():
         if not validate.is_valid_id(new_service_writer_id):
-            errors += "Invalid service writer ID!"
+            errors += "Invalid service writer ID!\n\n"
 
     if gui.change_tech_check_box.isChecked():
         if not validate.is_valid_id(new_tech_id):
-            errors += "Invalid technician ID!"
+            errors += "Invalid technician ID!\n\n"
 
     if gui.change_labor_check_box.isChecked():
         if not validate.is_valid_dollar_amount(new_labor_amount):
-            errors += "Invalid labor value!"
+            errors += "Invalid labor value!\n\n"
 
     if not validate.is_valid_description(
         problem_description
     ) or not validate.is_valid_description(repair_description):
-        errors += "Invalid description entered!"
+        errors += "Invalid description entered!\n\n"
 
     if errors != "":
         return gui.show_error(errors)

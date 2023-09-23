@@ -14,6 +14,8 @@ import customers
 
 # vvv--- TODO list ---vvv
 # ensure the titles of the message/error windows and other labels can be read and are not cut off.
+# move new lines in error strings to begining of error message.
+# check to make sure elimination of if statements and showing all errors at once does not let unvalididated input get passed to the database
 # use dictionaries instead of lists for large inputs?
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
@@ -37,7 +39,7 @@ import customers
 # search for bugs
 # update doc strings to describe things better
 # change naming conventions to uniform naming conventions
-# place comments where needed because you didnt do it at time of writing
+# place comments where needed because you didnt do it at time of writing, also spell check stuff
 # handle too many lines in module linter flags
 
 

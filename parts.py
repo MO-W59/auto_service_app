@@ -9,15 +9,19 @@ def create_part_submit(database, gui):
     new_part_id = gui.new_part_part_id_input_box.text()
     new_part_cost = gui.new_part_part_cost_input_box.text()
     new_part_descpition = gui.new_part_description_input_box.text()
+    errors = ""
 
     if not validate.is_valid_id(new_part_id):
-        return gui.show_error("Invaild part id.")
+        errors += "Invaild part id!\n\n"
 
     if not validate.is_valid_dollar_amount(new_part_cost):
-        return gui.show_error("Invalid part cost.")
+        errors += "Invalid part cost!\n\n"
 
     if not validate.is_valid_description(new_part_descpition):
-        return gui.show_error("Invalid description.")
+        errors += "Invalid description!\n\n"
+
+    if errors != "":
+        return gui.show_error(errors)
 
     inputs = [new_part_id, new_part_cost, new_part_descpition]
 
@@ -35,10 +39,10 @@ def edit_part_submit(database, gui):
     errors = ""
 
     if not validate.is_valid_dollar_amount(new_part_cost):
-        errors += "Invalid part cost."
+        errors += "Invalid part cost!\n\n"
 
     if not validate.is_valid_description(new_part_description):
-        errors += "Invalid part description."
+        errors += "Invalid part description!\n\n"
 
     if errors != "":
         return gui.show_error(errors)
