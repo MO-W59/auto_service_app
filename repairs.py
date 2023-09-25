@@ -8,17 +8,17 @@ import validate
 def new_repair_submit(database, gui):
     """Gets information for a new repair and passes it to the database for storage."""
 
-    service_writer_id = gui.new_repair_service_id_input_box.text()
-    technician_id = gui.new_repair_tech_id_input_box.text()
+    writer_id = gui.new_repair_service_id_input_box.text()
+    tech_id = gui.new_repair_tech_id_input_box.text()
     vin = gui.new_repair_vin_input_box.text()
     drop_off_date = gui.new_repair_current_date_display.text()
     problem_description = gui.new_repair_description_input_box.toPlainText()
     errors = ""
 
-    if not validate.is_valid_id(service_writer_id):
+    if not validate.is_valid_id(writer_id):
         errors += "Invalid service writer id.\n\n"
 
-    if not validate.is_valid_id(technician_id):
+    if not validate.is_valid_id(tech_id):
         errors += "Invalid technician id.\n\n"
 
     if not validate.is_valid_vin(vin):
@@ -55,22 +55,22 @@ def new_repair_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
-    inputs = [
-        repair_id,
-        0.0,
-        0.0,
-        0.0,
-        drop_off_date,
-        None,
-        problem_description,
-        None,
-        [],
-        technician_id,
-        service_writer_id,
-        vin,
-    ]
+    repair_data = {
+        "repair_id": repair_id,
+        "total_cost": 0.0,
+        "labor": 0.0,
+        "parts_cost": 0.0,
+        "drop_off_date": drop_off_date,
+        "completion_date": None,
+        "problem_description": problem_description,
+        "repair_description": None,
+        "required_parts": json.dumps([]),
+        "tech_id": tech_id,
+        "writer_id": writer_id,
+        "vin": vin,
+    }
 
-    database.insert_repair(inputs)
+    database.insert_repair(repair_data)
 
     database.update_vehicle_active_repair(vin, repair_id)
 

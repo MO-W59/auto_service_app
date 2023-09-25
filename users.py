@@ -29,30 +29,30 @@ def login_submit(database, gui):
 def new_user_submit(database, gui):
     """Gets information for a new user and passes it to the database for storage."""
 
-    new_user = gui.username_new_user_input_box.text()
-    new_pass = gui.password_new_user_input_box.text()
-    confirm_new_pass = gui.confirm_password_new_user_input_box.text()
-    new_name = gui.new_user_name_input_box.text()
-    new_team = gui.new_user_team_input_box.text()
+    username = gui.username_new_user_input_box.text()
+    pwrd = gui.password_new_user_input_box.text()
+    confirm_pwrd = gui.confirm_password_new_user_input_box.text()
+    name = gui.new_user_name_input_box.text()
+    team = gui.new_user_team_input_box.text()
     section_or_lane = None
     target_table = None
     assigned_repairs = []
     errors = ""
 
     if (
-        not validate.is_valid_username(new_user)
-        or not validate.is_valid_password(new_pass)
-        or not validate.is_valid_password(confirm_new_pass)
+        not validate.is_valid_username(username)
+        or not validate.is_valid_password(pwrd)
+        or not validate.is_valid_password(confirm_pwrd)
     ):
         errors += "Invalid username or password!\n\n"
 
-    if not new_pass == confirm_new_pass:
+    if not pwrd == confirm_pwrd:
         errors += "Passwords do not match!\n\n"
 
-    if not validate.is_valid_name(new_name):
+    if not validate.is_valid_name(name):
         errors += "Invalid name!\n\n"
 
-    if not validate.is_valid_team(new_team):
+    if not validate.is_valid_team(team):
         errors += "Invalid team!\n\n"
 
     if gui.new_user_tech_radio_button.isChecked():
@@ -77,25 +77,25 @@ def new_user_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
-    if database.is_username_in_use(new_user):
+    if database.is_username_in_use(username):
         return gui.show_error("Username already in use!")
 
-    hashed_pass = sha512_crypt.hash(new_pass)
+    hash_pwrd = sha512_crypt.hash(pwrd)
 
     user_id = database.gen_id(target_table)
 
-    inputs = [
-        target_table,
-        user_id,
-        new_user,
-        hashed_pass,
-        new_name,
-        new_team,
-        section_or_lane,
-        assigned_repairs,
-    ]
+    user_data = {
+        "target_table": target_table,
+        "user_id": user_id,
+        "username": username,
+        "hash_pwrd": hash_pwrd,
+        "name": name,
+        "team": team,
+        "section_or_lane": section_or_lane,
+        "assigned_repairs": json.dumps(assigned_repairs),
+    }
 
-    database.insert_user(inputs)
+    database.insert_user(user_data)
 
     return gui.show_success("User input successfuly.")
 
@@ -131,6 +131,8 @@ def update_password_submit(database, gui):
 
     if database.update_pass(username, old_pass, new_pass):
         return gui.show_success("Password update successful.")
+
+    return False
 
 
 def update_user_submit(database, gui):

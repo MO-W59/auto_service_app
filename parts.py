@@ -6,26 +6,32 @@ import validate
 def create_part_submit(database, gui):
     """Creates new part from inputs and passed to database for storage."""
 
-    new_part_id = gui.new_part_part_id_input_box.text()
-    new_part_cost = gui.new_part_part_cost_input_box.text()
-    new_part_descpition = gui.new_part_description_input_box.text()
+    part_id = gui.new_part_part_id_input_box.text()
+    part_cost = gui.new_part_part_cost_input_box.text()
+    part_descpition = gui.new_part_description_input_box.text()
     errors = ""
 
-    if not validate.is_valid_id(new_part_id):
+    if not validate.is_valid_id(part_id):
         errors += "Invaild part id!\n\n"
 
-    if not validate.is_valid_dollar_amount(new_part_cost):
+    if not validate.is_valid_dollar_amount(part_cost):
         errors += "Invalid part cost!\n\n"
 
-    if not validate.is_valid_description(new_part_descpition):
+    if not validate.is_valid_description(part_descpition):
         errors += "Invalid description!\n\n"
 
     if errors != "":
         return gui.show_error(errors)
 
-    inputs = [new_part_id, new_part_cost, new_part_descpition]
+    if database.get_part_data(part_id):
+        return gui.show_error("That part ID is already in use!")
 
-    database.insert_parts(inputs)
+    part_data = {
+        "part_id": part_id,
+        "part_cost": part_cost,
+        "part_description": part_descpition,
+    }
+    database.insert_part(part_data)
 
     return gui.show_success("Part input successfully.")
 

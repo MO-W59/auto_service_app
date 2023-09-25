@@ -106,7 +106,7 @@ class AppDatabase:
             customer_count integer);"""
         )
 
-        self.cursor.execute("""INSERT INTO counter_ids VALUES (1, 1, 1)""")
+        self.cursor.execute("""INSERT INTO counter_ids VALUES (1, 1, 1);""")
         self.connection.commit()
 
     def gen_id(self, target_table):
@@ -115,7 +115,7 @@ class AppDatabase:
         table."""
 
         created_id = ""
-        counter_list = self.cursor.execute("""SELECT * FROM counter_ids""").fetchone()
+        counter_list = self.cursor.execute("""SELECT * FROM counter_ids;""").fetchone()
 
         writer_count = counter_list[0]
         tech_count = counter_list[1]
@@ -127,7 +127,7 @@ class AppDatabase:
             new_writer_count = writer_count + 1
 
             sql_statement = f"""UPDATE counter_ids SET writer_count = {new_writer_count}
-                         WHERE writer_count = {writer_count}"""
+                         WHERE writer_count = {writer_count};"""
 
             self.cursor.execute(sql_statement)
 
@@ -141,7 +141,7 @@ class AppDatabase:
             new_tech_count = tech_count + 1
 
             sql_statement = f"""UPDATE counter_ids SET tech_count = {new_tech_count}
-                         WHERE tech_count = {tech_count}"""
+                         WHERE tech_count = {tech_count};"""
 
             self.cursor.execute(sql_statement)
 
@@ -155,7 +155,7 @@ class AppDatabase:
             new_customer_count = customer_count + 1
 
             sql_statement = f"""UPDATE counter_ids SET customer_count = {new_customer_count}
-                         WHERE customer_count = {customer_count}"""
+                         WHERE customer_count = {customer_count};"""
 
             self.cursor.execute(sql_statement)
 
@@ -172,16 +172,13 @@ class AppDatabase:
         verfication was successful."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM service_writers
-                                                 WHERE username = (?)""",
-            (input_user,),
+            """SELECT * FROM service_writers WHERE username = (?);""", (input_user,)
         ).fetchall()
+
         user_data = (
             user_data
             + self.cursor.execute(
-                """SELECT * FROM technicians
-                                                 WHERE username = (?)""",
-                (input_user,),
+                """SELECT * FROM technicians WHERE username = (?);""", (input_user,)
             ).fetchall()
         )
 
@@ -204,15 +201,14 @@ class AppDatabase:
         password in the database."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM service_writers
-                                                 WHERE employee_id = (?)""",
+            """SELECT * FROM service_writers WHERE employee_id = (?);""",
             (self.current_user,),
         ).fetchall()
+
         user_data = (
             user_data
             + self.cursor.execute(
-                """SELECT * FROM technicians
-                                                         WHERE employee_id = (?)""",
+                """SELECT * FROM technicians WHERE employee_id = (?);""",
                 (self.current_user,),
             ).fetchall()
         )
@@ -230,55 +226,45 @@ class AppDatabase:
 
         self.current_user = user_id
 
-    def insert_user(self, inputs):
+    def insert_user(self, user_data):
         """This function takes a set of inputs for a new user and inputs it into
         the database."""
 
-        target_table = inputs[0]
-        user_id = inputs[1]
-        input_user = inputs[2]
-        hashed_pass = str(inputs[3])
-        new_name = inputs[4]
-        new_team = inputs[5]
-        section_or_lane = inputs[6]
-        assigined_repairs = json.dumps(inputs[7])
-
-        if target_table == "service_writers":
+        if user_data["target_table"] == "service_writers":
             self.cursor.execute(
                 """INSERT INTO service_writers VALUES(?, ?, ?, ?, ?, ?, ?);""",
                 (
-                    user_id,
-                    input_user,
-                    hashed_pass,
-                    new_name,
-                    new_team,
-                    section_or_lane,
-                    assigined_repairs,
+                    user_data["user_id"],
+                    user_data["username"],
+                    user_data["hash_pwrd"],
+                    user_data["name"],
+                    user_data["team"],
+                    user_data["section_or_lane"],
+                    user_data["assigned_repairs"],
                 ),
             )
 
             self.connection.commit()
 
-        if target_table == "technicians":
+        if user_data["target_table"] == "technicians":
             self.cursor.execute(
-                """INSERT INTO technicians VALUES(?, ?, ?, ?, ?, ?, ?);""",
+                """INSERT INTO service_writers VALUES(?, ?, ?, ?, ?, ?, ?);""",
                 (
-                    user_id,
-                    input_user,
-                    hashed_pass,
-                    new_name,
-                    new_team,
-                    section_or_lane,
-                    assigined_repairs,
+                    user_data["user_id"],
+                    user_data["username"],
+                    user_data["hash_pwrd"],
+                    user_data["name"],
+                    user_data["team"],
+                    user_data["section_or_lane"],
+                    user_data["assigned_repairs"],
                 ),
             )
-
             self.connection.commit()
 
-    def set_login_status(self, passed_bool):
+    def set_login_status(self, status):
         """Sets the login status of the database."""
 
-        self.is_logged_in = passed_bool
+        self.is_logged_in = status
 
     def get_login_status(self):
         """Gets the login status of the database."""
@@ -291,13 +277,13 @@ class AppDatabase:
         new_pass = sha512_crypt.hash(new_pass)
 
         user_data = self.cursor.execute(
-            """SELECT * FROM service_writers WHERE username = (?)""", (user,)
+            """SELECT * FROM service_writers WHERE username = (?);""", (user,)
         ).fetchall()
 
         user_data = (
             user_data
             + self.cursor.execute(
-                """SELECT * FROM technicians WHERE username = (?)""", (user,)
+                """SELECT * FROM technicians WHERE username = (?);""", (user,)
             ).fetchall()
         )
 
@@ -311,7 +297,7 @@ class AppDatabase:
         if sha512_crypt.verify(old_pass, target_hash):
             if target_id.startswith("t"):
                 self.cursor.execute(
-                    """UPDATE technicians SET password = (?) WHERE employee_id = (?)""",
+                    """UPDATE technicians SET password = (?) WHERE employee_id = (?);""",
                     (
                         new_pass,
                         target_id,
@@ -324,7 +310,7 @@ class AppDatabase:
 
             if target_id.startswith("w"):
                 self.cursor.execute(
-                    """UPDATE service_writers SET password = (?) WHERE employee_id = (?)""",
+                    """UPDATE service_writers SET password = (?) WHERE employee_id = (?);""",
                     (
                         new_pass,
                         target_id,
@@ -342,7 +328,7 @@ class AppDatabase:
 
         if user_id.startswith("t"):
             self.cursor.execute(
-                """UPDATE technicians SET name = (?) WHERE employee_id = (?)""",
+                """UPDATE technicians SET name = (?) WHERE employee_id = (?);""",
                 (
                     new_name,
                     user_id,
@@ -353,7 +339,7 @@ class AppDatabase:
 
         if user_id.startswith("w"):
             self.cursor.execute(
-                """UPDATE service_writers SET name = (?) WHERE employee_id = (?)""",
+                """UPDATE service_writers SET name = (?) WHERE employee_id = (?);""",
                 (
                     new_name,
                     user_id,
@@ -369,7 +355,7 @@ class AppDatabase:
 
         if user_id.startswith("t"):
             self.cursor.execute(
-                """UPDATE technicians SET team = (?) WHERE employee_id = (?)""",
+                """UPDATE technicians SET team = (?) WHERE employee_id = (?);""",
                 (
                     new_team,
                     user_id,
@@ -380,7 +366,7 @@ class AppDatabase:
 
         if user_id.startswith("w"):
             self.cursor.execute(
-                """UPDATE service_writers SET name = (?) WHERE employee_id = (?)""",
+                """UPDATE service_writers SET name = (?) WHERE employee_id = (?);""",
                 (
                     new_team,
                     user_id,
@@ -395,7 +381,7 @@ class AppDatabase:
         """This function will update a user's lane in the database. (service writers)"""
 
         self.cursor.execute(
-            """UPDATE service_writers SET lane = (?) WHERE employee_id = (?)""",
+            """UPDATE service_writers SET lane = (?) WHERE employee_id = (?);""",
             (
                 new_lane,
                 user_id,
@@ -408,7 +394,7 @@ class AppDatabase:
         """This function will update a user's section in the database. (technicians)"""
 
         self.cursor.execute(
-            """UPDATE technicians SET section = (?) WHERE employee_id = (?)""",
+            """UPDATE technicians SET section = (?) WHERE employee_id = (?);""",
             (
                 new_section,
                 user_id,
@@ -423,14 +409,14 @@ class AppDatabase:
 
         if user_id.startswith("t"):
             user_data = self.cursor.execute(
-                """SELECT * FROM technicians WHERE employee_id = (?)""", (user_id,)
+                """SELECT * FROM technicians WHERE employee_id = (?);""", (user_id,)
             ).fetchone()
 
             return user_data
 
         elif user_id.startswith("w"):
             user_data = self.cursor.execute(
-                """SELECT * FROM service_writers WHERE employee_id = (?)""", (user_id,)
+                """SELECT * FROM service_writers WHERE employee_id = (?);""", (user_id,)
             ).fetchone()
 
             return user_data
@@ -442,64 +428,51 @@ class AppDatabase:
         """Checks the database to see if a username is already in use."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM technicians WHERE username = (?)""", (username,)
+            """SELECT * FROM technicians WHERE username = (?);""", (username,)
         ).fetchall()
 
         user_data = (
             user_data
             + self.cursor.execute(
-                """SELECT * FROM service_writers WHERE username = (?)""", (username,)
+                """SELECT * FROM service_writers WHERE username = (?);""", (username,)
             ).fetchall()
         )
 
         return user_data
 
-    def insert_repair(self, inputs):
+    def insert_repair(self, repair_data):
         """This function will insert a new repair into the database and call the functions
         need to add the repair to the valid employee's repair list."""
 
-        repair_id = inputs[0]
-        total_cost = inputs[1]
-        labor = inputs[2]
-        parts_cost = inputs[3]
-        drop_off_date = inputs[4]
-        repair_completed_date = inputs[5]
-        problem_description = inputs[6]
-        repair_description = inputs[7]
-        required_parts = json.dumps(inputs[8])
-        technician_id = inputs[9]
-        service_writer_id = inputs[10]
-        vehicle = inputs[11]
-
         self.cursor.execute(
-            """INSERT INTO repairs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO repairs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);""",
             (
-                repair_id,
-                total_cost,
-                labor,
-                parts_cost,
-                drop_off_date,
-                repair_completed_date,
-                problem_description,
-                repair_description,
-                required_parts,
-                technician_id,
-                service_writer_id,
-                vehicle,
+                repair_data["repair_id"],
+                repair_data["total_cost"],
+                repair_data["labor"],
+                repair_data["parts_cost"],
+                repair_data["drop_off_date"],
+                repair_data["completion_date"],
+                repair_data["problem_description"],
+                repair_data["repair_description"],
+                repair_data["required_parts"],
+                repair_data["tech_id"],
+                repair_data["writer_id"],
+                repair_data["vin"],
             ),
         )
 
         self.connection.commit()
 
-        self.add_repair_to_tech(technician_id, repair_id)
+        self.add_repair_to_tech(repair_data["tech_id"], repair_data["repair_id"])
 
-        self.add_repair_to_writer(service_writer_id, repair_id)
+        self.add_repair_to_writer(repair_data["writer_id"], repair_data["repair_id"])
 
     def add_repair_to_tech(self, technician_id, repair_id):
         """This function will add the passed repair to the passed technician's repair list."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM technicians WHERE employee_id = (?)""", (technician_id,)
+            """SELECT * FROM technicians WHERE employee_id = (?);""", (technician_id,)
         ).fetchone()
 
         new_repair_list = []
@@ -514,7 +487,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_repair_list)
 
         self.cursor.execute(
-            """UPDATE technicians SET assigned_repairs = (?) WHERE employee_id = (?)""",
+            """UPDATE technicians SET assigned_repairs = (?) WHERE employee_id = (?);""",
             (
                 new_dumped_list,
                 technician_id,
@@ -527,7 +500,7 @@ class AppDatabase:
         """This function will remove the passed repair from the technicians repair list."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM technicians WHERE employee_id = (?)""", (tech_id,)
+            """SELECT * FROM technicians WHERE employee_id = (?);""", (tech_id,)
         ).fetchone()
 
         new_repair_list = []
@@ -543,7 +516,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_repair_list)
 
         self.cursor.execute(
-            """UPDATE technicians SET assigned_repairs = (?) WHERE employee_id = (?)""",
+            """UPDATE technicians SET assigned_repairs = (?) WHERE employee_id = (?);""",
             (
                 new_dumped_list,
                 tech_id,
@@ -556,7 +529,7 @@ class AppDatabase:
         """This function will add the passed repair to the passed service writer's repair list."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM service_writers WHERE employee_id = (?)""",
+            """SELECT * FROM service_writers WHERE employee_id = (?);""",
             (service_writer_id,),
         ).fetchone()
 
@@ -572,7 +545,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_repair_list)
 
         self.cursor.execute(
-            """UPDATE service_writers SET assigned_repairs = (?) WHERE employee_id = (?)""",
+            """UPDATE service_writers SET assigned_repairs = (?) WHERE employee_id = (?);""",
             (
                 new_dumped_list,
                 service_writer_id,
@@ -585,7 +558,7 @@ class AppDatabase:
         """This function will remove the passed repair from the service writers repair list."""
 
         user_data = self.cursor.execute(
-            """SELECT * FROM service_writers WHERE employee_id = (?)""",
+            """SELECT * FROM service_writers WHERE employee_id = (?);""",
             (service_writer_id,),
         ).fetchone()
 
@@ -602,7 +575,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_repair_list)
 
         self.cursor.execute(
-            """UPDATE service_writers SET assigned_repairs = (?) WHERE employee_id = (?)""",
+            """UPDATE service_writers SET assigned_repairs = (?) WHERE employee_id = (?);""",
             (
                 new_dumped_list,
                 service_writer_id,
@@ -616,7 +589,7 @@ class AppDatabase:
         then return that data to be displayed."""
 
         repair_data = self.cursor.execute(
-            """SELECT * FROM repairs WHERE repair_id = (?)""", (repair_id,)
+            """SELECT * FROM repairs WHERE repair_id = (?);""", (repair_id,)
         ).fetchone()
 
         return repair_data
@@ -624,7 +597,7 @@ class AppDatabase:
     def get_all_repairs(self):
         """This function will return all active repairs (no completion date)."""
 
-        list_of_repairs = self.cursor.execute("""SELECT * FROM repairs""").fetchall()
+        list_of_repairs = self.cursor.execute("""SELECT * FROM repairs;""").fetchall()
 
         for repair in list_of_repairs:
             if repair[5] is not None:
@@ -636,7 +609,7 @@ class AppDatabase:
         """This function will update the targted repair with a new service writer."""
 
         self.cursor.execute(
-            """UPDATE repairs SET service_writer = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET service_writer = (?) WHERE repair_id = (?);""",
             (
                 service_writer_id,
                 repair_id,
@@ -653,7 +626,7 @@ class AppDatabase:
         """This function will update the targeted repair with a new technician."""
 
         self.cursor.execute(
-            """UPDATE repairs SET technician = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET technician = (?) WHERE repair_id = (?);""",
             (
                 tech_id,
                 repair_id,
@@ -670,7 +643,7 @@ class AppDatabase:
         """This function will update the total repair cost of the targeted repair."""
 
         self.cursor.execute(
-            """UPDATE repairs SET total_cost = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET total_cost = (?) WHERE repair_id = (?);""",
             (
                 total_repair_cost,
                 repair_id,
@@ -685,7 +658,7 @@ class AppDatabase:
         labor_repair_cost = float(labor_repair_cost)
 
         self.cursor.execute(
-            """UPDATE repairs SET labor = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET labor = (?) WHERE repair_id = (?);""",
             (
                 labor_repair_cost,
                 repair_id,
@@ -698,7 +671,7 @@ class AppDatabase:
         """This function will update the part cost of the targeted repair."""
 
         self.cursor.execute(
-            """UPDATE repairs SET parts_cost = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET parts_cost = (?) WHERE repair_id = (?);""",
             (
                 parts_cost,
                 repair_id,
@@ -711,7 +684,7 @@ class AppDatabase:
         """This funcition will update the completion date of the targeted repair."""
 
         self.cursor.execute(
-            """UPDATE repairs SET repair_completed_date = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET repair_completed_date = (?) WHERE repair_id = (?);""",
             (
                 completion_date,
                 repair_id,
@@ -724,7 +697,7 @@ class AppDatabase:
         """This function will update the problem description of the targted repair."""
 
         self.cursor.execute(
-            """UPDATE repairs SET problem_description = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET problem_description = (?) WHERE repair_id = (?);""",
             (
                 problem_description,
                 repair_id,
@@ -737,7 +710,7 @@ class AppDatabase:
         """This function will update the repair description of the targeted repair."""
 
         self.cursor.execute(
-            """UPDATE repairs SET repair_description = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET repair_description = (?) WHERE repair_id = (?);""",
             (
                 repair_description,
                 repair_id,
@@ -750,7 +723,7 @@ class AppDatabase:
         """This function will update the list of required parts for the repair."""
 
         repair_data = self.cursor.execute(
-            """SELECT * FROM repairs WHERE repair_id = (?)""",
+            """SELECT * FROM repairs WHERE repair_id = (?);""",
             (repair_id,),
         ).fetchone()
 
@@ -765,7 +738,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_parts_list)
 
         self.cursor.execute(
-            """UPDATE repairs SET required_parts = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET required_parts = (?) WHERE repair_id = (?);""",
             (
                 new_dumped_list,
                 repair_id,
@@ -779,7 +752,7 @@ class AppDatabase:
         repairs list of required parts."""
 
         repair_data = self.cursor.execute(
-            """SELECT * FROM repairs WHERE repair_id = (?)""",
+            """SELECT * FROM repairs WHERE repair_id = (?);""",
             (repair_id,),
         ).fetchone()
 
@@ -788,7 +761,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(parts_list)
 
         self.cursor.execute(
-            """UPDATE repairs SET required_parts = (?) WHERE repair_id = (?)""",
+            """UPDATE repairs SET required_parts = (?) WHERE repair_id = (?);""",
             (
                 new_dumped_list,
                 repair_id,
@@ -797,19 +770,15 @@ class AppDatabase:
 
         self.connection.commit()
 
-    def insert_parts(self, inputs):
+    def insert_part(self, part_data):
         """This function will insert a new part into the database."""
 
-        part_id = inputs[0]
-        part_cost = float(inputs[1])
-        part_description = inputs[2]
-
         self.cursor.execute(
-            """INSERT INTO parts VALUES(?, ?, ?)""",
+            """INSERT INTO parts VALUES(?, ?, ?);""",
             (
-                part_id,
-                part_cost,
-                part_description,
+                part_data["part_id"],
+                part_data["part_cost"],
+                part_data["part_description"],
             ),
         )
 
@@ -818,13 +787,13 @@ class AppDatabase:
     def get_all_parts_in_database(self):
         """This function will return a list containing all parts in the database."""
 
-        return self.cursor.execute("""SELECT * FROM parts""").fetchall()
+        return self.cursor.execute("""SELECT * FROM parts;""").fetchall()
 
     def get_part_data(self, part_id):
         """This function will return data for the passed part id."""
 
         return self.cursor.execute(
-            """SELECT * FROM parts WHERE part_id = (?)""",
+            """SELECT * FROM parts WHERE part_id = (?);""",
             (part_id,),
         ).fetchone()
 
@@ -832,7 +801,7 @@ class AppDatabase:
         """Updates the part cost in the database for the passed part id."""
 
         self.cursor.execute(
-            """UPDATE parts SET part_cost = (?) WHERE part_id = (?)""",
+            """UPDATE parts SET part_cost = (?) WHERE part_id = (?);""",
             (
                 new_cost,
                 part_id,
@@ -845,7 +814,7 @@ class AppDatabase:
         """Updates the part description in the databse for the passed part id."""
 
         self.cursor.execute(
-            """UPDATE parts SET part_description = (?) WHERE part_id = (?)""",
+            """UPDATE parts SET part_description = (?) WHERE part_id = (?);""",
             (
                 new_description,
                 part_id,
@@ -854,17 +823,17 @@ class AppDatabase:
 
         self.connection.commit()
 
-    def insert_customer(self, inputs):
+    def insert_customer(self, customer_data):
         """Takes the passed customer data and enters a new customer into the database."""
 
         self.cursor.execute(
-            """INSERT INTO customers VALUES (?, ?, ?, ?, ?)""",
+            """INSERT INTO customers VALUES (?, ?, ?, ?, ?);""",
             (
-                inputs[0],
-                inputs[1],
-                inputs[2],
-                inputs[3],
-                inputs[4],
+                customer_data["customer_id"],
+                customer_data["name"],
+                customer_data["adress"],
+                customer_data["phone"],
+                customer_data["list_of_vehicles"],
             ),
         )
 
@@ -874,14 +843,14 @@ class AppDatabase:
         """Returns customer data for the passed customer id from the database."""
 
         return self.cursor.execute(
-            """SELECT * FROM customers WHERE customer_id = (?)""",
+            """SELECT * FROM customers WHERE customer_id = (?);""",
             (customer_id,),
         ).fetchone()
 
     def get_all_customers(self):
         """Returns a all customers in the database."""
 
-        return self.cursor.execute("""SELECT * FROM customers""").fetchall()
+        return self.cursor.execute("""SELECT * FROM customers;""").fetchall()
 
     def vehicle_is_owned(self, vin_to_add):
         """Checks if a vin is listed in any customer's data in the database."""
@@ -901,7 +870,7 @@ class AppDatabase:
         """Updates the passed customer id to show the new name in the database."""
 
         self.cursor.execute(
-            """UPDATE customers SET name = (?) WHERE customer_id = (?)""",
+            """UPDATE customers SET name = (?) WHERE customer_id = (?);""",
             (
                 new_name,
                 customer_id,
@@ -914,7 +883,7 @@ class AppDatabase:
         """Updates the passed customer id to show the new address in the database."""
 
         self.cursor.execute(
-            """UPDATE customers SET address = (?) WHERE customer_id = (?)""",
+            """UPDATE customers SET address = (?) WHERE customer_id = (?);""",
             (
                 new_address,
                 customer_id,
@@ -927,7 +896,7 @@ class AppDatabase:
         """Updates the passed customer id to show the new phone number in the database."""
 
         self.cursor.execute(
-            """UPDATE customers SET phone_number = (?) WHERE customer_id = (?)""",
+            """UPDATE customers SET phone_number = (?) WHERE customer_id = (?);""",
             (
                 new_phone,
                 customer_id,
@@ -940,7 +909,7 @@ class AppDatabase:
         """Adds vehicle to passed customer ID."""
 
         customer_data = self.cursor.execute(
-            """SELECT * FROM customers WHERE customer_id = (?)""",
+            """SELECT * FROM customers WHERE customer_id = (?);""",
             (customer_id,),
         ).fetchone()
 
@@ -956,7 +925,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_vehicle_list)
 
         self.cursor.execute(
-            """UPDATE customers SET list_of_vehicles = (?) WHERE customer_id = (?)""",
+            """UPDATE customers SET list_of_vehicles = (?) WHERE customer_id = (?);""",
             (new_dumped_list, customer_id),
         )
 
@@ -966,7 +935,7 @@ class AppDatabase:
         """Removes vehicle from passed customer ID."""
 
         customer_data = self.cursor.execute(
-            """SELECT * FROM customers WHERE customer_id = (?)""",
+            """SELECT * FROM customers WHERE customer_id = (?);""",
             (customer_id,),
         ).fetchone()
 
@@ -982,7 +951,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(new_vehicle_list)
 
         self.cursor.execute(
-            """UPDATE customers SET list_of_vehicles = (?) WHERE customer_id = (?)""",
+            """UPDATE customers SET list_of_vehicles = (?) WHERE customer_id = (?);""",
             (new_dumped_list, customer_id),
         )
 
@@ -992,16 +961,16 @@ class AppDatabase:
         """Inserts new vehicle into the database from passed vehicle data."""
 
         self.cursor.execute(
-            """INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO vehicles VALUES(?, ?, ?, ?, ?, ?, ?, ?);""",
             (
-                vehicle_data[0],
-                vehicle_data[1],
-                vehicle_data[2],
-                vehicle_data[3],
-                vehicle_data[4],
-                vehicle_data[5],
-                json.dumps(vehicle_data[6]),
-                vehicle_data[7],
+                vehicle_data["vin"],
+                vehicle_data["model"],
+                vehicle_data["make"],
+                vehicle_data["year"],
+                vehicle_data["color"],
+                vehicle_data["engine"],
+                vehicle_data["repair_history"],
+                vehicle_data["repair_request"],
             ),
         )
 
@@ -1011,20 +980,20 @@ class AppDatabase:
         """Returns vehicle data based on vin."""
 
         return self.cursor.execute(
-            """SELECT * FROM vehicles WHERE vin = (?)""",
+            """SELECT * FROM vehicles WHERE vin = (?);""",
             (vin,),
         ).fetchone()
 
     def get_all_vehicles(self):
         """Returns all vehicles in the database."""
 
-        return self.cursor.execute("""SELECT * FROM vehicles""").fetchall()
+        return self.cursor.execute("""SELECT * FROM vehicles;""").fetchall()
 
     def update_vehicle_make(self, vin, new_make):
         """Updates the passed vin to have the passed new make in the database."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET make = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET make = (?) WHERE vin = (?);""",
             (
                 new_make,
                 vin,
@@ -1037,7 +1006,7 @@ class AppDatabase:
         """Updates the passed vin to have the passed new model in the database."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET model = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET model = (?) WHERE vin = (?);""",
             (
                 new_model,
                 vin,
@@ -1050,7 +1019,7 @@ class AppDatabase:
         """Updates the passed vin to have the passed new year in the database."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET year = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET year = (?) WHERE vin = (?);""",
             (
                 new_year,
                 vin,
@@ -1063,7 +1032,7 @@ class AppDatabase:
         """Updates the passed vin to have the passed new color in the database."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET color = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET color = (?) WHERE vin = (?);""",
             (
                 new_color,
                 vin,
@@ -1076,7 +1045,7 @@ class AppDatabase:
         """Updates the passed vin to have the new passed engine in the database."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET engine = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET engine = (?) WHERE vin = (?);""",
             (
                 new_engine,
                 vin,
@@ -1089,7 +1058,7 @@ class AppDatabase:
         """Updates the active repair id of a passed vehicle to the passed repair id."""
 
         self.cursor.execute(
-            """UPDATE vehicles SET repair_request = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET repair_request = (?) WHERE vin = (?);""",
             (repair_id, vin),
         )
 
@@ -1099,7 +1068,7 @@ class AppDatabase:
         """Moves the current acitve repair of a vehicle to the history of repairs."""
 
         vehicle_data = self.cursor.execute(
-            """SELECT * FROM vehicles WHERE vin = (?)""",
+            """SELECT * FROM vehicles WHERE vin = (?);""",
             (vin,),
         ).fetchone()
 
@@ -1112,7 +1081,7 @@ class AppDatabase:
         new_dumped_list = json.dumps(repair_history)
 
         self.cursor.execute(
-            """UPDATE vehicles SET repair_history = (?), repair_request = (?) WHERE vin = (?)""",
+            """UPDATE vehicles SET repair_history = (?), repair_request = (?) WHERE vin = (?);""",
             (new_dumped_list, None, vin),
         )
 
@@ -1122,7 +1091,7 @@ class AppDatabase:
         """Searches if a passed vin has an active repair."""
 
         vehicle_data = self.cursor.execute(
-            """SELECT * FROM vehicles WHERE vin = (?)""", (vin,)
+            """SELECT * FROM vehicles WHERE vin = (?);""", (vin,)
         ).fetchone()
 
         if vehicle_data is None:

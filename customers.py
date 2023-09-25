@@ -8,18 +8,18 @@ def new_customer_submit(database, gui):
     """Gets new customer data and passes it to the database for storage."""
 
     target_table = "customers"
-    customer_name = gui.new_customer_name_input_box.text()
-    customer_address = gui.new_customer_address_input_box.toPlainText()
-    customer_phone = gui.new_customer_phone_input_box.text()
+    name = gui.new_customer_name_input_box.text()
+    address = gui.new_customer_address_input_box.toPlainText()
+    phone = gui.new_customer_phone_input_box.text()
     errors = ""
 
-    if not validate.is_valid_name(customer_name):
+    if not validate.is_valid_name(name):
         errors += "Invalid name!"
 
-    if not validate.is_valid_address(customer_address):
+    if not validate.is_valid_address(address):
         errors += "\n\nInvalid address!"
 
-    if not validate.is_valid_phone_number(customer_phone):
+    if not validate.is_valid_phone_number(phone):
         errors += "\n\nInvalid phone number!"
 
     if errors != "":
@@ -29,15 +29,15 @@ def new_customer_submit(database, gui):
 
     list_of_vehicles = []
 
-    inputs = [
-        customer_id,
-        customer_name,
-        customer_address,
-        customer_phone,
-        json.dumps(list_of_vehicles),
-    ]
+    customer_data = {
+        "customer_id": customer_id,
+        "name": name,
+        "adress": address,
+        "phone": phone,
+        "list_of_vehicles": json.dumps(list_of_vehicles),
+    }
 
-    database.insert_customer(inputs)
+    database.insert_customer(customer_data)
 
     return gui.show_success("New customer input succesfully.")
 
@@ -46,34 +46,34 @@ def edit_customer_submit(database, gui):
     """Gets new information for a customer and passes it to the database for storage."""
 
     customer_id = gui.edit_customer_id_display_label.text()
-    new_name = gui.edit_customer_name_input_box.text()
-    new_address = gui.edit_customer_address_input_box.toPlainText()
-    new_phone = gui.edit_customer_phone_input_box.text()
+    name = gui.edit_customer_name_input_box.text()
+    address = gui.edit_customer_address_input_box.toPlainText()
+    phone = gui.edit_customer_phone_input_box.text()
     errors = ""
 
     if gui.edit_customer_change_name_check_box.isChecked():
-        if not validate.is_valid_name(new_name):
+        if not validate.is_valid_name(name):
             errors += "Invalid name!\n\n"
 
     if gui.edit_customer_change_address_check_box.isChecked():
-        if not validate.is_valid_address(new_address):
+        if not validate.is_valid_address(address):
             errors += "Invalid address!\n\n"
 
     if gui.edit_customer_change_phone_check_box.isChecked():
-        if not validate.is_valid_phone_number(new_phone):
+        if not validate.is_valid_phone_number(phone):
             errors += "Invalid phone!\n\n"
 
     if errors != "":
         return gui.show_error(errors)
 
     if gui.edit_customer_change_name_check_box.isChecked():
-        database.update_customer_name(customer_id, new_name)
+        database.update_customer_name(customer_id, name)
 
     if gui.edit_customer_change_address_check_box.isChecked():
-        database.update_customer_address(customer_id, new_address)
+        database.update_customer_address(customer_id, address)
 
     if gui.edit_customer_change_phone_check_box.isChecked():
-        database.update_customer_phone(customer_id, new_phone)
+        database.update_customer_phone(customer_id, phone)
 
     gui.show_success("Customer update successful.")
 

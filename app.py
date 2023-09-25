@@ -13,11 +13,12 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# check if part id is already in use
-# use dictionaries instead of lists for large inputs?
+# force monitary values to 2 decimal points, add $ sign
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
+# show user id after creation
 # add remove user functionality
+# add list of users functionality
 # clear login boxes after login --> other pages too where applicable
 # update the update user page after the user updates user data --> ie. refresh data after user submits update
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null

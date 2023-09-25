@@ -39,7 +39,16 @@ def new_vehicle_submit(database, gui):
     if database.get_vehicle_data(vin):
         return gui.show_error("There is a vehicle with this VIN already!")
 
-    vehicle_data = [vin, model, make, year, color, engine, [], None]
+    vehicle_data = {
+        "vin": vin,
+        "model": model,
+        "make": make,
+        "year": year,
+        "color": color,
+        "engine": engine,
+        "repair_history": json.dumps([]),
+        "repair_request": None,
+    }
 
     database.insert_vehicle(vehicle_data)
 
