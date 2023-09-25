@@ -46,9 +46,6 @@ def new_user_submit(database, gui):
     ):
         errors += "Invalid username or password!\n\n"
 
-    if database.is_username_in_use(new_user):
-        errors += "Username already in use!\n\n"
-
     if not new_pass == confirm_new_pass:
         errors += "Passwords do not match!\n\n"
 
@@ -80,6 +77,9 @@ def new_user_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
+    if database.is_username_in_use(new_user):
+        return gui.show_error("Username already in use!")
+
     hashed_pass = sha512_crypt.hash(new_pass)
 
     user_id = database.gen_id(target_table)
@@ -109,10 +109,8 @@ def update_password_submit(database, gui):
     confirm_new_pass = gui.confirm_new_password_input_box.text()
     errors = ""
 
-    if (
-        not validate.is_valid_username(username)
-        or not validate.is_valid_password(old_pass)
-        or not database.is_current_users_password(old_pass)
+    if not validate.is_valid_username(username) or not validate.is_valid_password(
+        old_pass
     ):
         errors += "Invalid username or password!\n\n"
 
@@ -143,9 +141,7 @@ def update_user_submit(database, gui):
     checkbox_dispatcher = update_user_dispatcher(database, gui)
     errors = ""
 
-    if not validate.is_valid_password(
-        input_pass
-    ) or not database.is_current_users_password(input_pass):
+    if not validate.is_valid_password(input_pass):
         errors += "Invalid password!\n\n"
 
     # run through dispatcher for errors
@@ -159,6 +155,9 @@ def update_user_submit(database, gui):
 
     if errors != "":
         return gui.show_error(errors)
+
+    if not database.is_current_users_password(input_pass):
+        return gui.show_error("Invalid password!")
 
     # run through dispatcher for updates
 

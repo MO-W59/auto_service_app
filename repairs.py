@@ -24,17 +24,11 @@ def new_repair_submit(database, gui):
     if not validate.is_valid_vin(vin):
         errors += "Invalid vin number.\n\n"
 
-    if not database.get_vehicle_data(vin):
-        errors += "A vehicle must be in the database to create a repair for it.\n\n"
-
     if not validate.is_valid_description(problem_description):
         errors += "Invalid problem description.\n\n"
 
-    if not database.vehicle_is_owned(vin):
-        errors += "The vehicle must first be owned by a customer.\n\n"
-
-    if database.has_active_repair(vin):
-        errors += "This vehicle already has an active repair.\n\n"
+    if errors != "":
+        return gui.show_errors(errors)
 
     constructing_suffix = []
     constructing_suffix[:0] = drop_off_date
@@ -45,6 +39,15 @@ def new_repair_submit(database, gui):
 
     repair_id_suffix = repair_id_suffix.join(constructing_suffix)
     repair_id = vin + repair_id_suffix
+
+    if not database.vehicle_is_owned(vin):
+        errors += "The vehicle must first be owned by a customer.\n\n"
+
+    if database.has_active_repair(vin):
+        errors += "This vehicle already has an active repair.\n\n"
+
+    if not database.get_vehicle_data(vin):
+        errors += "A vehicle must be in the database to create a repair for it.\n\n"
 
     if database.search_for_repair(repair_id):
         errors += "That Repair ID is already in use.\n\n"
@@ -348,7 +351,7 @@ def go_to_old_repair_page(database, gui):
 
         # If the user clicked cancel
         if repair_id is False:
-            return
+            return None
 
         if not validate.is_valid_id(repair_id):
             gui.show_error("Invalid Repair ID.")

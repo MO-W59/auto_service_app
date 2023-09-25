@@ -18,9 +18,6 @@ def new_vehicle_submit(database, gui):
     if not validate.is_valid_vin(vin):
         errors += "Invalid vin!\n\n"
 
-    if database.get_vehicle_data(vin):
-        errors += "There is a vehicle with this VIN already!\n\n"
-
     if not validate.is_valid_name(make):
         errors += "Invalid make!\n\n"
 
@@ -38,6 +35,9 @@ def new_vehicle_submit(database, gui):
 
     if errors != "":
         return gui.show_error(errors)
+
+    if database.get_vehicle_data(vin):
+        return gui.show_error("There is a vehicle with this VIN already!")
 
     vehicle_data = [vin, model, make, year, color, engine, [], None]
 

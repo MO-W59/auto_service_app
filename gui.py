@@ -578,7 +578,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.new_repair_tech_id_input_box.setObjectName("new_repair_tech_id_input_box")
 
         self.new_repair_description_label = QtWidgets.QLabel(self.new_repair_page)
-        self.new_repair_description_label.setGeometry(QtCore.QRect(490, 10, 201, 21))
+        self.new_repair_description_label.setGeometry(QtCore.QRect(490, 10, 201, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.new_repair_description_label.setFont(font)
@@ -632,7 +632,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.edit_repair_description_label = QtWidgets.QLabel(self.edit_repair_page)
-        self.edit_repair_description_label.setGeometry(QtCore.QRect(480, 100, 221, 21))
+        self.edit_repair_description_label.setGeometry(QtCore.QRect(480, 100, 221, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_repair_description_label.setFont(font)
@@ -722,7 +722,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.edit_repair_drop_off_date_label = QtWidgets.QLabel(self.edit_repair_page)
-        self.edit_repair_drop_off_date_label.setGeometry(QtCore.QRect(20, 270, 171, 21))
+        self.edit_repair_drop_off_date_label.setGeometry(QtCore.QRect(20, 270, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_repair_drop_off_date_label.setFont(font)
@@ -757,7 +757,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.edit_total_repair_cost_label = QtWidgets.QLabel(self.edit_repair_page)
-        self.edit_total_repair_cost_label.setGeometry(QtCore.QRect(20, 340, 171, 21))
+        self.edit_total_repair_cost_label.setGeometry(QtCore.QRect(20, 340, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_total_repair_cost_label.setFont(font)
@@ -817,7 +817,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.edit_repair_repair_id_label = QtWidgets.QLabel(self.edit_repair_page)
-        self.edit_repair_repair_id_label.setGeometry(QtCore.QRect(450, 10, 171, 21))
+        self.edit_repair_repair_id_label.setGeometry(QtCore.QRect(450, 10, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_repair_repair_id_label.setFont(font)
@@ -827,7 +827,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_repair_page
         )
         self.edit_repair_repair_id_display_label.setGeometry(
-            QtCore.QRect(350, 40, 301, 21)
+            QtCore.QRect(365, 40, 301, 21)
         )
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -850,7 +850,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_repair_page
         )
         self.edit_repair_repair_description_label.setGeometry(
-            QtCore.QRect(480, 380, 221, 21)
+            QtCore.QRect(480, 380, 221, 25)
         )
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -894,7 +894,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.active_repairs_page
         )
         self.active_repairs_list_of_repairs_label.setGeometry(
-            QtCore.QRect(370, 20, 201, 21)
+            QtCore.QRect(370, 20, 201, 25)
         )
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -919,7 +919,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.display_old_repair.setObjectName("display_old_repair")
 
         self.old_repair_description_label = QtWidgets.QLabel(self.display_old_repair)
-        self.old_repair_description_label.setGeometry(QtCore.QRect(480, 100, 221, 21))
+        self.old_repair_description_label.setGeometry(QtCore.QRect(480, 100, 221, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.old_repair_description_label.setFont(font)
@@ -933,7 +933,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.old_repair_part_cost_label.setObjectName("old_repair_part_cost_label")
 
         self.old_repair_drop_off_date_label = QtWidgets.QLabel(self.display_old_repair)
-        self.old_repair_drop_off_date_label.setGeometry(QtCore.QRect(20, 170, 171, 21))
+        self.old_repair_drop_off_date_label.setGeometry(QtCore.QRect(20, 170, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.old_repair_drop_off_date_label.setFont(font)
@@ -968,7 +968,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.old_total_repair_cost_label = QtWidgets.QLabel(self.display_old_repair)
-        self.old_total_repair_cost_label.setGeometry(QtCore.QRect(20, 330, 171, 21))
+        self.old_total_repair_cost_label.setGeometry(QtCore.QRect(20, 330, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.old_total_repair_cost_label.setFont(font)
@@ -1025,7 +1025,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.old_repair_repair_id_label = QtWidgets.QLabel(self.display_old_repair)
-        self.old_repair_repair_id_label.setGeometry(QtCore.QRect(450, 10, 171, 21))
+        self.old_repair_repair_id_label.setGeometry(QtCore.QRect(450, 10, 171, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.old_repair_repair_id_label.setFont(font)
@@ -1070,7 +1070,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.display_old_repair
         )
         self.old_repair_repair_description_label.setGeometry(
-            QtCore.QRect(480, 380, 221, 21)
+            QtCore.QRect(480, 380, 221, 25)
         )
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -1107,7 +1107,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.old_repair_complete_date_label = QtWidgets.QLabel(self.display_old_repair)
-        self.old_repair_complete_date_label.setGeometry(QtCore.QRect(20, 250, 211, 21))
+        self.old_repair_complete_date_label.setGeometry(QtCore.QRect(20, 250, 211, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.old_repair_complete_date_label.setFont(font)
@@ -1175,7 +1175,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.new_part_description_label = QtWidgets.QLabel(self.new_part_page)
-        self.new_part_description_label.setGeometry(QtCore.QRect(370, 450, 201, 21))
+        self.new_part_description_label.setGeometry(QtCore.QRect(370, 450, 201, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.new_part_description_label.setFont(font)
@@ -1201,14 +1201,14 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
         self.edit_part_cost_label = QtWidgets.QLabel(self.edit_part_page)
-        self.edit_part_cost_label.setGeometry(QtCore.QRect(370, 340, 141, 21))
+        self.edit_part_cost_label.setGeometry(QtCore.QRect(370, 340, 141, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_part_cost_label.setFont(font)
         self.edit_part_cost_label.setObjectName("edit_part_cost_label")
 
         self.edit_part_description_label = QtWidgets.QLabel(self.edit_part_page)
-        self.edit_part_description_label.setGeometry(QtCore.QRect(370, 450, 201, 21))
+        self.edit_part_description_label.setGeometry(QtCore.QRect(370, 450, 201, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.edit_part_description_label.setFont(font)
