@@ -14,7 +14,7 @@ import customers
 
 # vvv--- TODO list ---vvv
 # use dicts for gui page updates --> need to use sqlite3 row factory
-# force monitary values to 2 decimal points, add $ sign
+# add commas and $ to dollar amounts and enforce two digits after the decimal point
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
 # show user id after creation
@@ -23,16 +23,12 @@ import customers
 # clear login boxes after login --> other pages too where applicable
 # update the update user page after the user updates user data --> ie. refresh data after user submits update
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
-# change insert statments into the DB to a list rather than declaring all variables
-# move all json.dumps/loads to main app
+# move all json.dumps/loads to user, etc. modules and not in database
 # move all functions to their proper module, move string construction the app module not in gui or DB
-# add commas to dollar amounts and enforce two digits after the decimal point
-# alter edit page submit button functions to have reduced if statments? search for alternatives.
 # reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True
 # search for cut off diplay labels ---> extend width in gui
 # list of parts text browser not in same location on gui as other list pages
 # merge technicians and servicewriters? add column to display area of work and just have employees table?
-# iterate over text boxes with a list of checkboxes and use python match feature?
 # set restrictions on class set methods?
 # protect against SQL race condition, options -> thread lock? queue? connection pool?
 # consolidate code as much as possible --> edit customer submit make a update customer edit page function
