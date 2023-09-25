@@ -13,6 +13,7 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
+# use dicts for gui page updates --> need to use sqlite3 row factory
 # force monitary values to 2 decimal points, add $ sign
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
