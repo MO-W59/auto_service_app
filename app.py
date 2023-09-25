@@ -21,7 +21,6 @@ import customers
 # add remove user functionality
 # add list of users functionality
 # clear login boxes after login --> other pages too where applicable
-# update the update user page after the user updates user data --> ie. refresh data after user submits update
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
 # move all json.dumps/loads to user, etc. modules and not in database
 # move all functions to their proper module, move string construction the app module not in gui or DB
