@@ -80,9 +80,9 @@ def edit_customer_submit(database, gui):
     customer_data = database.get_customer_data(customer_id)
 
     return (
-        gui.edit_customer_name_display_label.setText(customer_data[1]),
-        gui.edit_customer_address_text_browser.setText(customer_data[2]),
-        gui.edit_customer_phone_display_label.setText(customer_data[3]),
+        gui.edit_customer_name_display_label.setText(customer_data["name"]),
+        gui.edit_customer_address_text_browser.setText(customer_data["address"]),
+        gui.edit_customer_phone_display_label.setText(customer_data["phone_number"]),
     )
 
 
@@ -119,14 +119,9 @@ def add_vehicle_to_customer_button(database, gui):
 
     customer_data = database.get_customer_data(customer_id)
 
-    list_of_vins = json.loads(customer_data[4])
+    list_of_vins = json.loads(customer_data["list_of_vehicles"])
 
-    vehicle_data = []
-
-    for vin in list_of_vins:
-        vehicle_data.append(list(database.get_vehicle_data(vin)))
-
-    list_of_vehicles = construct_vehicles_list(vehicle_data)
+    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
 
     gui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
@@ -168,14 +163,9 @@ def remove_vehicle_from_customer_button(database, gui):
 
     customer_data = database.get_customer_data(customer_id)
 
-    list_of_vins = json.loads(customer_data[4])
+    list_of_vins = json.loads(customer_data["list_of_vehicles"])
 
-    vehicle_data = []
-
-    for vin in list_of_vins:
-        vehicle_data.append(list(database.get_vehicle_data(vin)))
-
-    list_of_vehicles = construct_vehicles_list(vehicle_data)
+    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
 
     gui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
@@ -221,14 +211,9 @@ def go_to_edit_customer_page(database, gui):
         break
 
     # Use json loads to get a list from database return
-    list_of_vins = json.loads(customer_data[4])
+    list_of_vins = json.loads(customer_data["list_of_vehicles"])
 
-    vehicle_data = []
-
-    for vin in list_of_vins:
-        vehicle_data.append(list(database.get_vehicle_data(vin)))
-
-    list_of_vehicles = construct_vehicles_list(vehicle_data)
+    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
 
     gui.update_edit_customer_page(customer_data, list_of_vehicles)
 
@@ -259,23 +244,25 @@ def construct_list_of_customers(customer_data):
 
     for customer in customer_data:
         customer_list = customer_list + (
-            f"Customer ID : {customer[0]}, Name : {customer[1]}, "
-            f"Phone Number : {customer[3]}, Address : {customer[2]}\n\n"
+            f"Customer ID : {customer['customer_id']}, Name : {customer['name']}, "
+            f"Phone Number : {customer['phone_number']}, Address : {customer['address']}\n\n"
         )
 
     return customer_list
 
 
-def construct_vehicles_list(vehicle_data):
+def construct_vehicles_list(database, list_of_vins):
     """Constructs a formated string of passed vehicle data for display."""
 
     vehicle_list = ""
 
-    for vehicle in vehicle_data:
+    for vin in list_of_vins:
+        vehicle = database.get_vehicle_data(vin)
+
         vehicle_list = vehicle_list + (
-            f"VIN : {vehicle[0]}, Model : {vehicle[1]}, "
-            f"Make : {vehicle[2]}, Year : {vehicle[3]}, Color : {vehicle[4]}, "
-            f"Engine : {vehicle[5]}, Current Active Repair ID : {vehicle[7]}\n\n"
+            f"VIN : {vehicle['vin']}, Model : {vehicle['model']}, "
+            f"Make : {vehicle['make']}, Year : {vehicle['year']}, Color : {vehicle['color']}, "
+            f"Engine : {vehicle['engine']}, Current Active Repair ID : {vehicle['repair_request']}\n\n"
         )
 
     return vehicle_list

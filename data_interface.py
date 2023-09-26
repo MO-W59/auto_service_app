@@ -15,6 +15,7 @@ class AppDatabase:
         self.current_user = None
         self.data_directory = os.path.dirname(os.path.realpath(__file__)) + "\\data\\"
         self.connection = sqlite3.connect(self.data_directory + "data.db")
+        self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
         self.create_tables()
 
@@ -23,11 +24,11 @@ class AppDatabase:
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS customers 
-            (customer_id text, 
-            name text, 
-            address text, 
-            phone_number text, 
-            list_of_vehicles text);"""
+                (customer_id text, 
+                name text, 
+                address text, 
+                phone_number text, 
+                list_of_vehicles text);"""
         )
 
         self.connection.commit()
@@ -47,63 +48,63 @@ class AppDatabase:
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS technicians
-            (employee_id text,
-            username text,
-            password text,
-            name text,
-            team text,
-            section text,
-            assigned_repairs text);"""
+                (employee_id text,
+                username text,
+                password text,
+                name text,
+                team text,
+                section text,
+                assigned_repairs text);"""
         )
 
         self.connection.commit()
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS parts
-            (part_id text,
-            part_cost real,
-            part_description text);"""
+                (part_id text,
+                part_cost real,
+                part_description text);"""
         )
 
         self.connection.commit()
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS repairs
-            (repair_id text,
-            total_cost real,
-            labor real,
-            parts_cost real,
-            drop_off_date text,
-            repair_completed_date text,
-            problem_description text,
-            repair_description text,
-            required_parts text,
-            technician text,
-            service_writer text,
-            vehicle text);"""
+                (repair_id text,
+                total_cost real,
+                labor real,
+                parts_cost real,
+                drop_off_date text,
+                repair_completed_date text,
+                problem_description text,
+                repair_description text,
+                required_parts text,
+                technician text,
+                service_writer text,
+                vehicle text);"""
         )
 
         self.connection.commit()
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS vehicles
-            (vin text,
-            model text,
-            make text,
-            year text,
-            color text,
-            engine text,
-            repair_history text,
-            repair_request text);"""
+                (vin text,
+                model text,
+                make text,
+                year text,
+                color text,
+                engine text,
+                repair_history text,
+                repair_request text);"""
         )
 
         self.connection.commit()
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS counter_ids
-            (writer_count integer,
-            tech_count integer,
-            customer_count integer);"""
+                (writer_count integer,
+                tech_count integer,
+                customer_count integer);"""
         )
 
         self.cursor.execute("""INSERT INTO counter_ids VALUES (1, 1, 1);""")
@@ -185,10 +186,10 @@ class AppDatabase:
         if user_data == []:
             return False
 
-        target_hash = user_data[0][2]
+        target_hash = user_data[0]["password"]
 
         if sha512_crypt.verify(input_pass, target_hash):
-            self.set_current_user(user_data[0][0])
+            self.set_current_user(user_data[0]["employee_id"])
 
             self.set_login_status(True)
 
@@ -216,7 +217,7 @@ class AppDatabase:
         if user_data == []:
             return False
 
-        if sha512_crypt.verify(input_pass, user_data[0][2]):
+        if sha512_crypt.verify(input_pass, user_data[0]["password"]):
             return True
 
         return False
@@ -290,9 +291,9 @@ class AppDatabase:
         if user_data == []:
             return False
 
-        target_hash = user_data[0][2]
+        target_hash = user_data[0]["password"]
 
-        target_id = user_data[0][0]
+        target_id = user_data[0]["employee_id"]
 
         if sha512_crypt.verify(old_pass, target_hash):
             if target_id.startswith("t"):
@@ -323,14 +324,14 @@ class AppDatabase:
 
         return False
 
-    def update_user_name(self, user_id, new_name):
+    def update_user_name(self, user_id, name):
         """This fucntion will update a user's name in the database."""
 
         if user_id.startswith("t"):
             self.cursor.execute(
                 """UPDATE technicians SET name = (?) WHERE employee_id = (?);""",
                 (
-                    new_name,
+                    name,
                     user_id,
                 ),
             )
@@ -341,7 +342,7 @@ class AppDatabase:
             self.cursor.execute(
                 """UPDATE service_writers SET name = (?) WHERE employee_id = (?);""",
                 (
-                    new_name,
+                    name,
                     user_id,
                 ),
             )
@@ -350,14 +351,14 @@ class AppDatabase:
 
         return None
 
-    def update_user_team(self, user_id, new_team):
+    def update_user_team(self, user_id, team):
         """This function will update a user's team in the database."""
 
         if user_id.startswith("t"):
             self.cursor.execute(
                 """UPDATE technicians SET team = (?) WHERE employee_id = (?);""",
                 (
-                    new_team,
+                    team,
                     user_id,
                 ),
             )
@@ -368,7 +369,7 @@ class AppDatabase:
             self.cursor.execute(
                 """UPDATE service_writers SET name = (?) WHERE employee_id = (?);""",
                 (
-                    new_team,
+                    team,
                     user_id,
                 ),
             )
@@ -377,26 +378,26 @@ class AppDatabase:
 
         return None
 
-    def update_user_lane(self, user_id, new_lane):
+    def update_user_lane(self, user_id, lane):
         """This function will update a user's lane in the database. (service writers)"""
 
         self.cursor.execute(
             """UPDATE service_writers SET lane = (?) WHERE employee_id = (?);""",
             (
-                new_lane,
+                lane,
                 user_id,
             ),
         )
 
         self.connection.commit()
 
-    def update_user_section(self, user_id, new_section):
+    def update_user_section(self, user_id, section):
         """This function will update a user's section in the database. (technicians)"""
 
         self.cursor.execute(
             """UPDATE technicians SET section = (?) WHERE employee_id = (?);""",
             (
-                new_section,
+                section,
                 user_id,
             ),
         )
@@ -476,7 +477,7 @@ class AppDatabase:
         ).fetchone()
 
         new_repair_list = []
-        repair_data = json.loads(user_data[6])
+        repair_data = json.loads(user_data["assigned_repairs"])
 
         if repair_data != []:
             for prior_entry in repair_data:
@@ -504,7 +505,7 @@ class AppDatabase:
         ).fetchone()
 
         new_repair_list = []
-        repair_data = json.loads(user_data[6])
+        repair_data = json.loads(user_data["assigned_repairs"])
 
         if repair_data != []:
             for prior_entry in repair_data:
@@ -534,7 +535,7 @@ class AppDatabase:
         ).fetchone()
 
         new_repair_list = []
-        repair_data = json.loads(user_data[6])
+        repair_data = json.loads(user_data["assigned_repairs"])
 
         if repair_data != []:
             for prior_entry in repair_data:
@@ -563,7 +564,7 @@ class AppDatabase:
         ).fetchone()
 
         new_repair_list = []
-        repair_data = json.loads(user_data[6])
+        repair_data = json.loads(user_data["assigned_repairs"])
 
         if repair_data != []:
             for prior_entry in repair_data:
@@ -600,7 +601,7 @@ class AppDatabase:
         list_of_repairs = self.cursor.execute("""SELECT * FROM repairs;""").fetchall()
 
         for repair in list_of_repairs:
-            if repair[5] is not None:
+            if repair["repair_completed_date"] is not None:
                 list_of_repairs.remove(repair)
 
         return list_of_repairs
@@ -727,7 +728,7 @@ class AppDatabase:
             (repair_id,),
         ).fetchone()
 
-        parts_list = json.loads(repair_data[8])
+        parts_list = json.loads(repair_data["required_parts"])
         new_parts_list = []
 
         if parts_list != []:
@@ -756,7 +757,7 @@ class AppDatabase:
             (repair_id,),
         ).fetchone()
 
-        parts_list = json.loads(repair_data[8])
+        parts_list = json.loads(repair_data["required_parts"])
         parts_list.remove(removal_id)
         new_dumped_list = json.dumps(parts_list)
 
@@ -858,7 +859,7 @@ class AppDatabase:
         customer_data = self.get_all_customers()
 
         for data_set in customer_data:
-            list_of_vins = json.loads(data_set[4])
+            list_of_vins = json.loads(data_set["list_of_vehicles"])
 
             for vin in list_of_vins:
                 if vin == vin_to_add:
@@ -913,7 +914,7 @@ class AppDatabase:
             (customer_id,),
         ).fetchone()
 
-        vehicle_list = json.loads(customer_data[4])
+        vehicle_list = json.loads(customer_data["list_of_vehicles"])
 
         new_vehicle_list = []
 
@@ -939,7 +940,7 @@ class AppDatabase:
             (customer_id,),
         ).fetchone()
 
-        vehicle_list = json.loads(customer_data[4])
+        vehicle_list = json.loads(customer_data["list_of_vehicles"])
 
         vehicle_list.remove(vin)
 
@@ -1072,9 +1073,9 @@ class AppDatabase:
             (vin,),
         ).fetchone()
 
-        completed_repair = vehicle_data[7]
+        completed_repair = vehicle_data["repair_request"]
 
-        repair_history = json.loads(vehicle_data[6])
+        repair_history = json.loads(vehicle_data["repair_history"])
 
         repair_history.append(completed_repair)
 

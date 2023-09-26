@@ -208,8 +208,10 @@ def add_part_to_repair(database, gui):
 
     repair_data = database.search_for_repair(repair_id)
 
-    gui.edit_repair_total_repair_cost_display_label.setText(str(repair_data[1]))
-    gui.edit_repair_part_cost_display_label.setText(str(repair_data[3]))
+    gui.edit_repair_total_repair_cost_display_label.setText(
+        str(repair_data["total_cost"])
+    )
+    gui.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
     return gui.show_success("Part added successfuly.")
@@ -258,8 +260,10 @@ def remove_part_from_repair(database, gui):
 
     repair_data = database.search_for_repair(repair_id)
 
-    gui.edit_repair_part_cost_display_label.setText(str(repair_data[3]))
-    gui.edit_repair_total_repair_cost_display_label.setText(str(repair_data[1]))
+    gui.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+    gui.edit_repair_total_repair_cost_display_label.setText(
+        str(repair_data["total_cost"])
+    )
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
     return gui.show_success("Part successfuly removed.")
@@ -328,10 +332,11 @@ def go_to_active_repairs_page(database, gui):
 
     for repair in repair_data:
         list_of_repairs = (
-            list_of_repairs + f"Repair ID : {repair[0]}, Total Cost : {repair[1]}, "
-            f"Labor : {repair[2]}, Parts Cost : {repair[3]}, Drop off Date : {repair[4]}, "
-            f"Repair Completed Date : {repair[5]}, Technician ID : {repair[9]}, "
-            f"Service Writer ID : {repair[10]}\n\n"
+            list_of_repairs
+            + f"Repair ID : {repair['repair_id']}, Total Cost : {repair['total_cost']}, "
+            f"Labor : {repair['labor']}, Parts Cost : {repair['parts_cost']}, Drop off Date : {repair['drop_off_date']}, "
+            f"Repair Completed Date : {repair['repair_completed_date']}, Technician ID : {repair['technician']}, "
+            f"Service Writer ID : {repair['service_writer']}\n\n"
         )
 
     gui.update_active_repair_list(list_of_repairs)
@@ -394,7 +399,7 @@ def construct_repair_parts_list(repair_id, database):
         part_data = database.get_part_data(part_id)
         parts_list = (
             parts_list
-            + f"Part ID : {part_data[0]}, Cost : ${part_data[1]}, Description : {part_data[2]}\n\n"
+            + f"Part ID : {part_data['part_id']}, Cost : ${part_data['part_cost']}, Description : {part_data['part_description']}\n\n"
         )
 
     return parts_list
@@ -408,7 +413,7 @@ def calculate_total_cost(repair_id, database):
 
     parts_cost = calculate_parts_cost(repair_id, database)
 
-    labor_cost = repair_data[2]
+    labor_cost = repair_data["labor"]
 
     total_cost = parts_cost + labor_cost
 
@@ -422,7 +427,7 @@ def calculate_parts_cost(repair_id, database):
 
     repair_data = database.search_for_repair(repair_id)
 
-    part_id_list = json.loads(repair_data[8])
+    part_id_list = json.loads(repair_data["required_parts"])
 
     for part_id in part_id_list:
         part_data = database.get_part_data(part_id)

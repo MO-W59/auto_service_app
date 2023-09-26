@@ -2627,72 +2627,84 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         """This function will take the information retrived from the database and update
         labels displaying the requested user information."""
 
-        self.update_user_user_id_display_label.setText(user_data[0])
-        self.update_user_name_display_label.setText(user_data[3])
-        self.update_user_team_display_label.setText(user_data[4])
+        self.update_user_user_id_display_label.setText(user_data["employee_id"])
+        self.update_user_name_display_label.setText(user_data["name"])
+        self.update_user_team_display_label.setText(user_data["team"])
 
         if user_data[0].startswith("t"):
-            self.update_user_section_display_label.setText(user_data[5])
+            self.update_user_section_display_label.setText(user_data["section"])
             self.update_user_lane_display_label.setText("N/A")
 
         if user_data[0].startswith("w"):
-            self.update_user_lane_display_label.setText(str(user_data[5]))
+            self.update_user_lane_display_label.setText(str(user_data["lane"]))
             self.update_user_section_display_label.setText("N/A")
 
     def update_edit_repair_displays(self, repair_data):
         """This function will update the displays located on the edit display page to
         that of the requested repair."""
 
-        self.edit_repair_service_id_display_label.setText(repair_data[10])
-        self.edit_repair_tech_id_display_label.setText(repair_data[9])
-        self.edit_repair_drop_off_date_display_label.setText(repair_data[4])
-        self.edit_repair_total_repair_cost_display_label.setText(str(repair_data[1]))
-        self.edit_repair_labor_cost_display_label.setText(str(repair_data[2]))
-        self.edit_repair_part_cost_display_label.setText(str(repair_data[3]))
-        self.edit_repair_repair_id_display_label.setText(repair_data[0])
-        self.edit_repair_problem_description_input_box.setText(repair_data[6])
-        self.edit_repair_repair_description_input_box.setText(repair_data[7])
+        self.edit_repair_service_id_display_label.setText(repair_data["service_writer"])
+        self.edit_repair_tech_id_display_label.setText(repair_data["technician"])
+        self.edit_repair_drop_off_date_display_label.setText(
+            repair_data["drop_off_date"]
+        )
+        self.edit_repair_total_repair_cost_display_label.setText(
+            str(repair_data["total_cost"])
+        )
+        self.edit_repair_labor_cost_display_label.setText(str(repair_data["labor"]))
+        self.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+        self.edit_repair_repair_id_display_label.setText(repair_data["repair_id"])
+        self.edit_repair_problem_description_input_box.setText(
+            repair_data["problem_description"]
+        )
+        self.edit_repair_repair_description_input_box.setText(
+            repair_data["repair_description"]
+        )
 
     def update_old_repair_displays(self, repair_data, list_of_parts):
         """This function will update the old repair page with the repair data passed to it."""
 
-        self.old_repair_repair_id_display_label.setText(repair_data[0])
-        self.old_repair_total_cost_display_label.setText(str(repair_data[1]))
-        self.old_repair_labor_cost_display_label.setText(str(repair_data[2]))
-        self.old_repair_part_cost_display_label.setText(str(repair_data[3]))
-        self.old_repair_drop_off_date_display_label.setText(repair_data[4])
-        self.old_repair_complete_date_display_label.setText(repair_data[5])
-        self.old_repair_problem_text_browser.setText(repair_data[6])
-        self.old_repair_repair_text_browser.setText(repair_data[7])
+        self.old_repair_repair_id_display_label.setText(repair_data["repair_id"])
+        self.old_repair_total_cost_display_label.setText(str(repair_data["total_cost"]))
+        self.old_repair_labor_cost_display_label.setText(str(repair_data["labor"]))
+        self.old_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+        self.old_repair_drop_off_date_display_label.setText(
+            repair_data["drop_off_date"]
+        )
+        self.old_repair_complete_date_display_label.setText(
+            repair_data["repair_completed_date"]
+        )
+        self.old_repair_problem_text_browser.setText(repair_data["problem_description"])
+        self.old_repair_repair_text_browser.setText(repair_data["repair_description"])
         self.old_repair_list_of_parts_text_browser.setText(list_of_parts)
-        self.old_repair_tech_id_display_label.setText(repair_data[9])
-        self.old_repair_service_id_display_label.setText(repair_data[10])
+        self.old_repair_tech_id_display_label.setText(repair_data["technician"])
+        self.old_repair_service_id_display_label.setText(repair_data["service_writer"])
 
     def update_edit_part_page(self, part_data):
         """This function will update the edit part page display data."""
 
-        self.edit_part_id_display_label.setText(part_data[0])
-        self.edit_part_part_cost_input_box.setText(str(part_data[1]))
-        self.edit_part_description_input_box.setText(part_data[2])
+        self.edit_part_id_display_label.setText(part_data["part_id"])
+        self.edit_part_part_cost_input_box.setText(str(part_data["part_cost"]))
+        self.edit_part_description_input_box.setText(part_data["part_description"])
 
     def update_edit_customer_page(self, customer_data, vehicle_list):
         """Updates the edit customer page with the passed data."""
 
-        self.edit_customer_id_display_label.setText(customer_data[0])
-        self.edit_customer_name_display_label.setText(customer_data[1])
-        self.edit_customer_address_text_browser.setText(customer_data[2])
-        self.edit_customer_phone_display_label.setText(customer_data[3])
+        self.edit_customer_id_display_label.setText(customer_data["customer_id"])
+        self.edit_customer_name_display_label.setText(customer_data["name"])
+        self.edit_customer_address_text_browser.setText(customer_data["address"])
+        self.edit_customer_phone_display_label.setText(customer_data["phone_number"])
         self.edit_customer_vechile_list_text_browser.setText(vehicle_list)
 
     def update_edit_vehicle_page(self, vehicle_data):
         """Updates the edit vehicle page with the passed vehicle data."""
 
-        self.edit_vehicle_vin_display_label.setText(vehicle_data[0])
-        self.edit_vehicle_model_input_box.setText(vehicle_data[1])
-        self.edit_vehicle_make_input_box.setText(vehicle_data[2])
-        self.edit_vehicle_year_input_box.setText(vehicle_data[3])
-        self.edit_vehicle_color_input_box.setText(vehicle_data[4])
-        self.edit_vehicle_engine_input_box.setText(vehicle_data[5])
+        self.edit_vehicle_vin_display_label.setText(vehicle_data["vin"])
+        self.edit_vehicle_model_input_box.setText(vehicle_data["model"])
+        self.edit_vehicle_make_input_box.setText(vehicle_data["make"])
+        self.edit_vehicle_year_input_box.setText(vehicle_data["year"])
+        self.edit_vehicle_color_input_box.setText(vehicle_data["color"])
+        self.edit_vehicle_engine_input_box.setText(vehicle_data["engine"])
 
     def confirm_repair_complete(self):
         """Shows a confirmation window to the user."""

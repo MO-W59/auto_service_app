@@ -200,7 +200,7 @@ def search_repair_history(database, gui):
 
         break
     # use json loads to get a list from database return
-    repair_history = json.loads(vehicle_data[6])
+    repair_history = json.loads(vehicle_data["repair_history"])
 
     repair_info = f"VIN : {vin_to_search}\n\n--- Pior Repair IDs ---\n\n"
 
@@ -233,9 +233,9 @@ def construct_vehicles_list(vehicle_data):
 
     for vehicle in vehicle_data:
         vehicle_list = vehicle_list + (
-            f"VIN : {vehicle[0]}, Model : {vehicle[1]}, "
-            f"Make : {vehicle[2]}, Year : {vehicle[3]}, Color : {vehicle[4]}, "
-            f"Engine : {vehicle[5]}, Current Active Repair ID : {vehicle[7]}\n\n"
+            f"VIN : {vehicle['vin']}, Model : {vehicle['model']}, "
+            f"Make : {vehicle['make']}, Year : {vehicle['year']}, Color : {vehicle['color']}, "
+            f"Engine : {vehicle['engine']}, Current Active Repair ID : {vehicle['repair_request']}\n\n"
         )
 
     return vehicle_list

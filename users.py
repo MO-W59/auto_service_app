@@ -336,12 +336,12 @@ def user_string(user_data):
     """Takes user data and returns a formated string for display of that users
     data."""
 
-    repair_data = json.loads(user_data[6])
+    repair_data = json.loads(user_data["assigned_repairs"])
 
     informaion_to_display = (
-        f"User ID : {user_data[0]}\nUsername : {user_data[1]}\n"
-        f"Name : {user_data[3]}\nTeam : {user_data[4]}\n"
-        f"Lane/Section : {user_data[5]}\n\n"
+        f"User ID : {user_data['employee_id']}\nUsername : {user_data['username']}\n"
+        f"Name : {user_data['name']}\nTeam : {user_data['team']}\n"
+        f"Lane/Section : {user_data[5]}\n\n"  # Index 5 = lane or section depending on employee
         f"--- Assigned Repairs ---\n\n"
     )
 
