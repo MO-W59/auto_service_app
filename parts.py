@@ -119,7 +119,8 @@ def go_to_list_of_parts_page(database, gui):
     for part in parts_data:
         parts_list = (
             parts_list
-            + f"Part ID : {part['part_id']}, Cost : ${part['part_cost']}, Description : {part['part_description']}\n\n"
+            + f"Part ID : {part['part_id']}, Cost : ${part['part_cost']:.2f}, "
+            f"Description : {part['part_description']}\n\n"
         )
 
     gui.list_of_parts_text_browser.setText(parts_list)

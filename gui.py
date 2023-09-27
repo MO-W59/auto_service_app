@@ -2649,10 +2649,14 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             repair_data["drop_off_date"]
         )
         self.edit_repair_total_repair_cost_display_label.setText(
-            str(repair_data["total_cost"])
+            f"${repair_data['total_cost']:.2f}"
         )
-        self.edit_repair_labor_cost_display_label.setText(str(repair_data["labor"]))
-        self.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+        self.edit_repair_labor_cost_display_label.setText(
+            f"${repair_data['labor']:.2f}"
+        )
+        self.edit_repair_part_cost_display_label.setText(
+            f"${repair_data['parts_cost']:.2f}"
+        )
         self.edit_repair_repair_id_display_label.setText(repair_data["repair_id"])
         self.edit_repair_problem_description_input_box.setText(
             repair_data["problem_description"]
@@ -2665,9 +2669,13 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         """This function will update the old repair page with the repair data passed to it."""
 
         self.old_repair_repair_id_display_label.setText(repair_data["repair_id"])
-        self.old_repair_total_cost_display_label.setText(str(repair_data["total_cost"]))
-        self.old_repair_labor_cost_display_label.setText(str(repair_data["labor"]))
-        self.old_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+        self.old_repair_total_cost_display_label.setText(
+            f"${repair_data['total_cost']:.2f}"
+        )
+        self.old_repair_labor_cost_display_label.setText(f"${repair_data['labor']:.2f}")
+        self.old_repair_part_cost_display_label.setText(
+            f"${repair_data['parts_cost']:.2f}"
+        )
         self.old_repair_drop_off_date_display_label.setText(
             repair_data["drop_off_date"]
         )
@@ -2684,7 +2692,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         """This function will update the edit part page display data."""
 
         self.edit_part_id_display_label.setText(part_data["part_id"])
-        self.edit_part_part_cost_input_box.setText(str(part_data["part_cost"]))
+        self.edit_part_part_cost_input_box.setText(f"{part_data['part_cost']:.2f}")
         self.edit_part_description_input_box.setText(part_data["part_description"])
 
     def update_edit_customer_page(self, customer_data, vehicle_list):

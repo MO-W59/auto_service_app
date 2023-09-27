@@ -234,8 +234,9 @@ def construct_vehicles_list(vehicle_data):
     for vehicle in vehicle_data:
         vehicle_list = vehicle_list + (
             f"VIN : {vehicle['vin']}, Model : {vehicle['model']}, "
-            f"Make : {vehicle['make']}, Year : {vehicle['year']}, Color : {vehicle['color']}, "
-            f"Engine : {vehicle['engine']}, Current Active Repair ID : {vehicle['repair_request']}\n\n"
+            f"Make : {vehicle['make']}, Year : {vehicle['year']}, "
+            f"Color : {vehicle['color']}, Engine : {vehicle['engine']}, "
+            f"Current Active Repair ID : {vehicle['repair_request']}\n\n"
         )
 
     return vehicle_list

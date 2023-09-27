@@ -13,7 +13,6 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# add commas and $ to dollar amounts and enforce two digits after the decimal point, fix new lines too long in large string listings
 # setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
 # setup foriegn keys
 # show user id after creation
