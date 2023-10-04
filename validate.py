@@ -79,8 +79,8 @@ def is_valid_id(passed_id):
     if (
         not passed_id
         or isinstance(passed_id, bool)
-        or len(passed_id) > 100
-        or len(passed_id) < 2
+        or len(passed_id) > 100000000
+        or len(passed_id) < 1
     ):
         return False
 

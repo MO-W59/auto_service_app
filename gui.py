@@ -1862,12 +1862,16 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.action_update_user = QtGui.QAction(app_main_window)
         self.action_update_user.setObjectName("action_update_user")
 
+        self.action_show_users = QtGui.QAction(app_main_window)
+        self.action_show_users.setObjectName("action_show_users")
+
         self.menu_users.addAction(self.action_login)
         self.menu_users.addAction(self.action_logout)
         self.menu_users.addAction(self.action_new_user)
         self.menu_users.addAction(self.action_update_password)
         self.menu_users.addAction(self.action_search_user)
         self.menu_users.addAction(self.action_update_user)
+        self.menu_users.addAction(self.action_show_users)
         self.menu_repairs.addAction(self.action_new_repair)
         self.menu_repairs.addAction(self.action_edit_repair)
         self.menu_repairs.addAction(self.action_active_repairs)
@@ -2421,6 +2425,8 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.action_new_user.setText(_translate("app_main_window", "New User"))
 
+        self.action_show_users.setText(_translate("app_main_window", "Show Users"))
+
         self.action_new_repair.setText(_translate("app_main_window", "New Repair"))
 
         self.action_edit_repair.setText(_translate("app_main_window", "Edit Repair"))
@@ -2627,24 +2633,26 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         """This function will take the information retrived from the database and update
         labels displaying the requested user information."""
 
-        self.update_user_user_id_display_label.setText(user_data["employee_id"])
+        self.update_user_user_id_display_label.setText(str(user_data["employee_id"]))
         self.update_user_name_display_label.setText(user_data["name"])
         self.update_user_team_display_label.setText(user_data["team"])
 
-        if user_data[0].startswith("t"):
-            self.update_user_section_display_label.setText(user_data["section"])
+        if user_data["is_tech"] == 1:
+            self.update_user_section_display_label.setText(user_data["lane_or_section"])
             self.update_user_lane_display_label.setText("N/A")
 
-        if user_data[0].startswith("w"):
-            self.update_user_lane_display_label.setText(str(user_data["lane"]))
+        if user_data["is_writer"] == 1:
+            self.update_user_lane_display_label.setText(user_data["lane_or_section"])
             self.update_user_section_display_label.setText("N/A")
 
     def update_edit_repair_displays(self, repair_data):
         """This function will update the displays located on the edit display page to
         that of the requested repair."""
 
-        self.edit_repair_service_id_display_label.setText(repair_data["service_writer"])
-        self.edit_repair_tech_id_display_label.setText(repair_data["technician"])
+        self.edit_repair_service_id_display_label.setText(
+            str(repair_data["service_writer"])
+        )
+        self.edit_repair_tech_id_display_label.setText(str(repair_data["technician"]))
         self.edit_repair_drop_off_date_display_label.setText(
             repair_data["drop_off_date"]
         )
@@ -2665,7 +2673,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             repair_data["repair_description"]
         )
 
-    def update_old_repair_displays(self, repair_data, list_of_parts):
+    def update_old_repair_displays(self, repair_data, parts_list):
         """This function will update the old repair page with the repair data passed to it."""
 
         self.old_repair_repair_id_display_label.setText(repair_data["repair_id"])
@@ -2684,9 +2692,11 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
         self.old_repair_problem_text_browser.setText(repair_data["problem_description"])
         self.old_repair_repair_text_browser.setText(repair_data["repair_description"])
-        self.old_repair_list_of_parts_text_browser.setText(list_of_parts)
-        self.old_repair_tech_id_display_label.setText(repair_data["technician"])
-        self.old_repair_service_id_display_label.setText(repair_data["service_writer"])
+        self.old_repair_list_of_parts_text_browser.setText(parts_list)
+        self.old_repair_tech_id_display_label.setText(str(repair_data["technician"]))
+        self.old_repair_service_id_display_label.setText(
+            str(repair_data["service_writer"])
+        )
 
     def update_edit_part_page(self, part_data):
         """This function will update the edit part page display data."""
@@ -2698,7 +2708,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
     def update_edit_customer_page(self, customer_data, vehicle_list):
         """Updates the edit customer page with the passed data."""
 
-        self.edit_customer_id_display_label.setText(customer_data["customer_id"])
+        self.edit_customer_id_display_label.setText(str(customer_data["customer_id"]))
         self.edit_customer_name_display_label.setText(customer_data["name"])
         self.edit_customer_address_text_browser.setText(customer_data["address"])
         self.edit_customer_phone_display_label.setText(customer_data["phone_number"])

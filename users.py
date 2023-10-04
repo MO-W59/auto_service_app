@@ -1,6 +1,6 @@
 """This module contains all the logic to handle user events in the application."""
 
-import json
+
 from passlib.hash import sha512_crypt
 import validate
 
@@ -34,9 +34,7 @@ def new_user_submit(database, gui):
     confirm_pwrd = gui.confirm_password_new_user_input_box.text()
     name = gui.new_user_name_input_box.text()
     team = gui.new_user_team_input_box.text()
-    section_or_lane = None
-    target_table = None
-    assigned_repairs = []
+    lane_or_section = None
     errors = ""
 
     if (
@@ -56,23 +54,25 @@ def new_user_submit(database, gui):
         errors += "Invalid team!\n\n"
 
     if gui.new_user_tech_radio_button.isChecked():
-        target_table = "technicians"
+        is_tech = 1
+        is_writer = 0
 
-        section_or_lane = gui.new_user_section_input_box.text()
+        lane_or_section = gui.new_user_section_input_box.text()
 
-        if not validate.is_valid_name(section_or_lane):
+        if not validate.is_valid_name(lane_or_section):
             errors += "Invalid section!\n\n"
 
     if gui.new_user_service_writer_radio_button.isChecked():
-        target_table = "service_writers"
+        is_tech = 0
+        is_writer = 1
 
-        section_or_lane = gui.new_user_lane_input_box.text()
+        lane_or_section = gui.new_user_lane_input_box.text()
 
-        if not validate.is_valid_lane(section_or_lane):
+        if not validate.is_valid_lane(lane_or_section):
             errors += "Invalid lane!\n\n"
 
         else:
-            section_or_lane = int(section_or_lane)
+            lane_or_section = int(lane_or_section)
 
     if errors != "":
         return gui.show_error(errors)
@@ -82,17 +82,14 @@ def new_user_submit(database, gui):
 
     hash_pwrd = sha512_crypt.hash(pwrd)
 
-    user_id = database.gen_id(target_table)
-
     user_data = {
-        "target_table": target_table,
-        "user_id": user_id,
         "username": username,
         "hash_pwrd": hash_pwrd,
         "name": name,
         "team": team,
-        "section_or_lane": section_or_lane,
-        "assigned_repairs": json.dumps(assigned_repairs),
+        "lane_or_section": lane_or_section,
+        "is_tech": is_tech,
+        "is_writer": is_writer,
     }
 
     database.insert_user(user_data)
@@ -129,10 +126,8 @@ def update_password_submit(database, gui):
     if not database.is_current_users_password(old_pass):
         return gui.show_error("Invalid username or password!")
 
-    if database.update_pass(username, old_pass, new_pass):
-        return gui.show_success("Password update successful.")
-
-    return False
+    database.update_pass(sha512_crypt.hash(new_pass))
+    return gui.show_success("Password update successful.")
 
 
 def update_user_submit(database, gui):
@@ -173,7 +168,7 @@ def update_user_submit(database, gui):
 
     user_data = database.search_for_user(target_id)
 
-    information_to_display = user_string(user_data)
+    information_to_display = user_string(database, user_data)
 
     gui.update_user_update_displays(user_data)
 
@@ -212,7 +207,7 @@ def update_user_dispatcher(database, gui):
             "validator": validate.is_valid_name,
             "input": gui.update_user_section_input_box.text,
             "error": "Invalid section!\n\n",
-            "updater": database.update_user_section,
+            "updater": database.update_user_lane_or_section,
         },
         gui.update_user_change_lane_check_box: {
             "checked": lambda: all(
@@ -226,7 +221,7 @@ def update_user_dispatcher(database, gui):
             "validator": validate.is_valid_lane,
             "input": gui.update_user_lane_input_box.text,
             "error": "Invalid lane!\n\n",
-            "updater": database.update_user_lane,
+            "updater": database.update_user_lane_or_section,
         },
     }
 
@@ -247,6 +242,7 @@ def logout_user(database, gui):
         return gui.show_error("Unable to logout, you are currently not logged in.")
 
     database.set_login_status(False)
+    database.set_current_user(None)
 
     gui.show_success("Logout successful.")
 
@@ -295,7 +291,7 @@ def search_for_user(database, gui):
 
         break
 
-    information_to_display = user_string(user_data)
+    information_to_display = user_string(database, user_data)
 
     return gui.show_user_search(information_to_display)
 
@@ -332,20 +328,47 @@ def go_to_update_user_page(database, gui):
     return gui.widget_stack.setCurrentIndex(3)
 
 
-def user_string(user_data):
+def show_all_users(database, gui):
+    """Gets user data from Database and passes it to GUI message box for user
+    to see a list of users."""
+
+    if not database.get_login_status():
+        return gui.show_error("You must be logged in to access this page.")
+
+    user_list = list_users(database.get_all_users())
+
+    return gui.show_user_search(user_list)
+
+
+def list_users(user_data):
+    """Creates a string listing users simple data(id, name, lane/section)"""
+
+    user_list = ""
+
+    for user in user_data:
+        user_list = (
+            user_list + f"User ID : {user['employee_id']}, Name : {user['name']}, "
+            f"Lane/Section : {user['lane_or_section']}\n\n"
+        )
+
+    return user_list
+
+
+def user_string(database, user_data):
     """Takes user data and returns a formated string for display of that users
     data."""
 
-    repair_data = json.loads(user_data["assigned_repairs"])
+    repair_data = database.get_repairs_assigned(user_data["employee_id"])
+    print(repair_data)
 
     informaion_to_display = (
         f"User ID : {user_data['employee_id']}\nUsername : {user_data['username']}\n"
         f"Name : {user_data['name']}\nTeam : {user_data['team']}\n"
-        f"Lane/Section : {user_data[5]}\n\n"  # Index 5 = lane or section depending on employee
+        f"Lane/Section : {user_data['lane_or_section']}\n\n"
         f"--- Assigned Repairs ---\n\n"
     )
 
     for repair in repair_data:
-        informaion_to_display = informaion_to_display + f"{repair}\n\n"
+        informaion_to_display = informaion_to_display + f"{repair['repair_id']}\n\n"
 
     return informaion_to_display

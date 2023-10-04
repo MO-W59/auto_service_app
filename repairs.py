@@ -1,6 +1,5 @@
 """This module handles all the logic for repair events in the application"""
 
-import json
 import datetime
 import validate
 
@@ -40,6 +39,12 @@ def new_repair_submit(database, gui):
     repair_id_suffix = repair_id_suffix.join(constructing_suffix)
     repair_id = vin + repair_id_suffix
 
+    if (
+        database.search_for_user(tech_id)["is_tech"] != 1
+        or database.search_for_user(writer_id)["is_writer"] != 1
+    ):
+        errors += "Employee ID that does not match their role (tech/writer).\n\n"
+
     if not database.vehicle_is_owned(vin):
         errors += "The vehicle must first be owned by a customer.\n\n"
 
@@ -61,10 +66,7 @@ def new_repair_submit(database, gui):
         "labor": 0.0,
         "parts_cost": 0.0,
         "drop_off_date": drop_off_date,
-        "completion_date": None,
         "problem_description": problem_description,
-        "repair_description": None,
-        "required_parts": json.dumps([]),
         "tech_id": tech_id,
         "writer_id": writer_id,
         "vin": vin,
@@ -86,21 +88,20 @@ def edit_repair_submit(database, gui):
     problem_description = gui.edit_repair_problem_description_input_box.toPlainText()
     repair_description = gui.edit_repair_repair_description_input_box.toPlainText()
     repair_id = gui.edit_repair_repair_id_display_label.text()
-    old_tech_id = gui.edit_repair_tech_id_display_label.text()
-    old_writer_id = gui.edit_repair_service_id_display_label.text()
     errors = ""
 
-    if gui.change_writer_check_box.isChecked():
-        if not validate.is_valid_id(new_service_writer_id):
-            errors += "Invalid service writer ID!\n\n"
+    if gui.change_writer_check_box.isChecked() and not validate.is_valid_id(
+        new_service_writer_id
+    ):
+        errors += "Invalid service writer ID!\n\n"
 
-    if gui.change_tech_check_box.isChecked():
-        if not validate.is_valid_id(new_tech_id):
-            errors += "Invalid technician ID!\n\n"
+    if gui.change_tech_check_box.isChecked() and not validate.is_valid_id(new_tech_id):
+        errors += "Invalid technician ID!\n\n"
 
-    if gui.change_labor_check_box.isChecked():
-        if not validate.is_valid_dollar_amount(new_labor_amount):
-            errors += "Invalid labor value!\n\n"
+    if gui.change_labor_check_box.isChecked() and not validate.is_valid_dollar_amount(
+        new_labor_amount
+    ):
+        errors += "Invalid labor value!\n\n"
 
     if not validate.is_valid_description(
         problem_description
@@ -110,13 +111,22 @@ def edit_repair_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
+    if (
+        gui.change_tech_check_box.isChecked()
+        and database.search_for_user(new_tech_id)["is_tech"] != 1
+        or gui.change_writer_check_box.isChecked()
+        and database.search_for_user(new_service_writer_id)["is_writer"] != 1
+    ):
+        errors += "Employee ID that does not match their role (tech/writer).\n\n"
+
+    if errors != "":
+        return gui.show_error(errors)
+
     if gui.change_writer_check_box.isChecked():
-        database.update_repair_service_writer(
-            repair_id, new_service_writer_id, old_writer_id
-        )
+        database.update_repair_service_writer(repair_id, new_service_writer_id)
 
     if gui.change_tech_check_box.isChecked():
-        database.update_repair_tech(repair_id, new_tech_id, old_tech_id)
+        database.update_repair_tech(repair_id, new_tech_id)
 
     if gui.change_labor_check_box.isChecked():
         database.update_labor_cost(repair_id, new_labor_amount)
@@ -141,9 +151,7 @@ def finish_repair_submit(database, gui):
     repair page in the gui."""
 
     pass_confirm = gui.confirm_repair_complete()
-    compelting_repair_id = gui.edit_repair_repair_id_display_label.text()
-    service_writer_id = gui.edit_repair_service_id_display_label.text()
-    tech_id = gui.edit_repair_tech_id_display_label.text()
+    repair_id = gui.edit_repair_repair_id_display_label.text()
 
     if not validate.is_valid_password(pass_confirm):
         return gui.show_error("Invalid password!")
@@ -153,20 +161,13 @@ def finish_repair_submit(database, gui):
 
     compelted_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
-    database.update_repair_complete_date(compelting_repair_id, compelted_date)
-
-    database.remove_repair_from_writer(compelting_repair_id, service_writer_id)
-    database.remove_repair_from_tech(compelting_repair_id, tech_id)
+    database.update_repair_complete_date(repair_id, compelted_date)
 
     gui.show_success("Repair completed.")
 
-    repair_data = database.search_for_repair(compelting_repair_id)
+    repair_data = database.search_for_repair(repair_id)
 
-    vin = repair_data[11]
-
-    parts_list = construct_repair_parts_list(compelting_repair_id, database)
-
-    database.update_vehicle_completed_repairs(vin)
+    parts_list = construct_repair_parts_list(repair_id, database)
 
     gui.update_old_repair_displays(repair_data, parts_list)
 
@@ -197,7 +198,7 @@ def add_part_to_repair(database, gui):
 
         break
 
-    database.update_required_parts_add(repair_id, part_to_add)
+    database.insert_part_listing(repair_id, part_to_add)
     parts_list = construct_repair_parts_list(repair_id, database)
 
     parts_cost = calculate_parts_cost(repair_id, database)
@@ -241,7 +242,7 @@ def remove_part_from_repair(database, gui):
             continue
 
         try:
-            database.update_required_parts_remove(repair_id, part_id_to_remove)
+            database.drop_part_listing(repair_id, part_id_to_remove)
 
         except ValueError:
             gui.show_error("Repair does not have that part currently listed.")
@@ -336,7 +337,6 @@ def go_to_active_repairs_page(database, gui):
             + f"Repair ID : {repair['repair_id']}, Total Cost : ${repair['total_cost']:.2f}, "
             f"Labor : ${repair['labor']:.2f}, Parts Cost : ${repair['parts_cost']:.2f}, "
             f"Drop off Date : {repair['drop_off_date']}, "
-            f"Repair Completed Date : {repair['repair_completed_date']}, "
             f"Technician ID : {repair['technician']}, "
             f"Service Writer ID : {repair['service_writer']}\n\n"
         )
@@ -372,7 +372,7 @@ def go_to_old_repair_page(database, gui):
 
             continue
 
-        if repair_data[5] is None:
+        if repair_data["repair_completed_date"] is None:
             gui.show_error("That repair is still underway.")
 
             continue
@@ -392,13 +392,10 @@ def construct_repair_parts_list(repair_id, database):
 
     parts_list = ""
 
-    repair_data = database.search_for_repair(repair_id)
+    part_listings = database.get_repair_part_listings(repair_id)
 
-    # use json loads to get a list from the database return value
-    part_id_list = json.loads(repair_data[8])
-
-    for part_id in part_id_list:
-        part_data = database.get_part_data(part_id)
+    for listing in part_listings:
+        part_data = database.get_part_data(listing["part_id"])
         parts_list = (
             parts_list
             + f"Part ID : {part_data['part_id']}, Cost : ${part_data['part_cost']:.2f}, "
@@ -428,13 +425,11 @@ def calculate_parts_cost(repair_id, database):
 
     parts_cost = 0.0
 
-    repair_data = database.search_for_repair(repair_id)
+    part_listings = database.get_repair_part_listings(repair_id)
 
-    part_id_list = json.loads(repair_data["required_parts"])
+    for listing in part_listings:
+        part_data = database.get_part_data(listing["part_id"])
 
-    for part_id in part_id_list:
-        part_data = database.get_part_data(part_id)
-
-        parts_cost = parts_cost + part_data[1]
+        parts_cost = parts_cost + part_data["part_cost"]
 
     return parts_cost

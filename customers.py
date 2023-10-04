@@ -1,13 +1,11 @@
 """This module contains all the handling for customer events in the application."""
 
-import json
 import validate
 
 
 def new_customer_submit(database, gui):
     """Gets new customer data and passes it to the database for storage."""
 
-    target_table = "customers"
     name = gui.new_customer_name_input_box.text()
     address = gui.new_customer_address_input_box.toPlainText()
     phone = gui.new_customer_phone_input_box.text()
@@ -25,16 +23,10 @@ def new_customer_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
-    customer_id = database.gen_id(target_table)
-
-    list_of_vehicles = []
-
     customer_data = {
-        "customer_id": customer_id,
         "name": name,
         "adress": address,
         "phone": phone,
-        "list_of_vehicles": json.dumps(list_of_vehicles),
     }
 
     database.insert_customer(customer_data)
@@ -115,13 +107,11 @@ def add_vehicle_to_customer_button(database, gui):
 
         break
 
-    database.add_vehicle_to_customer(customer_id, vin_to_add)
+    database.add_vehicle_owner(vin_to_add, customer_id)
 
-    customer_data = database.get_customer_data(customer_id)
+    vehicle_data = database.get_owned_vehicles(customer_id)
 
-    list_of_vins = json.loads(customer_data["list_of_vehicles"])
-
-    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
+    list_of_vehicles = construct_vehicles_list(vehicle_data)
 
     gui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
@@ -151,21 +141,16 @@ def remove_vehicle_from_customer_button(database, gui):
 
             continue
 
-        try:
-            database.remove_vehicle_from_customer(customer_id, vin_to_remove)
-
-        except ValueError:
+        if not database.remove_vehicle_owner(vin_to_remove):
             gui.show_error("Customer does not have ownership of that vehicle.")
 
             continue
 
         break
 
-    customer_data = database.get_customer_data(customer_id)
+    vehicle_data = database.get_owned_vehicles(customer_id)
 
-    list_of_vins = json.loads(customer_data["list_of_vehicles"])
-
-    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
+    list_of_vehicles = construct_vehicles_list(vehicle_data)
 
     gui.edit_customer_vechile_list_text_browser.setText(list_of_vehicles)
 
@@ -210,10 +195,9 @@ def go_to_edit_customer_page(database, gui):
 
         break
 
-    # Use json loads to get a list from database return
-    list_of_vins = json.loads(customer_data["list_of_vehicles"])
+    vehicle_data = database.get_owned_vehicles(customer_id)
 
-    list_of_vehicles = construct_vehicles_list(database, list_of_vins)
+    list_of_vehicles = construct_vehicles_list(vehicle_data)
 
     gui.update_edit_customer_page(customer_data, list_of_vehicles)
 
@@ -251,14 +235,12 @@ def construct_list_of_customers(customer_data):
     return customer_list
 
 
-def construct_vehicles_list(database, list_of_vins):
+def construct_vehicles_list(vehicle_data):
     """Constructs a formated string of passed vehicle data for display."""
 
     vehicle_list = ""
 
-    for vin in list_of_vins:
-        vehicle = database.get_vehicle_data(vin)
-
+    for vehicle in vehicle_data:
         vehicle_list = vehicle_list + (
             f"VIN : {vehicle['vin']}, Model : {vehicle['model']}, "
             f"Make : {vehicle['make']}, Year : {vehicle['year']}, "

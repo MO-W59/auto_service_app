@@ -13,11 +13,9 @@ import vehicles
 import customers
 
 # vvv--- TODO list ---vvv
-# setup primary keys / Change gen of employee/customer ids? --> random number 0-1000? or count up?
-# setup foriegn keys
+# finish testing PK and FK update
 # show user id after creation
 # add remove user functionality
-# add list of users functionality
 # clear login boxes after login --> other pages too where applicable
 # add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
 # move all json.dumps/loads to user, etc. modules and not in database
@@ -124,6 +122,7 @@ def setup_button_handlers():
     Gui.action_search_user.triggered.connect(
         lambda: users.search_for_user(Database, Gui)
     )
+    Gui.action_show_users.triggered.connect(lambda: users.show_all_users(Database, Gui))
 
     # repair actions
     Gui.action_new_repair.triggered.connect(

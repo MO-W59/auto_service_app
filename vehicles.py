@@ -1,6 +1,5 @@
 """This module handles all of the vehicle events for the application."""
 
-import json
 import validate
 
 
@@ -46,8 +45,8 @@ def new_vehicle_submit(database, gui):
         "year": year,
         "color": color,
         "engine": engine,
-        "repair_history": json.dumps([]),
         "repair_request": None,
+        "owner": None,
     }
 
     database.insert_vehicle(vehicle_data)
@@ -200,7 +199,7 @@ def search_repair_history(database, gui):
 
         break
     # use json loads to get a list from database return
-    repair_history = json.loads(vehicle_data["repair_history"])
+    repair_history = database.get_vehicle_repair_history(vin_to_search)
 
     repair_info = f"VIN : {vin_to_search}\n\n--- Pior Repair IDs ---\n\n"
 
