@@ -12,32 +12,6 @@ import parts
 import vehicles
 import customers
 
-# vvv--- TODO list ---vvv
-# finish testing PK and FK update
-# show user id after creation
-# add remove user functionality
-# clear login boxes after login --> other pages too where applicable
-# add column to table for vehicles showing customer id --> possibly done during foriegn keys if fk can be null
-# move all json.dumps/loads to user, etc. modules and not in database
-# move all functions to their proper module, move string construction the app module not in gui or DB
-# reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True
-# search for cut off diplay labels ---> extend width in gui
-# list of parts text browser not in same location on gui as other list pages
-# merge technicians and servicewriters? add column to display area of work and just have employees table?
-# set restrictions on class set methods?
-# protect against SQL race condition, options -> thread lock? queue? connection pool?
-# consolidate code as much as possible --> edit customer submit make a update customer edit page function
-# search for bugs
-# update doc strings to describe things better
-# change naming conventions to uniform naming conventions
-# place comments where needed because you didnt do it at time of writing, also spell check stuff
-# handle too many lines in module linter flags
-
-
-# https://docs.python.org/3/library/sqlite3.html
-# https://doc.qt.io/qtforpython-5/api.html#basic-modules
-
-
 # disable linter message due to using C extention
 # pylint: disable=c-extension-no-member
 
@@ -123,6 +97,7 @@ def setup_button_handlers():
         lambda: users.search_for_user(Database, Gui)
     )
     Gui.action_show_users.triggered.connect(lambda: users.show_all_users(Database, Gui))
+    Gui.action_remove_user.triggered.connect(lambda: users.remove_user(Database, Gui))
 
     # repair actions
     Gui.action_new_repair.triggered.connect(

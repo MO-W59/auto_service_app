@@ -141,7 +141,7 @@ def remove_vehicle_from_customer_button(database, gui):
 
             continue
 
-        if not database.remove_vehicle_owner(vin_to_remove):
+        if not database.remove_vehicle_owner(vin_to_remove, customer_id):
             gui.show_error("Customer does not have ownership of that vehicle.")
 
             continue

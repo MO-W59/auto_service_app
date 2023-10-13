@@ -94,7 +94,15 @@ def new_user_submit(database, gui):
 
     database.insert_user(user_data)
 
-    return gui.show_success("User input successfuly.")
+    gui.show_success("User input successfuly.")
+
+    new_id = database.get_user_id_for_username(username)
+
+    user_data = database.search_for_user(new_id["employee_id"])
+
+    information_to_display = user_string(database, user_data)
+
+    return gui.show_user_search(information_to_display)
 
 
 def update_password_submit(database, gui):
@@ -123,7 +131,9 @@ def update_password_submit(database, gui):
     if errors != "":
         return gui.show_error(errors)
 
-    if not database.is_current_users_password(old_pass):
+    if not database.is_current_users_password(
+        old_pass
+    ) or not database.is_current_users_username(username):
         return gui.show_error("Invalid username or password!")
 
     database.update_pass(sha512_crypt.hash(new_pass))
@@ -340,6 +350,61 @@ def show_all_users(database, gui):
     return gui.show_user_search(user_list)
 
 
+def remove_user(database, gui):
+    """Gets a user to remove from the GUI and passes it to the database for
+    removal."""
+
+    if not database.get_login_status():
+        return gui.show_error("You must be logged in to access this page.")
+
+    while True:
+        id_to_remove = gui.show_user_id_search_request()
+
+        # if the user clicked cancel
+        if id_to_remove is False:
+            return None
+
+        if id_to_remove is True:
+            gui.show_error("No ID entered!")
+
+            continue
+
+        if not validate.is_valid_id(id_to_remove):
+            gui.show_error("Invalid user ID!")
+
+            continue
+
+        if not database.search_for_user(id_to_remove):
+            gui.show_error("Invalid user ID!")
+
+            continue
+
+        break
+
+    while True:
+        password = gui.confirm_user_delete()
+
+        if password is False:
+            return None
+
+        if password is True:
+            gui.show_error("No password entered!")
+
+            continue
+
+        if not validate.is_valid_password(password):
+            gui.show_error("Invalid password!")
+
+            continue
+
+        if not database.remove_user(id_to_remove, password):
+            gui.show_error("Invalid employee ID and or password!")
+
+            continue
+
+        return gui.show_success("User removed succesfully.")
+
+
 def list_users(user_data):
     """Creates a string listing users simple data(id, name, lane/section)"""
 
@@ -359,7 +424,6 @@ def user_string(database, user_data):
     data."""
 
     repair_data = database.get_repairs_assigned(user_data["employee_id"])
-    print(repair_data)
 
     informaion_to_display = (
         f"User ID : {user_data['employee_id']}\nUsername : {user_data['username']}\n"

@@ -1865,6 +1865,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.action_show_users = QtGui.QAction(app_main_window)
         self.action_show_users.setObjectName("action_show_users")
 
+        self.action_remove_user = QtGui.QAction(app_main_window)
+        self.action_remove_user.setObjectName("action_remove_user")
+
         self.menu_users.addAction(self.action_login)
         self.menu_users.addAction(self.action_logout)
         self.menu_users.addAction(self.action_new_user)
@@ -1872,6 +1875,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.menu_users.addAction(self.action_search_user)
         self.menu_users.addAction(self.action_update_user)
         self.menu_users.addAction(self.action_show_users)
+        self.menu_users.addAction(self.action_remove_user)
         self.menu_repairs.addAction(self.action_new_repair)
         self.menu_repairs.addAction(self.action_edit_repair)
         self.menu_repairs.addAction(self.action_active_repairs)
@@ -2427,6 +2431,8 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.action_show_users.setText(_translate("app_main_window", "Show Users"))
 
+        self.action_remove_user.setText(_translate("app_main_window", "Remove User"))
+
         self.action_new_repair.setText(_translate("app_main_window", "New Repair"))
 
         self.action_edit_repair.setText(_translate("app_main_window", "Edit Repair"))
@@ -2725,13 +2731,37 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.edit_vehicle_engine_input_box.setText(vehicle_data["engine"])
 
     def confirm_repair_complete(self):
-        """Shows a confirmation window to the user."""
+        """Shows a confirmation window to the user to finish a repair."""
 
         password, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Repair Complete", "Enter password to confirm repair complete."
+            self,
+            "Repair Complete",
+            "Enter password to confirm repair complete.",
+            QtWidgets.QLineEdit.EchoMode.Password,
         )
 
         if ok_button and password:
             return password
 
-        return None
+        if ok_button:
+            return True
+
+        return False
+
+    def confirm_user_delete(self):
+        """Shows a password confirmation window to the user to remove a user."""
+
+        password, ok_button = QtWidgets.QInputDialog.getText(
+            self,
+            "Remove User",
+            "Enter password to remove user.",
+            QtWidgets.QLineEdit.EchoMode.Password,
+        )
+
+        if ok_button and password:
+            return password
+
+        if ok_button:
+            return True
+
+        return False

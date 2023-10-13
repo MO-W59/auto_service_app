@@ -123,6 +123,29 @@ class AppDatabase:
 
         return False
 
+    def remove_user(self, employee_id, password):
+        """Takes passed employee id and removes that employee from the database if
+        the passed password is the correct password for that employee."""
+
+        target_pass = self.cursor.execute(
+            """SELECT password FROM employees WHERE employee_id = (?);""",
+            (employee_id,),
+        ).fetchone()
+
+        if target_pass is None:
+            return False
+
+        if sha512_crypt.verify(password, target_pass["password"]):
+            self.cursor.execute(
+                """DELETE FROM employees WHERE employee_id = (?);""", (employee_id,)
+            )
+
+            self.connection.commit()
+
+            return True
+
+        return False
+
     def is_current_users_password(self, input_pass):
         """This function will check if an input password matches the current users
         password in the database."""
@@ -139,6 +162,19 @@ class AppDatabase:
             return True
 
         return False
+
+    def is_current_users_username(self, username):
+        """Checks if the passed username is the username of the current logged in database user."""
+
+        current_username = self.cursor.execute(
+            """SELECT username FROM employees WHERE employee_id = (?)""",
+            (self.current_user,),
+        ).fetchone()
+
+        if current_username["username"] != username:
+            return False
+
+        return True
 
     def set_current_user(self, user_id):
         """This function will set the databases current user as the passed user_id,
@@ -257,6 +293,13 @@ class AppDatabase:
             """SELECT employee_id, name, lane_or_section FROM employees;"""
         ).fetchall()
 
+    def get_user_id_for_username(self, username):
+        """Searches the database for a username and returns that users employee_id."""
+
+        return self.cursor.execute(
+            """SELECT employee_id FROM employees WHERE username = (?)""", (username,)
+        ).fetchone()
+
     def insert_repair(self, repair_data):
         """This function will insert a new repair into the database and call the functions
         need to add the repair to the valid employee's repair list."""
@@ -296,16 +339,12 @@ class AppDatabase:
             """SELECT * FROM repairs WHERE repair_id = (?);""", (repair_id,)
         ).fetchone()
 
-    def get_all_repairs(self):
+    def get_all_active_repairs(self):
         """This function will return all active repairs (no completion date)."""
 
-        list_of_repairs = self.cursor.execute("""SELECT * FROM repairs;""").fetchall()
-
-        for repair in list_of_repairs:
-            if repair["repair_completed_date"] is not None:
-                list_of_repairs.remove(repair)
-
-        return list_of_repairs
+        return self.cursor.execute(
+            """SELECT * FROM repairs WHERE repair_completed_date IS NULL;"""
+        ).fetchall()
 
     def get_repairs_assigned(self, employee_id):
         """Returns all repair_ids assosiated with the passed employee id."""
@@ -455,12 +494,17 @@ class AppDatabase:
             (part_id, repair_id),
         ).fetchone()
 
+        if listing_id is None:
+            return False
+
         self.cursor.execute(
             """DELETE FROM part_listings WHERE listing_id = (?)""",
             (listing_id["listing_id"],),
         )
 
         self.connection.commit()
+
+        return True
 
     def get_repair_part_listings(self, repair_id):
         """Returns all part listings for the assosiated repair_id."""
@@ -652,20 +696,23 @@ class AppDatabase:
     def remove_vehicle_owner(self, vin, customer_id):
         """Removes owner from passed vin."""
 
-        vehicles = self.cursor.execute(
-            """SELECT * FROM vehicles WHERE owner = (?)""", (customer_id,)
-        ).fetchall()
+        vehicle = self.cursor.execute(
+            """SELECT * FROM vehicles WHERE owner = (?) AND vin = (?)""",
+            (
+                customer_id,
+                vin,
+            ),
+        ).fetchone()
 
-        for vehicle in vehicles:
-            if vehicle["vin"] == vin and vehicle["owner"] == customer_id:
-                self.cursor.execute(
-                    """UPDATE vehicles SET owner = (?) WHERE vin = (?);""",
-                    (None, vin),
-                )
+        if vehicle["vin"] == vin and vehicle["owner"] == int(customer_id):
+            self.cursor.execute(
+                """UPDATE vehicles SET owner = (?) WHERE vin = (?);""",
+                (None, vin),
+            )
 
-                self.connection.commit()
+            self.connection.commit()
 
-                return True
+            return True
 
         return False
 
@@ -761,6 +808,7 @@ class AppDatabase:
         """Returns all completed repairs assosiated with the passed vin."""
 
         return self.cursor.execute(
-            """SELECT repair_id FROM repairs WHERE vehicle = (?) AND repair_completed_date = (?)""",
-            (vin, None),
+            """SELECT repair_id FROM repairs WHERE vehicle = (?) 
+            AND repair_completed_date IS NOT NULL""",
+            (vin,),
         ).fetchall()

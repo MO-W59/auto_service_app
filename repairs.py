@@ -27,7 +27,7 @@ def new_repair_submit(database, gui):
         errors += "Invalid problem description.\n\n"
 
     if errors != "":
-        return gui.show_errors(errors)
+        return gui.show_error(errors)
 
     constructing_suffix = []
     constructing_suffix[:0] = drop_off_date
@@ -150,14 +150,29 @@ def finish_repair_submit(database, gui):
     then has the database update employee assignments and moves the user to view the completed
     repair page in the gui."""
 
-    pass_confirm = gui.confirm_repair_complete()
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
-    if not validate.is_valid_password(pass_confirm):
-        return gui.show_error("Invalid password!")
+    while True:
+        pass_confirm = gui.confirm_repair_complete()
 
-    if not database.is_current_users_password(pass_confirm):
-        return gui.show_error("Invalid password!")
+        # if user clicked cancel button
+        if pass_confirm is False:
+            return None
+
+        if pass_confirm is True:
+            gui.show_error("No password entered!")
+
+        if not validate.is_valid_password(pass_confirm):
+            gui.show_error("Invalid password!")
+
+            continue
+
+        if not database.is_current_users_password(pass_confirm):
+            gui.show_error("Invalid password!")
+
+            continue
+
+        break
 
     compelted_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
@@ -166,6 +181,8 @@ def finish_repair_submit(database, gui):
     gui.show_success("Repair completed.")
 
     repair_data = database.search_for_repair(repair_id)
+
+    database.update_vehicle_active_repair(repair_data["vehicle"])
 
     parts_list = construct_repair_parts_list(repair_id, database)
 
@@ -241,10 +258,7 @@ def remove_part_from_repair(database, gui):
 
             continue
 
-        try:
-            database.drop_part_listing(repair_id, part_id_to_remove)
-
-        except ValueError:
+        if not database.drop_part_listing(repair_id, part_id_to_remove):
             gui.show_error("Repair does not have that part currently listed.")
 
             continue
@@ -304,6 +318,11 @@ def go_to_edit_repair_page(database, gui):
 
         repair_data = database.search_for_repair(requested_repair_id)
 
+        if repair_data["repair_completed_date"] is not None:
+            gui.show_error("That repair has already been completed.")
+
+            continue
+
         if not repair_data:
             gui.show_error("Repair not found.")
 
@@ -327,7 +346,7 @@ def go_to_active_repairs_page(database, gui):
     if not database.get_login_status():
         return gui.show_error("You must be logged in to access this page.")
 
-    repair_data = database.get_all_repairs()
+    repair_data = database.get_all_active_repairs()
 
     list_of_repairs = ""
 

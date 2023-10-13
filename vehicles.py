@@ -198,13 +198,13 @@ def search_repair_history(database, gui):
             continue
 
         break
-    # use json loads to get a list from database return
+
     repair_history = database.get_vehicle_repair_history(vin_to_search)
 
     repair_info = f"VIN : {vin_to_search}\n\n--- Pior Repair IDs ---\n\n"
 
     for repair in repair_history:
-        repair_info = repair_info + (f"{repair}\n\n")
+        repair_info = repair_info + (f"{repair['repair_id']}\n\n")
 
     return gui.show_vehicle_repair_history(repair_info)
 
