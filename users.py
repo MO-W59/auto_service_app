@@ -21,6 +21,9 @@ def login_submit(database, gui):
         return gui.show_error("Invalid username or password!")
 
     if database.is_valid_login_query(input_user, input_pass):
+        gui.username_login_input_box.clear()
+        gui.password_login_input_box.clear()
+
         return gui.show_success("Login successful.")
 
     return gui.show_error("Invalid username or password!")
@@ -101,6 +104,14 @@ def new_user_submit(database, gui):
     user_data = database.search_for_user(new_id["employee_id"])
 
     information_to_display = user_string(database, user_data)
+
+    gui.username_new_user_input_box.clear()
+    gui.password_new_user_input_box.clear()
+    gui.confirm_password_new_user_input_box.clear()
+    gui.new_user_name_input_box.clear()
+    gui.new_user_team_input_box.clear()
+    gui.new_user_section_input_box.clear()
+    gui.new_user_lane_input_box.clear()
 
     return gui.show_user_search(information_to_display)
 
