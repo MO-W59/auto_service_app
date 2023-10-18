@@ -76,6 +76,11 @@ def new_repair_submit(database, gui):
 
     database.update_vehicle_active_repair(vin, repair_id)
 
+    gui.new_repair_service_id_input_box.clear()
+    gui.new_repair_tech_id_input_box.clear()
+    gui.new_repair_vin_input_box.clear()
+    gui.new_repair_description_input_box.clear()
+
     return gui.show_success("New repair input successfuly.")
 
 
@@ -141,6 +146,10 @@ def edit_repair_submit(database, gui):
     gui.show_success("Repair update successful.")
 
     repair_data = database.search_for_repair(repair_id)
+
+    gui.edit_repair_service_id_input_box.clear()
+    gui.edit_repair_tech_id_input_box.clear()
+    gui.edit_repair_labor_input_box.clear()
 
     return gui.update_edit_repair_displays(repair_data)
 

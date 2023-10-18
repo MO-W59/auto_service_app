@@ -15,6 +15,10 @@ vvv----- TODO list -----vvv
 
 clear login boxes after login --> other pages too where applicable
 
+uncheck checkboxes after submit
+
+go to edit page after new submit for all items
+
 move all functions to their proper module, move string construction the app module not in gui or DB
 
 reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True

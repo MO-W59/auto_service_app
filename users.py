@@ -148,6 +148,12 @@ def update_password_submit(database, gui):
         return gui.show_error("Invalid username or password!")
 
     database.update_pass(sha512_crypt.hash(new_pass))
+
+    gui.update_password_username_input_box.clear()
+    gui.old_password_input_box.clear()
+    gui.new_password_input_box.clear()
+    gui.confirm_new_password_input_box.clear()
+
     return gui.show_success("Password update successful.")
 
 
@@ -192,6 +198,12 @@ def update_user_submit(database, gui):
     information_to_display = user_string(database, user_data)
 
     gui.update_user_update_displays(user_data)
+
+    gui.update_user_password_input_box.clear()
+    gui.update_user_name_input_box.clear()
+    gui.update_user_team_input_box.clear()
+    gui.update_user_section_input_box.clear()
+    gui.update_user_lane_input_box.clear()
 
     return gui.show_user_search(information_to_display)
 
