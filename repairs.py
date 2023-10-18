@@ -151,6 +151,10 @@ def edit_repair_submit(database, gui):
     gui.edit_repair_tech_id_input_box.clear()
     gui.edit_repair_labor_input_box.clear()
 
+    gui.change_writer_check_box.setChecked(False)
+    gui.change_tech_check_box.setChecked(False)
+    gui.change_labor_check_box.setChecked(False)
+
     return gui.update_edit_repair_displays(repair_data)
 
 
@@ -196,6 +200,18 @@ def finish_repair_submit(database, gui):
     parts_list = construct_repair_parts_list(repair_id, database)
 
     gui.update_old_repair_displays(repair_data, parts_list)
+
+    gui.edit_repair_service_id_input_box.clear()
+    gui.edit_repair_tech_id_input_box.clear()
+    gui.edit_repair_labor_input_box.clear()
+
+    gui.edit_repair_problem_description_input_box.clear()
+    gui.edit_repair_repair_description_input_box.clear()
+    gui.edit_repair_list_of_parts_text_browser.clear()
+
+    gui.change_writer_check_box.setChecked(False)
+    gui.change_tech_check_box.setChecked(False)
+    gui.change_labor_check_box.setChecked(False)
 
     return gui.widget_stack.setCurrentIndex(7)
 
@@ -303,6 +319,11 @@ def go_to_new_repair_page(database, gui):
 
     gui.new_repair_current_date_display.setText(drop_off_date)
 
+    gui.new_repair_service_id_input_box.clear()
+    gui.new_repair_tech_id_input_box.clear()
+    gui.new_repair_vin_input_box.clear()
+    gui.new_repair_description_input_box.clear()
+
     return gui.widget_stack.setCurrentIndex(4)
 
 
@@ -344,6 +365,14 @@ def go_to_edit_repair_page(database, gui):
     parts_list = construct_repair_parts_list(requested_repair_id, database)
 
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
+
+    gui.edit_repair_service_id_input_box.clear()
+    gui.edit_repair_tech_id_input_box.clear()
+    gui.edit_repair_labor_input_box.clear()
+
+    gui.change_writer_check_box.setChecked(False)
+    gui.change_tech_check_box.setChecked(False)
+    gui.change_labor_check_box.setChecked(False)
 
     return gui.widget_stack.setCurrentIndex(5)
 

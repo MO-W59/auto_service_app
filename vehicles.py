@@ -51,6 +51,13 @@ def new_vehicle_submit(database, gui):
 
     database.insert_vehicle(vehicle_data)
 
+    gui.new_vehicle_vin_input_box.clear()
+    gui.new_vehicle_make_input_box.clear()
+    gui.new_vehicle_model_input_box.clear()
+    gui.new_vehicle_year_input_box.clear()
+    gui.new_vehicle_color_input_box.clear()
+    gui.new_vehicle_engine_input_box.clear()
+
     return gui.show_success("Vehicle input successfully.")
 
 
@@ -78,7 +85,10 @@ def edit_vehicle_submit(database, gui):
         if checkbox["checked"]():
             checkbox["updater"](current_vin, checkbox["input"]())
 
-    # show success
+    # show success, reset checkboxes
+
+    for checkbox in checkbox_dispatcher:
+        checkbox.setChecked(False)
 
     return gui.show_success("Vehicle update successful.")
 
@@ -135,6 +145,13 @@ def go_to_new_vehicle_page(database, gui):
     if not database.get_login_status():
         return gui.show_error("You must be logged in to access this page.")
 
+    gui.new_vehicle_vin_input_box.clear()
+    gui.new_vehicle_make_input_box.clear()
+    gui.new_vehicle_model_input_box.clear()
+    gui.new_vehicle_year_input_box.clear()
+    gui.new_vehicle_color_input_box.clear()
+    gui.new_vehicle_engine_input_box.clear()
+
     return gui.widget_stack.setCurrentIndex(14)
 
 
@@ -165,6 +182,11 @@ def go_to_edit_vehicle_page(database, gui):
             continue
 
         break
+
+    checkbox_dispatcher = edit_vehicle_dispatcher(database, gui)
+
+    for checkbox in checkbox_dispatcher:
+        checkbox.setChecked(False)
 
     gui.update_edit_vehicle_page(vehicle_data)
 

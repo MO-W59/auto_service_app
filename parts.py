@@ -33,6 +33,10 @@ def create_part_submit(database, gui):
     }
     database.insert_part(part_data)
 
+    gui.new_part_part_id_input_box.clear()
+    gui.new_part_part_cost_input_box.clear()
+    gui.new_part_description_input_box.clear()
+
     return gui.show_success("Part input successfully.")
 
 
@@ -59,6 +63,9 @@ def edit_part_submit(database, gui):
     if gui.edit_part_change_description_check_box.isChecked():
         database.update_part_description(part_id, new_part_description)
 
+    gui.edit_part_change_cost_check_box.setChecked(False)
+    gui.edit_part_change_description_check_box.setChecked(False)
+
     return gui.show_success("Part update successful.")
 
 
@@ -67,6 +74,10 @@ def go_to_new_part_page(database, gui):
 
     if not database.get_login_status():
         return gui.show_error("You must be logged in to access this page.")
+
+    gui.new_part_part_id_input_box.clear()
+    gui.new_part_part_cost_input_box.clear()
+    gui.new_part_description_input_box.clear()
 
     return gui.widget_stack.setCurrentIndex(8)
 
@@ -101,6 +112,9 @@ def go_to_edit_part_page(database, gui):
         break
 
     gui.update_edit_part_page(part_data)
+
+    gui.edit_part_change_cost_check_box.setChecked(False)
+    gui.edit_part_change_description_check_box.setChecked(False)
 
     return gui.widget_stack.setCurrentIndex(9)
 

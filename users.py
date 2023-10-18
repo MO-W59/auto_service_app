@@ -77,6 +77,12 @@ def new_user_submit(database, gui):
         else:
             lane_or_section = int(lane_or_section)
 
+    if (
+        not gui.new_user_tech_radio_button.isChecked()
+        and not gui.new_user_service_writer_radio_button.isChecked()
+    ):
+        errors += "The user must be a Technician or Service Writer!"
+
     if errors != "":
         return gui.show_error(errors)
 
@@ -112,6 +118,14 @@ def new_user_submit(database, gui):
     gui.new_user_team_input_box.clear()
     gui.new_user_section_input_box.clear()
     gui.new_user_lane_input_box.clear()
+
+    for radio_button in [
+        gui.new_user_tech_radio_button,
+        gui.new_user_service_writer_radio_button,
+    ]:
+        radio_button.setAutoExclusive(False)
+        radio_button.setChecked(False)
+        radio_button.setAutoExclusive(True)
 
     return gui.show_user_search(information_to_display)
 
@@ -205,6 +219,17 @@ def update_user_submit(database, gui):
     gui.update_user_section_input_box.clear()
     gui.update_user_lane_input_box.clear()
 
+    for radio_button in [
+        gui.update_user_tech_radio_button,
+        gui.update_user_service_writer_radio_button,
+    ]:
+        radio_button.setAutoExclusive(False)
+        radio_button.setChecked(False)
+        radio_button.setAutoExclusive(True)
+
+    for check_box in checkbox_dispatcher:
+        check_box.setChecked(False)
+
     return gui.show_user_search(information_to_display)
 
 
@@ -264,6 +289,9 @@ def update_user_dispatcher(database, gui):
 def go_to_login_page(gui):
     """Takes user to the login page."""
 
+    gui.username_login_input_box.clear()
+    gui.password_login_input_box.clear()
+
     gui.widget_stack.setCurrentIndex(0)
 
 
@@ -277,6 +305,9 @@ def logout_user(database, gui):
     database.set_login_status(False)
     database.set_current_user(None)
 
+    gui.username_login_input_box.clear()
+    gui.password_login_input_box.clear()
+
     gui.show_success("Logout successful.")
 
     return gui.widget_stack.setCurrentIndex(0)
@@ -284,6 +315,22 @@ def logout_user(database, gui):
 
 def go_to_new_user_page(gui):
     """Takes the user to the new user page."""
+
+    gui.username_new_user_input_box.clear()
+    gui.password_new_user_input_box.clear()
+    gui.confirm_password_new_user_input_box.clear()
+    gui.new_user_name_input_box.clear()
+    gui.new_user_team_input_box.clear()
+    gui.new_user_section_input_box.clear()
+    gui.new_user_lane_input_box.clear()
+
+    for radio_button in [
+        gui.new_user_tech_radio_button,
+        gui.new_user_service_writer_radio_button,
+    ]:
+        radio_button.setAutoExclusive(False)
+        radio_button.setChecked(False)
+        radio_button.setAutoExclusive(True)
 
     gui.widget_stack.setCurrentIndex(1)
 
@@ -293,6 +340,11 @@ def go_to_update_password_page(database, gui):
 
     if not database.get_login_status():
         return gui.show_error("You must be logged in to access this page.")
+
+    gui.update_password_username_input_box.clear()
+    gui.old_password_input_box.clear()
+    gui.new_password_input_box.clear()
+    gui.confirm_new_password_input_box.clear()
 
     return gui.widget_stack.setCurrentIndex(2)
 
@@ -357,6 +409,25 @@ def go_to_update_user_page(database, gui):
         break
 
     gui.update_user_update_displays(user_data)
+
+    gui.update_user_password_input_box.clear()
+    gui.update_user_name_input_box.clear()
+    gui.update_user_team_input_box.clear()
+    gui.update_user_section_input_box.clear()
+    gui.update_user_lane_input_box.clear()
+
+    for radio_button in [
+        gui.update_user_tech_radio_button,
+        gui.update_user_service_writer_radio_button,
+    ]:
+        radio_button.setAutoExclusive(False)
+        radio_button.setChecked(False)
+        radio_button.setAutoExclusive(True)
+
+    checkbox_dispatcher = update_user_dispatcher(database, gui)
+
+    for check_box in checkbox_dispatcher:
+        check_box.setChecked(False)
 
     return gui.widget_stack.setCurrentIndex(3)
 
