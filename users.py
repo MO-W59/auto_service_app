@@ -4,6 +4,9 @@
 from passlib.hash import sha512_crypt
 import validate
 
+INVALID_AUTH_MSG = "Invalid username or password!"
+NO_LOGIN_MSG = "You must be logged in to access this page or function."
+
 
 def login_submit(database, gui):
     """Checks login status in database, validates inputs via validate, submits values
@@ -18,7 +21,7 @@ def login_submit(database, gui):
     if not validate.is_valid_username(input_user) and validate.is_valid_password(
         input_pass
     ):
-        return gui.show_error("Invalid username or password!")
+        return gui.show_error(INVALID_AUTH_MSG)
 
     if database.is_valid_login_query(input_user, input_pass):
         gui.username_login_input_box.clear()
@@ -26,7 +29,7 @@ def login_submit(database, gui):
 
         return gui.show_success("Login successful.")
 
-    return gui.show_error("Invalid username or password!")
+    return gui.show_error(INVALID_AUTH_MSG)
 
 
 def new_user_submit(database, gui):
@@ -47,7 +50,7 @@ def new_user_submit(database, gui):
     ):
         errors += "Invalid username or password!\n\n"
 
-    if not pwrd == confirm_pwrd:
+    if pwrd != confirm_pwrd:
         errors += "Passwords do not match!\n\n"
 
     if not validate.is_valid_name(name):
@@ -142,7 +145,7 @@ def update_password_submit(database, gui):
     if not validate.is_valid_username(username) or not validate.is_valid_password(
         old_pass
     ):
-        errors += "Invalid username or password!\n\n"
+        errors += INVALID_AUTH_MSG + "\n\n"
 
     if new_pass != confirm_new_pass:
         errors += "New passwords do not match!\n\n"
@@ -159,7 +162,7 @@ def update_password_submit(database, gui):
     if not database.is_current_users_password(
         old_pass
     ) or not database.is_current_users_username(username):
-        return gui.show_error("Invalid username or password!")
+        return gui.show_error(INVALID_AUTH_MSG)
 
     database.update_pass(sha512_crypt.hash(new_pass))
 
@@ -339,7 +342,7 @@ def go_to_update_password_page(database, gui):
     """Takes the user to the update password page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     gui.update_password_username_input_box.clear()
     gui.old_password_input_box.clear()
@@ -353,7 +356,7 @@ def search_for_user(database, gui):
     """Gets a user id and passes it to the database to get that users data."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this function.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     while True:
         id_to_search = gui.show_user_id_search_request()
@@ -385,7 +388,7 @@ def go_to_update_user_page(database, gui):
     """Takes the user to the update user page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     while True:
         id_to_update = gui.show_user_id_search_request()
@@ -437,7 +440,7 @@ def show_all_users(database, gui):
     to see a list of users."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     user_list = list_users(database.get_all_users())
 
@@ -449,7 +452,7 @@ def remove_user(database, gui):
     removal."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     while True:
         id_to_remove = gui.show_user_id_search_request()

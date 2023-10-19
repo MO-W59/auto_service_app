@@ -15,6 +15,8 @@ vvv----- TODO list -----vvv
 
 go to edit page after new submit for all items
 
+new user/remove user functions refactor
+
 reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True
 
 search for cut off diplay labels ---> extend width in gui
