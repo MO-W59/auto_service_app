@@ -2,6 +2,8 @@
 
 import validate
 
+NO_LOGIN_MSG = "You must be logged in to access this page."
+
 
 def new_vehicle_submit(database, gui):
     """Gets information for a new vehicle and passes it to the database for storage."""
@@ -58,7 +60,9 @@ def new_vehicle_submit(database, gui):
     gui.new_vehicle_color_input_box.clear()
     gui.new_vehicle_engine_input_box.clear()
 
-    return gui.show_success("Vehicle input successfully.")
+    gui.show_success("Vehicle input successfully.")
+
+    return go_to_edit_vehicle_page(database, gui, vin)
 
 
 def edit_vehicle_submit(database, gui):
@@ -143,7 +147,7 @@ def go_to_new_vehicle_page(database, gui):
     """Takes the user to the new vehicles page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     gui.new_vehicle_vin_input_box.clear()
     gui.new_vehicle_make_input_box.clear()
@@ -155,33 +159,37 @@ def go_to_new_vehicle_page(database, gui):
     return gui.widget_stack.setCurrentIndex(14)
 
 
-def go_to_edit_vehicle_page(database, gui):
+def go_to_edit_vehicle_page(database, gui, vin=None):
     """Gets a vin and takes the user to the edit vehicle page passes vin to database
     to get that vehicles data and passes that data to the GUI to populate the page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
-    while True:
-        vin = gui.show_vin_search_request()
+    if vin is None:
+        while True:
+            vin = gui.show_vin_search_request()
 
-        # If the user clicked cancel
-        if vin is False:
-            return None
+            # If the user clicked cancel
+            if vin is False:
+                return None
 
-        if not validate.is_valid_vin(vin):
-            gui.show_error("Invalid VIN.")
+            if not validate.is_valid_vin(vin):
+                gui.show_error("Invalid VIN.")
 
-            continue
+                continue
 
+            vehicle_data = database.get_vehicle_data(vin)
+
+            if not vehicle_data:
+                gui.show_error("Vehicle not found.")
+
+                continue
+
+            break
+
+    else:
         vehicle_data = database.get_vehicle_data(vin)
-
-        if not vehicle_data:
-            gui.show_error("Vehicle not found.")
-
-            continue
-
-        break
 
     checkbox_dispatcher = edit_vehicle_dispatcher(database, gui)
 
@@ -236,7 +244,7 @@ def go_to_list_of_vehicles_page(database, gui):
     the database and passes it to the GUI to populate the page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     vehicle_data = database.get_all_vehicles()
 

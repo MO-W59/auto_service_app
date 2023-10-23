@@ -130,7 +130,9 @@ def new_user_submit(database, gui):
         radio_button.setChecked(False)
         radio_button.setAutoExclusive(True)
 
-    return gui.show_user_search(information_to_display)
+    gui.show_user_search(information_to_display)
+
+    return go_to_login_page(gui)
 
 
 def update_password_submit(database, gui):
@@ -171,7 +173,9 @@ def update_password_submit(database, gui):
     gui.new_password_input_box.clear()
     gui.confirm_new_password_input_box.clear()
 
-    return gui.show_success("Password update successful.")
+    gui.show_success("Password update successful.")
+
+    return go_to_login_page(gui)
 
 
 def update_user_submit(database, gui):

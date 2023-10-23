@@ -573,12 +573,24 @@ class AppDatabase:
             """INSERT INTO customers (name, address, phone_number) VALUES (?, ?, ?);""",
             (
                 customer_data["name"],
-                customer_data["adress"],
+                customer_data["address"],
                 customer_data["phone"],
             ),
         )
 
         self.connection.commit()
+
+        customer_id = self.cursor.execute(
+            """SELECT customer_id FROM customers WHERE
+              name = (?) AND address = (?) AND phone_number = (?)""",
+            (
+                customer_data["name"],
+                customer_data["address"],
+                customer_data["phone"],
+            ),
+        ).fetchone()
+
+        return customer_id["customer_id"]
 
     def get_customer_data(self, customer_id):
         """Returns customer data for the passed customer id from the database."""

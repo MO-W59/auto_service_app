@@ -3,6 +3,8 @@
 import datetime
 import validate
 
+NO_LOGIN_MSG = "You must be logged in to access this page."
+
 
 def new_repair_submit(database, gui):
     """Gets information for a new repair and passes it to the database for storage."""
@@ -81,7 +83,9 @@ def new_repair_submit(database, gui):
     gui.new_repair_vin_input_box.clear()
     gui.new_repair_description_input_box.clear()
 
-    return gui.show_success("New repair input successfuly.")
+    gui.show_success("New repair input successfuly.")
+
+    return go_to_edit_repair_page(database, gui, repair_id)
 
 
 def edit_repair_submit(database, gui):
@@ -313,7 +317,7 @@ def go_to_new_repair_page(database, gui):
     """Takes the user to the new repair page and gets current date to display."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     drop_off_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
@@ -327,38 +331,42 @@ def go_to_new_repair_page(database, gui):
     return gui.widget_stack.setCurrentIndex(4)
 
 
-def go_to_edit_repair_page(database, gui):
+def go_to_edit_repair_page(database, gui, requested_repair_id=None):
     """Takes the user to the edit repair page, gets information from the database
     based on entered repair id to populate the page with data."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
-    while True:
-        requested_repair_id = gui.show_repair_id_search_request()
+    if requested_repair_id is None:
+        while True:
+            requested_repair_id = gui.show_repair_id_search_request()
 
-        # If the user clicked cancel
-        if requested_repair_id is False:
-            return None
+            # If the user clicked cancel
+            if requested_repair_id is False:
+                return None
 
-        if not validate.is_valid_id(requested_repair_id):
-            gui.show_error("Invalid Repair ID.")
+            if not validate.is_valid_id(requested_repair_id):
+                gui.show_error("Invalid Repair ID.")
 
-            continue
+                continue
 
+            repair_data = database.search_for_repair(requested_repair_id)
+
+            if repair_data["repair_completed_date"] is not None:
+                gui.show_error("That repair has already been completed.")
+
+                continue
+
+            if not repair_data:
+                gui.show_error("Repair not found.")
+
+                continue
+
+            break
+
+    else:
         repair_data = database.search_for_repair(requested_repair_id)
-
-        if repair_data["repair_completed_date"] is not None:
-            gui.show_error("That repair has already been completed.")
-
-            continue
-
-        if not repair_data:
-            gui.show_error("Repair not found.")
-
-            continue
-
-        break
 
     gui.update_edit_repair_displays(repair_data)
 
@@ -382,7 +390,7 @@ def go_to_active_repairs_page(database, gui):
     from the database to populate the page.."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     repair_data = database.get_all_active_repairs()
 
@@ -408,7 +416,7 @@ def go_to_old_repair_page(database, gui):
     old repair, then populates the page with its data."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     while True:
         repair_id = gui.show_repair_id_search_request()

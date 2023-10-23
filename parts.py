@@ -2,6 +2,8 @@
 
 import validate
 
+NO_LOGIN_MSG = "You must be logged in to access this page."
+
 
 def create_part_submit(database, gui):
     """Creates new part from inputs and passed to database for storage."""
@@ -37,7 +39,9 @@ def create_part_submit(database, gui):
     gui.new_part_part_cost_input_box.clear()
     gui.new_part_description_input_box.clear()
 
-    return gui.show_success("Part input successfully.")
+    gui.show_success("Part input successfully.")
+
+    return go_to_edit_part_page(database, gui, part_id)
 
 
 def edit_part_submit(database, gui):
@@ -73,7 +77,7 @@ def go_to_new_part_page(database, gui):
     """Takes the user to the new parts page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     gui.new_part_part_id_input_box.clear()
     gui.new_part_part_cost_input_box.clear()
@@ -82,34 +86,38 @@ def go_to_new_part_page(database, gui):
     return gui.widget_stack.setCurrentIndex(8)
 
 
-def go_to_edit_part_page(database, gui):
+def go_to_edit_part_page(database, gui, part_id=None):
     """Gets a part id to edit and passes it to the database to get
     that part's information then passes the data to the GUI to update
     the page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
-    while True:
-        part_id = gui.show_part_id_search_request()
+    if part_id is None:
+        while True:
+            part_id = gui.show_part_id_search_request()
 
-        # If user clicked cancel
-        if part_id is False:
-            return None
+            # If user clicked cancel
+            if part_id is False:
+                return None
 
-        if not validate.is_valid_id(part_id):
-            gui.show_error("Invalid Part ID.")
+            if not validate.is_valid_id(part_id):
+                gui.show_error("Invalid Part ID.")
 
-            continue
+                continue
 
+            part_data = database.get_part_data(part_id)
+
+            if not part_data:
+                gui.show_error("Part not found.")
+
+                continue
+
+            break
+
+    else:
         part_data = database.get_part_data(part_id)
-
-        if not part_data:
-            gui.show_error("Part not found.")
-
-            continue
-
-        break
 
     gui.update_edit_part_page(part_data)
 
@@ -124,7 +132,7 @@ def go_to_list_of_parts_page(database, gui):
     part data from the database to pass the data to the GUI."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     parts_data = database.get_all_parts_in_database()
 

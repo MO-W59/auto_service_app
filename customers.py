@@ -2,6 +2,8 @@
 
 import validate
 
+NO_LOGIN_MSG = "You must be logged in to access this page."
+
 
 def new_customer_submit(database, gui):
     """Gets new customer data and passes it to the database for storage."""
@@ -25,17 +27,19 @@ def new_customer_submit(database, gui):
 
     customer_data = {
         "name": name,
-        "adress": address,
+        "address": address,
         "phone": phone,
     }
 
-    database.insert_customer(customer_data)
+    customer_id = database.insert_customer(customer_data)
 
     gui.new_customer_name_input_box.clear()
     gui.new_customer_address_input_box.clear()
     gui.new_customer_phone_input_box.clear()
 
-    return gui.show_success("New customer input succesfully.")
+    gui.show_success("New customer input succesfully.")
+
+    return go_to_edit_customer_page(database, gui, customer_id)
 
 
 def edit_customer_submit(database, gui):
@@ -176,7 +180,7 @@ def go_to_new_customer_page(database, gui):
     """Takes the user to the new customer page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     gui.new_customer_name_input_box.clear()
     gui.new_customer_address_input_box.clear()
@@ -185,34 +189,37 @@ def go_to_new_customer_page(database, gui):
     return gui.widget_stack.setCurrentIndex(11)
 
 
-def go_to_edit_customer_page(database, gui):
+def go_to_edit_customer_page(database, gui, customer_id=None):
     """Gets a customer id and takes them to the edit customer page
     uses the id to get customer information from the database and passes
     it to the GUI to update the page data."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
-    while True:
-        customer_id = gui.show_customer_id_search_request()
+    if customer_id is None:
+        while True:
+            customer_id = gui.show_customer_id_search_request()
 
-        # if the user clicked cancel
-        if customer_id is False:
-            return None
+            # if the user clicked cancel
+            if customer_id is False:
+                return None
 
-        if not validate.is_valid_id(customer_id):
-            gui.show_error("Invalid Customer ID.")
+            if not validate.is_valid_id(customer_id):
+                gui.show_error("Invalid Customer ID.")
 
-            continue
+                continue
 
+            customer_data = database.get_customer_data(customer_id)
+
+            if not customer_data:
+                gui.show_error("Customer not found.")
+
+                continue
+
+            break
+    else:
         customer_data = database.get_customer_data(customer_id)
-
-        if not customer_data:
-            gui.show_error("Customer not found.")
-
-            continue
-
-        break
 
     vehicle_data = database.get_owned_vehicles(customer_id)
 
@@ -239,7 +246,7 @@ def go_to_list_of_customers_page(database, gui):
     all customers and passes it to the GUI to populate data on the page."""
 
     if not database.get_login_status():
-        return gui.show_error("You must be logged in to access this page.")
+        return gui.show_error(NO_LOGIN_MSG)
 
     customer_data = database.get_all_customers()
 

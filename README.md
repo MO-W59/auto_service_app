@@ -13,9 +13,11 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-go to edit page after new submit for all items
-
 new user/remove user functions refactor
+
+edit/go to edit repair functions refactor
+
+add remove functions for all objects
 
 reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True
 
