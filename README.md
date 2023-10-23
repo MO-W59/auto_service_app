@@ -13,8 +13,6 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-new user/remove user functions refactor
-
 edit/go to edit repair functions refactor
 
 add remove functions for all objects

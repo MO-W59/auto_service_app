@@ -233,3 +233,53 @@ def is_valid_year(year):
             is_valid = False
 
     return is_valid
+
+
+def new_user(gui, test_data):
+    """Ensures all passed data for a new user id valid, returns errors if any, and
+    returns errors, is_tech, is_writer and lane/section information for the user."""
+
+    if (
+        not is_valid_username(test_data["username"])
+        or not is_valid_password(test_data["pwrd"])
+        or not is_valid_password(test_data["confirm_pwrd"])
+    ):
+        test_data["errors"] += "Invalid username or password!\n\n"
+
+    if test_data["pwrd"] != test_data["confirm_pwrd"]:
+        test_data["errors"] += "Passwords do not match!\n\n"
+
+    if not is_valid_name(test_data["name"]):
+        test_data["errors"] += "Invalid name!\n\n"
+
+    if not is_valid_team(test_data["team"]):
+        test_data["errors"] += "Invalid team!\n\n"
+
+    if gui.new_user_tech_radio_button.isChecked():
+        test_data["is_tech"] = 1
+        test_data["is_writer"] = 0
+
+        test_data["lane_or_section"] = gui.new_user_section_input_box.text()
+
+        if not is_valid_name(test_data["lane_or_section"]):
+            test_data["errors"] += "Invalid section!\n\n"
+
+    if gui.new_user_service_writer_radio_button.isChecked():
+        test_data["is_tech"] = 0
+        test_data["is_writer"] = 1
+
+        test_data["lane_or_section"] = gui.new_user_lane_input_box.text()
+
+        if not is_valid_lane(test_data["lane_or_section"]):
+            test_data["errors"] += "Invalid lane!\n\n"
+
+        else:
+            test_data["lane_or_section"] = int(test_data["lane_or_section"])
+
+    if (
+        not gui.new_user_tech_radio_button.isChecked()
+        and not gui.new_user_service_writer_radio_button.isChecked()
+    ):
+        test_data["errors"] += "The user must be a Technician or Service Writer!"
+
+    return test_data

@@ -34,80 +34,43 @@ def login_submit(database, gui):
 def new_user_submit(database, gui):
     """Gets information for a new user and passes it to the database for storage."""
 
-    username = gui.username_new_user_input_box.text()
-    pwrd = gui.password_new_user_input_box.text()
-    confirm_pwrd = gui.confirm_password_new_user_input_box.text()
-    name = gui.new_user_name_input_box.text()
-    team = gui.new_user_team_input_box.text()
-    lane_or_section = None
-    errors = ""
+    test_data = {
+        "errors": "",
+        "username": gui.username_new_user_input_box.text(),
+        "pwrd": gui.password_new_user_input_box.text(),
+        "confirm_pwrd": gui.confirm_password_new_user_input_box.text(),
+        "name": gui.new_user_name_input_box.text(),
+        "team": gui.new_user_team_input_box.text(),
+        "lane_or_section": None,
+        "is_tech": None,
+        "is_writer": None,
+    }
 
-    if (
-        not validate.is_valid_username(username)
-        or not validate.is_valid_password(pwrd)
-        or not validate.is_valid_password(confirm_pwrd)
-    ):
-        errors += "Invalid username or password!\n\n"
+    test_data = validate.new_user(gui, test_data)
 
-    if pwrd != confirm_pwrd:
-        errors += "Passwords do not match!\n\n"
+    if test_data["errors"] != "":
+        return gui.show_error(test_data["errors"])
 
-    if not validate.is_valid_name(name):
-        errors += "Invalid name!\n\n"
-
-    if not validate.is_valid_team(team):
-        errors += "Invalid team!\n\n"
-
-    if gui.new_user_tech_radio_button.isChecked():
-        is_tech = 1
-        is_writer = 0
-
-        lane_or_section = gui.new_user_section_input_box.text()
-
-        if not validate.is_valid_name(lane_or_section):
-            errors += "Invalid section!\n\n"
-
-    if gui.new_user_service_writer_radio_button.isChecked():
-        is_tech = 0
-        is_writer = 1
-
-        lane_or_section = gui.new_user_lane_input_box.text()
-
-        if not validate.is_valid_lane(lane_or_section):
-            errors += "Invalid lane!\n\n"
-
-        else:
-            lane_or_section = int(lane_or_section)
-
-    if (
-        not gui.new_user_tech_radio_button.isChecked()
-        and not gui.new_user_service_writer_radio_button.isChecked()
-    ):
-        errors += "The user must be a Technician or Service Writer!"
-
-    if errors != "":
-        return gui.show_error(errors)
-
-    if database.is_username_in_use(username):
+    if database.is_username_in_use(test_data["username"]):
         return gui.show_error("Username already in use!")
 
-    hash_pwrd = sha512_crypt.hash(pwrd)
+    hash_pwrd = sha512_crypt.hash(test_data["pwrd"])
 
     user_data = {
-        "username": username,
+        "username": test_data["username"],
         "hash_pwrd": hash_pwrd,
-        "name": name,
-        "team": team,
-        "lane_or_section": lane_or_section,
-        "is_tech": is_tech,
-        "is_writer": is_writer,
+        "name": test_data["name"],
+        "team": test_data["team"],
+        "lane_or_section": test_data["lane_or_section"],
+        "is_tech": test_data["is_tech"],
+        "is_writer": test_data["is_writer"],
     }
 
     database.insert_user(user_data)
 
     gui.show_success("User input successfuly.")
 
-    new_id = database.get_user_id_for_username(username)
+    new_id = database.get_user_id_for_username(test_data["username"])
 
     user_data = database.search_for_user(new_id["employee_id"])
 
@@ -389,6 +352,36 @@ def remove_user(database, gui):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
+    id_to_remove = get_remove_id_loop(database, gui)
+
+    while True:
+        password = gui.confirm_user_delete()
+
+        # if the user clicked cancel
+        if password is False:
+            return None
+
+        if password is True:
+            gui.show_error("No password entered!")
+
+            continue
+
+        if not validate.is_valid_password(password):
+            gui.show_error("Invalid password!")
+
+            continue
+
+        if not database.remove_user(id_to_remove, password):
+            gui.show_error("Invalid employee ID and or password!")
+
+            continue
+
+        return gui.show_success("User removed succesfully.")
+
+
+def get_remove_id_loop(database, gui):
+    """Loop to contiune asking for an user id to remove."""
+
     while True:
         id_to_remove = gui.show_user_id_search_request()
 
@@ -411,30 +404,7 @@ def remove_user(database, gui):
 
             continue
 
-        break
-
-    while True:
-        password = gui.confirm_user_delete()
-
-        if password is False:
-            return None
-
-        if password is True:
-            gui.show_error("No password entered!")
-
-            continue
-
-        if not validate.is_valid_password(password):
-            gui.show_error("Invalid password!")
-
-            continue
-
-        if not database.remove_user(id_to_remove, password):
-            gui.show_error("Invalid employee ID and or password!")
-
-            continue
-
-        return gui.show_success("User removed succesfully.")
+        return id_to_remove
 
 
 def list_users(user_data):
