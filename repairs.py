@@ -78,10 +78,7 @@ def new_repair_submit(database, gui):
 
     database.update_vehicle_active_repair(vin, repair_id)
 
-    gui.new_repair_service_id_input_box.clear()
-    gui.new_repair_tech_id_input_box.clear()
-    gui.new_repair_vin_input_box.clear()
-    gui.new_repair_description_input_box.clear()
+    gui.reset_new_repair_page()
 
     gui.show_success("New repair input successfuly.")
 
@@ -151,13 +148,7 @@ def edit_repair_submit(database, gui):
 
     repair_data = database.search_for_repair(repair_id)
 
-    gui.edit_repair_service_id_input_box.clear()
-    gui.edit_repair_tech_id_input_box.clear()
-    gui.edit_repair_labor_input_box.clear()
-
-    gui.change_writer_check_box.setChecked(False)
-    gui.change_tech_check_box.setChecked(False)
-    gui.change_labor_check_box.setChecked(False)
+    gui.reset_edit_repair_page()
 
     return gui.update_edit_repair_displays(repair_data)
 
@@ -205,17 +196,7 @@ def finish_repair_submit(database, gui):
 
     gui.update_old_repair_displays(repair_data, parts_list)
 
-    gui.edit_repair_service_id_input_box.clear()
-    gui.edit_repair_tech_id_input_box.clear()
-    gui.edit_repair_labor_input_box.clear()
-
-    gui.edit_repair_problem_description_input_box.clear()
-    gui.edit_repair_repair_description_input_box.clear()
-    gui.edit_repair_list_of_parts_text_browser.clear()
-
-    gui.change_writer_check_box.setChecked(False)
-    gui.change_tech_check_box.setChecked(False)
-    gui.change_labor_check_box.setChecked(False)
+    gui.reset_edit_repair_page_finish()
 
     return gui.widget_stack.setCurrentIndex(7)
 
@@ -323,10 +304,7 @@ def go_to_new_repair_page(database, gui):
 
     gui.new_repair_current_date_display.setText(drop_off_date)
 
-    gui.new_repair_service_id_input_box.clear()
-    gui.new_repair_tech_id_input_box.clear()
-    gui.new_repair_vin_input_box.clear()
-    gui.new_repair_description_input_box.clear()
+    gui.reset_new_repair_page()
 
     return gui.widget_stack.setCurrentIndex(4)
 
@@ -374,13 +352,7 @@ def go_to_edit_repair_page(database, gui, requested_repair_id=None):
 
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
-    gui.edit_repair_service_id_input_box.clear()
-    gui.edit_repair_tech_id_input_box.clear()
-    gui.edit_repair_labor_input_box.clear()
-
-    gui.change_writer_check_box.setChecked(False)
-    gui.change_tech_check_box.setChecked(False)
-    gui.change_labor_check_box.setChecked(False)
+    gui.reset_edit_repair_page()
 
     return gui.widget_stack.setCurrentIndex(5)
 

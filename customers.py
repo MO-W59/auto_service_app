@@ -33,9 +33,7 @@ def new_customer_submit(database, gui):
 
     customer_id = database.insert_customer(customer_data)
 
-    gui.new_customer_name_input_box.clear()
-    gui.new_customer_address_input_box.clear()
-    gui.new_customer_phone_input_box.clear()
+    gui.reset_new_customer_page()
 
     gui.show_success("New customer input succesfully.")
 
@@ -79,16 +77,7 @@ def edit_customer_submit(database, gui):
 
     customer_data = database.get_customer_data(customer_id)
 
-    gui.edit_customer_name_input_box.clear()
-    gui.edit_customer_address_input_box.clear()
-    gui.edit_customer_phone_input_box.clear()
-
-    for checkbox in [
-        gui.edit_customer_change_name_check_box,
-        gui.edit_customer_change_address_check_box,
-        gui.edit_customer_change_phone_check_box,
-    ]:
-        checkbox.setChecked(False)
+    gui.reset_edit_customer_page()
 
     return (
         gui.edit_customer_name_display_label.setText(customer_data["name"]),
@@ -182,9 +171,7 @@ def go_to_new_customer_page(database, gui):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
-    gui.new_customer_name_input_box.clear()
-    gui.new_customer_address_input_box.clear()
-    gui.new_customer_phone_input_box.clear()
+    gui.reset_new_customer_page()
 
     return gui.widget_stack.setCurrentIndex(11)
 
@@ -227,16 +214,7 @@ def go_to_edit_customer_page(database, gui, customer_id=None):
 
     gui.update_edit_customer_page(customer_data, list_of_vehicles)
 
-    gui.edit_customer_name_input_box.clear()
-    gui.edit_customer_address_input_box.clear()
-    gui.edit_customer_phone_input_box.clear()
-
-    for checkbox in [
-        gui.edit_customer_change_name_check_box,
-        gui.edit_customer_change_address_check_box,
-        gui.edit_customer_change_phone_check_box,
-    ]:
-        checkbox.setChecked(False)
+    gui.reset_edit_customer_page()
 
     return gui.widget_stack.setCurrentIndex(12)
 

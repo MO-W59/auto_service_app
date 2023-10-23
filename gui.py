@@ -2765,3 +2765,136 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             return True
 
         return False
+
+    def reset_login_page(self):
+        """Clears text boxes on the login page."""
+
+        self.username_login_input_box.clear()
+        self.password_login_input_box.clear()
+
+    def reset_new_user_page(self):
+        """Clears all text boxes and checkable items on the new use page."""
+
+        self.username_new_user_input_box.clear()
+        self.password_new_user_input_box.clear()
+        self.confirm_password_new_user_input_box.clear()
+        self.new_user_name_input_box.clear()
+        self.new_user_team_input_box.clear()
+        self.new_user_section_input_box.clear()
+        self.new_user_lane_input_box.clear()
+
+        for radio_button in [
+            self.new_user_tech_radio_button,
+            self.new_user_service_writer_radio_button,
+        ]:
+            radio_button.setAutoExclusive(False)
+            radio_button.setChecked(False)
+            radio_button.setAutoExclusive(True)
+
+    def reset_update_password_page(self):
+        """Clears all text boxes on the update password page."""
+
+        self.update_password_username_input_box.clear()
+        self.old_password_input_box.clear()
+        self.new_password_input_box.clear()
+        self.confirm_new_password_input_box.clear()
+
+    def reset_update_user_page(self):
+        """Clears all text boxes and checkables on the update user page."""
+
+        self.update_user_password_input_box.clear()
+        self.update_user_name_input_box.clear()
+        self.update_user_team_input_box.clear()
+        self.update_user_section_input_box.clear()
+        self.update_user_lane_input_box.clear()
+
+        for radio_button in [
+            self.update_user_tech_radio_button,
+            self.update_user_service_writer_radio_button,
+        ]:
+            radio_button.setAutoExclusive(False)
+            radio_button.setChecked(False)
+            radio_button.setAutoExclusive(True)
+
+        self.update_user_change_name_check_box.setChecked(False)
+        self.update_user_change_team_check_box.setChecked(False)
+        self.update_user_change_section_check_box.setChecked(False)
+        self.update_user_change_lane_check_box.setChecked(False)
+
+    def reset_new_repair_page(self):
+        """Clears all text boxes on the new repair page."""
+
+        self.new_repair_service_id_input_box.clear()
+        self.new_repair_tech_id_input_box.clear()
+        self.new_repair_vin_input_box.clear()
+        self.new_repair_description_input_box.clear()
+
+    def reset_edit_repair_page(self):
+        """Clears all text boxes and checkables on the edit repair page."""
+
+        self.edit_repair_service_id_input_box.clear()
+        self.edit_repair_tech_id_input_box.clear()
+        self.edit_repair_labor_input_box.clear()
+
+        self.change_writer_check_box.setChecked(False)
+        self.change_tech_check_box.setChecked(False)
+        self.change_labor_check_box.setChecked(False)
+
+    def reset_edit_repair_page_finish(self):
+        """Clears all text boxes, browsers and checkables on the edit repair page."""
+
+        self.reset_edit_repair_page()
+
+        self.edit_repair_problem_description_input_box.clear()
+        self.edit_repair_repair_description_input_box.clear()
+        self.edit_repair_list_of_parts_text_browser.clear()
+
+    def reset_new_part_page(self):
+        """Clears all text boxes on the new part page."""
+
+        self.new_part_part_id_input_box.clear()
+        self.new_part_part_cost_input_box.clear()
+        self.new_part_description_input_box.clear()
+
+    def reset_edit_part_page(self):
+        """Clears checkboxes on the edit part page."""
+
+        self.edit_part_change_cost_check_box.setChecked(False)
+        self.edit_part_change_description_check_box.setChecked(False)
+
+    def reset_new_customer_page(self):
+        """Clears all text boxes on the new customer page."""
+
+        self.new_customer_name_input_box.clear()
+        self.new_customer_address_input_box.clear()
+        self.new_customer_phone_input_box.clear()
+
+    def reset_edit_customer_page(self):
+        """Clears all text boxes and checkables on the edit customer page."""
+
+        self.edit_customer_name_input_box.clear()
+        self.edit_customer_address_input_box.clear()
+        self.edit_customer_phone_input_box.clear()
+
+        self.edit_customer_change_name_check_box.setChecked(False)
+        self.edit_customer_change_address_check_box.setChecked(False)
+        self.edit_customer_change_phone_check_box.setChecked(False)
+
+    def reset_new_vehicle_page(self):
+        """Clears all text boxes on the new vehicles page."""
+
+        self.new_vehicle_vin_input_box.clear()
+        self.new_vehicle_make_input_box.clear()
+        self.new_vehicle_model_input_box.clear()
+        self.new_vehicle_year_input_box.clear()
+        self.new_vehicle_color_input_box.clear()
+        self.new_vehicle_engine_input_box.clear()
+
+    def reset_edit_vehicle_page(self):
+        """Clears all checkables on the edit vehicles page."""
+
+        self.edit_vehicle_change_make_check_box.setChecked(False)
+        self.edit_vehicle_change_model_check_box.setChecked(False)
+        self.edit_vehicle_change_year_check_box.setChecked(False)
+        self.edit_vehicle_change_color_check_box.setChecked(False)
+        self.edit_vehicle_change_engine_check_box.setChecked(False)

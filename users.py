@@ -24,8 +24,7 @@ def login_submit(database, gui):
         return gui.show_error(INVALID_AUTH_MSG)
 
     if database.is_valid_login_query(input_user, input_pass):
-        gui.username_login_input_box.clear()
-        gui.password_login_input_box.clear()
+        gui.reset_login_page()
 
         return gui.show_success("Login successful.")
 
@@ -114,21 +113,7 @@ def new_user_submit(database, gui):
 
     information_to_display = user_string(database, user_data)
 
-    gui.username_new_user_input_box.clear()
-    gui.password_new_user_input_box.clear()
-    gui.confirm_password_new_user_input_box.clear()
-    gui.new_user_name_input_box.clear()
-    gui.new_user_team_input_box.clear()
-    gui.new_user_section_input_box.clear()
-    gui.new_user_lane_input_box.clear()
-
-    for radio_button in [
-        gui.new_user_tech_radio_button,
-        gui.new_user_service_writer_radio_button,
-    ]:
-        radio_button.setAutoExclusive(False)
-        radio_button.setChecked(False)
-        radio_button.setAutoExclusive(True)
+    gui.reset_new_user_page()
 
     gui.show_user_search(information_to_display)
 
@@ -168,10 +153,7 @@ def update_password_submit(database, gui):
 
     database.update_pass(sha512_crypt.hash(new_pass))
 
-    gui.update_password_username_input_box.clear()
-    gui.old_password_input_box.clear()
-    gui.new_password_input_box.clear()
-    gui.confirm_new_password_input_box.clear()
+    gui.reset_update_password_page()
 
     gui.show_success("Password update successful.")
 
@@ -220,22 +202,7 @@ def update_user_submit(database, gui):
 
     gui.update_user_update_displays(user_data)
 
-    gui.update_user_password_input_box.clear()
-    gui.update_user_name_input_box.clear()
-    gui.update_user_team_input_box.clear()
-    gui.update_user_section_input_box.clear()
-    gui.update_user_lane_input_box.clear()
-
-    for radio_button in [
-        gui.update_user_tech_radio_button,
-        gui.update_user_service_writer_radio_button,
-    ]:
-        radio_button.setAutoExclusive(False)
-        radio_button.setChecked(False)
-        radio_button.setAutoExclusive(True)
-
-    for check_box in checkbox_dispatcher:
-        check_box.setChecked(False)
+    gui.reset_update_user_page()
 
     return gui.show_user_search(information_to_display)
 
@@ -296,8 +263,7 @@ def update_user_dispatcher(database, gui):
 def go_to_login_page(gui):
     """Takes user to the login page."""
 
-    gui.username_login_input_box.clear()
-    gui.password_login_input_box.clear()
+    gui.reset_login_page()
 
     gui.widget_stack.setCurrentIndex(0)
 
@@ -312,8 +278,7 @@ def logout_user(database, gui):
     database.set_login_status(False)
     database.set_current_user(None)
 
-    gui.username_login_input_box.clear()
-    gui.password_login_input_box.clear()
+    gui.reset_login_page()
 
     gui.show_success("Logout successful.")
 
@@ -323,21 +288,7 @@ def logout_user(database, gui):
 def go_to_new_user_page(gui):
     """Takes the user to the new user page."""
 
-    gui.username_new_user_input_box.clear()
-    gui.password_new_user_input_box.clear()
-    gui.confirm_password_new_user_input_box.clear()
-    gui.new_user_name_input_box.clear()
-    gui.new_user_team_input_box.clear()
-    gui.new_user_section_input_box.clear()
-    gui.new_user_lane_input_box.clear()
-
-    for radio_button in [
-        gui.new_user_tech_radio_button,
-        gui.new_user_service_writer_radio_button,
-    ]:
-        radio_button.setAutoExclusive(False)
-        radio_button.setChecked(False)
-        radio_button.setAutoExclusive(True)
+    gui.reset_new_user_page()
 
     gui.widget_stack.setCurrentIndex(1)
 
@@ -348,10 +299,7 @@ def go_to_update_password_page(database, gui):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
-    gui.update_password_username_input_box.clear()
-    gui.old_password_input_box.clear()
-    gui.new_password_input_box.clear()
-    gui.confirm_new_password_input_box.clear()
+    gui.reset_update_password_page()
 
     return gui.widget_stack.setCurrentIndex(2)
 
@@ -417,24 +365,7 @@ def go_to_update_user_page(database, gui):
 
     gui.update_user_update_displays(user_data)
 
-    gui.update_user_password_input_box.clear()
-    gui.update_user_name_input_box.clear()
-    gui.update_user_team_input_box.clear()
-    gui.update_user_section_input_box.clear()
-    gui.update_user_lane_input_box.clear()
-
-    for radio_button in [
-        gui.update_user_tech_radio_button,
-        gui.update_user_service_writer_radio_button,
-    ]:
-        radio_button.setAutoExclusive(False)
-        radio_button.setChecked(False)
-        radio_button.setAutoExclusive(True)
-
-    checkbox_dispatcher = update_user_dispatcher(database, gui)
-
-    for check_box in checkbox_dispatcher:
-        check_box.setChecked(False)
+    gui.reset_update_user_page()
 
     return gui.widget_stack.setCurrentIndex(3)
 
