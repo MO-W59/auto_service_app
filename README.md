@@ -19,7 +19,7 @@ edit/go to edit repair functions refactor
 
 add remove functions for all objects
 
-reduce lines in modules look at validte.py for example, is_valid = False --> return is_valid...just return False or True
+reduce lines in modules look at validate.py for example, is_valid = False --> return is_valid...just return False or True
 
 search for cut off diplay labels ---> extend width in gui
 
@@ -29,9 +29,9 @@ protect against SQL race condition, options -> thread lock? queue? connection po
 
 search for bugs
 
-update doc strings to describe things better
+review doc strings
 
-change naming conventions to uniform naming conventions
+review naming conventions
 
 place comments where needed because you didnt do it at time of writing, also spell check stuff
 
