@@ -472,7 +472,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.update_user_section_display_label = QtWidgets.QLabel(self.update_user_page)
         self.update_user_section_display_label.setGeometry(
-            QtCore.QRect(710, 360, 120, 21)
+            QtCore.QRect(710, 360, 230, 21)
         )
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -1508,7 +1508,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_customer_page
         )
         self.edit_customer_name_display_label.setGeometry(
-            QtCore.QRect(100, 180, 131, 21)
+            QtCore.QRect(100, 180, 200, 21)
         )
         font = QtGui.QFont()
         font.setPointSize(14)
