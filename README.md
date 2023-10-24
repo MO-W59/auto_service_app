@@ -21,8 +21,6 @@ reduce lines in modules look at validate.py for example, is_valid = False --> re
 
 search for cut off diplay labels ---> extend width in gui
 
-list of parts text browser not in same location on gui as other list pages
-
 protect against SQL race condition, options -> thread lock? queue? connection pool?
 
 search for bugs
