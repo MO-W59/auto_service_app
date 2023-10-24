@@ -268,10 +268,8 @@ def add_part_to_repair(database, gui):
 
     repair_data = database.search_for_repair(repair_id)
 
-    gui.edit_repair_total_repair_cost_display_label.setText(
-        str(repair_data["total_cost"])
-    )
-    gui.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
+    gui.update_edit_repair_displays(repair_data)
+
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
     return gui.show_success("Part added successfuly.")
@@ -317,10 +315,7 @@ def remove_part_from_repair(database, gui):
 
     repair_data = database.search_for_repair(repair_id)
 
-    gui.edit_repair_part_cost_display_label.setText(str(repair_data["parts_cost"]))
-    gui.edit_repair_total_repair_cost_display_label.setText(
-        str(repair_data["total_cost"])
-    )
+    gui.update_edit_repair_displays(repair_data)
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
     return gui.show_success("Part successfuly removed.")

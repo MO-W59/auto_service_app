@@ -13,8 +13,6 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-adding part to repair removes dollar signs on total and part cost values
-
 sometimes when adding a part to a repair values go past two numbers past the decimal point --> .00000005
 
 add remove functions for all objects
