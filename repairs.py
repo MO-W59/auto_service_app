@@ -88,61 +88,47 @@ def new_repair_submit(database, gui):
 def edit_repair_submit(database, gui):
     """Gets new information for a repair and passes it to the database for storage."""
 
-    new_service_writer_id = gui.edit_repair_service_id_input_box.text()
-    new_tech_id = gui.edit_repair_tech_id_input_box.text()
-    new_labor_amount = gui.edit_repair_labor_input_box.text()
-    problem_description = gui.edit_repair_problem_description_input_box.toPlainText()
-    repair_description = gui.edit_repair_repair_description_input_box.toPlainText()
+    checkbox_dispatcher = edit_repair_dispatcher(database, gui)
     repair_id = gui.edit_repair_repair_id_display_label.text()
     errors = ""
 
-    if gui.change_writer_check_box.isChecked() and not validate.is_valid_id(
-        new_service_writer_id
-    ):
-        errors += "Invalid service writer ID!\n\n"
+    # run through dispatcher for errors
 
-    if gui.change_tech_check_box.isChecked() and not validate.is_valid_id(new_tech_id):
-        errors += "Invalid technician ID!\n\n"
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            if not checkbox["validator"](checkbox["input"]()):
+                errors += checkbox["error"]
 
-    if gui.change_labor_check_box.isChecked() and not validate.is_valid_dollar_amount(
-        new_labor_amount
-    ):
-        errors += "Invalid labor value!\n\n"
-
-    if not validate.is_valid_description(
-        problem_description
-    ) or not validate.is_valid_description(repair_description):
-        errors += "Invalid description entered!\n\n"
+    # if errors display and return
 
     if errors != "":
         return gui.show_error(errors)
+
+    # ensure passed employee ids apply to their roles, if error display and return
+
+    change_writer_checkbox = checkbox_dispatcher[gui.change_writer_check_box]
+    change_tech_checkbox = checkbox_dispatcher[gui.change_tech_check_box]
 
     if (
-        gui.change_tech_check_box.isChecked()
-        and database.search_for_user(new_tech_id)["is_tech"] != 1
-        or gui.change_writer_check_box.isChecked()
-        and database.search_for_user(new_service_writer_id)["is_writer"] != 1
+        change_tech_checkbox["checked"]()
+        and database.search_for_user(change_tech_checkbox["input"]())["is_tech"] != 1
+        or change_tech_checkbox["checked"]()
+        and database.search_for_user(change_writer_checkbox["input"]())["is_writer"]
+        != 1
     ):
-        errors += "Employee ID that does not match their role (tech/writer).\n\n"
+        return gui.show_error(
+            "Employee ID entered that does not match their role (tech/writer).\n\n"
+        )
 
-    if errors != "":
-        return gui.show_error(errors)
+    # if checked update via dispatch
 
-    if gui.change_writer_check_box.isChecked():
-        database.update_repair_service_writer(repair_id, new_service_writer_id)
+    for checkbox in checkbox_dispatcher.values():
+        if checkbox["checked"]():
+            checkbox["updater"](repair_id, checkbox["input"]())
 
-    if gui.change_tech_check_box.isChecked():
-        database.update_repair_tech(repair_id, new_tech_id)
+    total_cost = calculate_total_cost(repair_id, database)
 
-    if gui.change_labor_check_box.isChecked():
-        database.update_labor_cost(repair_id, new_labor_amount)
-
-        total_cost = calculate_total_cost(repair_id, database)
-
-        database.update_total_repair_cost(repair_id, total_cost)
-
-    database.update_repair_problem(repair_id, problem_description)
-    database.update_repair_description(repair_id, repair_description)
+    database.update_total_repair_cost(repair_id, total_cost)
 
     gui.show_success("Repair update successful.")
 
@@ -151,6 +137,52 @@ def edit_repair_submit(database, gui):
     gui.reset_edit_repair_page()
 
     return gui.update_edit_repair_displays(repair_data)
+
+
+def edit_repair_dispatcher(database, gui):
+    """Creates a dictionary of dictionaries that contain the checkbox checked and field has changed
+    value in question, related validation fuctions, related update functions, related input fields
+    and error messages to use when updating repair data."""
+
+    checkbox_dispatcher = {
+        gui.change_writer_check_box: {
+            "checked": gui.change_writer_check_box.isChecked,
+            "validator": validate.is_valid_id,
+            "input": gui.edit_repair_service_id_input_box.text,
+            "error": "Invalid service writer ID!\n\n",
+            "updater": database.update_repair_service_writer,
+        },
+        gui.change_tech_check_box: {
+            "checked": gui.change_tech_check_box.isChecked,
+            "validator": validate.is_valid_id,
+            "input": gui.edit_repair_tech_id_input_box.text,
+            "error": "Invalid technician ID!\n\n",
+            "updater": database.update_repair_tech,
+        },
+        gui.change_labor_check_box: {
+            "checked": gui.change_labor_check_box.isChecked,
+            "validator": validate.is_valid_dollar_amount,
+            "input": gui.edit_repair_labor_input_box.text,
+            "error": "Invalid labor value!\n\n",
+            "updater": database.update_labor_cost,
+        },
+        gui.edit_repair_problem_description_input_box: {
+            "checked": gui.get_repair_problem_has_changed,
+            "validator": validate.is_valid_description,
+            "input": gui.edit_repair_problem_description_input_box.toPlainText,
+            "error": "Invalid description entered!\n\n",
+            "updater": database.update_repair_problem,
+        },
+        gui.edit_repair_repair_description_input_box: {
+            "checked": gui.get_repair_repair_has_changed,
+            "validator": validate.is_valid_description,
+            "input": gui.edit_repair_repair_description_input_box.toPlainText,
+            "error": "Invalid description entered!\n\n",
+            "updater": database.update_repair_description,
+        },
+    }
+
+    return checkbox_dispatcher
 
 
 def finish_repair_submit(database, gui):
@@ -317,31 +349,10 @@ def go_to_edit_repair_page(database, gui, requested_repair_id=None):
         return gui.show_error(NO_LOGIN_MSG)
 
     if requested_repair_id is None:
-        while True:
-            requested_repair_id = gui.show_repair_id_search_request()
+        repair_data = get_repair_data_loop(database, gui)
 
-            # If the user clicked cancel
-            if requested_repair_id is False:
-                return None
-
-            if not validate.is_valid_id(requested_repair_id):
-                gui.show_error("Invalid Repair ID.")
-
-                continue
-
-            repair_data = database.search_for_repair(requested_repair_id)
-
-            if repair_data["repair_completed_date"] is not None:
-                gui.show_error("That repair has already been completed.")
-
-                continue
-
-            if not repair_data:
-                gui.show_error("Repair not found.")
-
-                continue
-
-            break
+        if repair_data is None:
+            return None
 
     else:
         repair_data = database.search_for_repair(requested_repair_id)
@@ -355,6 +366,36 @@ def go_to_edit_repair_page(database, gui, requested_repair_id=None):
     gui.reset_edit_repair_page()
 
     return gui.widget_stack.setCurrentIndex(5)
+
+
+def get_repair_data_loop(database, gui):
+    """Loop to obtain a repair id from the user."""
+
+    while True:
+        requested_repair_id = gui.show_repair_id_search_request()
+
+        # If the user clicked cancel
+        if requested_repair_id is False:
+            return None
+
+        if not validate.is_valid_id(requested_repair_id):
+            gui.show_error("Invalid Repair ID.")
+
+            continue
+
+        repair_data = database.search_for_repair(requested_repair_id)
+
+        if repair_data["repair_completed_date"] is not None:
+            gui.show_error("That repair has already been completed.")
+
+            continue
+
+        if not repair_data:
+            gui.show_error("Repair not found.")
+
+            continue
+
+        return repair_data
 
 
 def go_to_active_repairs_page(database, gui):

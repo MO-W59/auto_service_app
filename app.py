@@ -208,6 +208,18 @@ class MainWindow(UiGarageTrackerMainWindow):
                     vehicles.edit_vehicle_submit(Database, Gui)
 
 
+def setup_text_handlers():
+    """Sets up the handling for events on the edit repair QTextEdit objects
+    (repair description and problem description)"""
+
+    Gui.edit_repair_problem_description_input_box.textChanged.connect(
+        lambda: Gui.set_repair_problem_has_changed(True)
+    )
+    Gui.edit_repair_repair_description_input_box.textChanged.connect(
+        lambda: Gui.set_repair_repair_has_changed(True)
+    )
+
+
 # Set up application ui and database
 App = QtWidgets.QApplication(sys.argv)
 Gui = MainWindow()
@@ -219,6 +231,7 @@ def main():
     and instucts system to exit when GUI is closed."""
 
     setup_button_handlers()
+    setup_text_handlers()
     Gui.show()
     sys.exit(App.exec())
 

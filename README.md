@@ -13,8 +13,6 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-edit/go to edit repair functions refactor
-
 add remove functions for all objects
 
 reduce lines in modules look at validate.py for example, is_valid = False --> return is_valid...just return False or True

@@ -36,6 +36,9 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         app_main_window.setAutoFillBackground(False)
         app_main_window.setStyleSheet("background-color: rgb(30, 30, 30); color: white")
 
+        self.edit_repair_problem_has_changed = False
+        self.edit_repair_repair_has_changed = False
+
         self.centralwidget = QtWidgets.QWidget(app_main_window)
         self.centralwidget.setObjectName("centralwidget")
         self.widget_stack = QtWidgets.QStackedWidget(self.centralwidget)
@@ -2898,3 +2901,25 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.edit_vehicle_change_year_check_box.setChecked(False)
         self.edit_vehicle_change_color_check_box.setChecked(False)
         self.edit_vehicle_change_engine_check_box.setChecked(False)
+
+    def set_repair_problem_has_changed(self, passed_bool):
+        """Sets the changed status of the repair_problem_has_changed value, used by edit
+        repair dispatcher logic in the repair module."""
+
+        self.edit_repair_problem_has_changed = passed_bool
+
+    def set_repair_repair_has_changed(self, passed_bool):
+        """Sets the changed status of the repair_repair_has_changed value, used by edit
+        repair dispatcher logic in the repair module."""
+
+        self.edit_repair_repair_has_changed = passed_bool
+
+    def get_repair_problem_has_changed(self):
+        """Gets the changed status of the edit repair problem description text browser."""
+
+        return self.edit_repair_problem_has_changed
+
+    def get_repair_repair_has_changed(self):
+        """Gets the changed status of the edit repair repair description text browser."""
+
+        return self.edit_repair_repair_has_changed
