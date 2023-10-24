@@ -13,13 +13,13 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
+adding part to repair removes dollar signs on total and part cost values
+
+sometimes when adding a part to a repair values go past two numbers past the decimal point --> .00000005
+
 add remove functions for all objects
 
 reduce lines in modules look at validate.py for example, is_valid = False --> return is_valid...just return False or True
-
-search for cut off diplay labels ---> extend width in gui
-
-list of parts text browser not in same location on gui as other list pages
 
 protect against SQL race condition, options -> thread lock? queue? connection pool?
 

@@ -475,7 +475,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.update_user_section_display_label = QtWidgets.QLabel(self.update_user_page)
         self.update_user_section_display_label.setGeometry(
-            QtCore.QRect(710, 360, 120, 21)
+            QtCore.QRect(710, 360, 230, 21)
         )
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -1511,7 +1511,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self.edit_customer_page
         )
         self.edit_customer_name_display_label.setGeometry(
-            QtCore.QRect(100, 180, 131, 21)
+            QtCore.QRect(100, 180, 200, 21)
         )
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -1528,13 +1528,13 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.list_of_customers_text_browser = QtWidgets.QTextBrowser(
             self.list_of_customers_page
         )
-        self.list_of_customers_text_browser.setGeometry(QtCore.QRect(40, 40, 861, 821))
+        self.list_of_customers_text_browser.setGeometry(QtCore.QRect(40, 50, 861, 821))
         self.list_of_customers_text_browser.setObjectName(
             "list_of_customers_text_browser"
         )
 
         self.list_of_customers_label = QtWidgets.QLabel(self.list_of_customers_page)
-        self.list_of_customers_label.setGeometry(QtCore.QRect(390, 10, 201, 21))
+        self.list_of_customers_label.setGeometry(QtCore.QRect(370, 20, 201, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.list_of_customers_label.setFont(font)
@@ -1763,13 +1763,13 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.list_of_vehicles_text_browser = QtWidgets.QTextBrowser(
             self.list_of_vehicles_page
         )
-        self.list_of_vehicles_text_browser.setGeometry(QtCore.QRect(40, 40, 861, 821))
+        self.list_of_vehicles_text_browser.setGeometry(QtCore.QRect(40, 50, 861, 821))
         self.list_of_vehicles_text_browser.setObjectName(
             "list_of_vehicles_text_browser"
         )
 
         self.list_of_vehicles_label = QtWidgets.QLabel(self.list_of_vehicles_page)
-        self.list_of_vehicles_label.setGeometry(QtCore.QRect(400, 10, 201, 21))
+        self.list_of_vehicles_label.setGeometry(QtCore.QRect(370, 20, 201, 25))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.list_of_vehicles_label.setFont(font)
