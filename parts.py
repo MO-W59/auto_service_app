@@ -135,7 +135,7 @@ def go_to_list_of_parts_page(database, gui):
     for part in parts_data:
         parts_list = (
             parts_list
-            + f"Part ID : {part['part_id']}, Cost : ${part['part_cost']:.2f}, "
+            + f"Part ID : {part['part_id']}, Cost : ${part['part_cost']:,.2f}, "
             f"Description : {part['part_description']}\n\n"
         )
 
