@@ -27,6 +27,10 @@ review naming conventions
 
 place comments where needed because you didnt do it at time of writing, also spell check stuff
 
+reimplement OOP style for objects? --> large rewrite/redesign
+
+Improve visuals of the UI
+
 
 
 https://docs.python.org/3/library/sqlite3.html
