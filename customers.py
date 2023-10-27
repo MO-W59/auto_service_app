@@ -92,7 +92,7 @@ def add_vehicle_to_customer_button(database, gui):
     customer_id = gui.edit_customer_id_display_label.text()
 
     while True:
-        vin_to_add = gui.show_vin_search_request()
+        vin_to_add = gui.show_id_search_request("Search VIN", "Input VIN to add:")
 
         # if the user hit the cancel button
         if vin_to_add is False:
@@ -133,7 +133,7 @@ def remove_vehicle_from_customer_button(database, gui):
     customer_id = gui.edit_customer_id_display_label.text()
 
     while True:
-        vin_to_remove = gui.show_vin_search_request()
+        vin_to_remove = gui.show_id_search_request("Remove Vehicle", "Input VIN:")
 
         # If the user clicked the cancel button
         if vin_to_remove is False:
@@ -186,7 +186,9 @@ def go_to_edit_customer_page(database, gui, customer_id=None):
 
     if customer_id is None:
         while True:
-            customer_id = gui.show_customer_id_search_request()
+            customer_id = gui.show_id_search_request(
+                "Search Customer", "Input Customer ID:"
+            )
 
             # if the user clicked cancel
             if customer_id is False:

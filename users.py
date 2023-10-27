@@ -274,7 +274,9 @@ def search_for_user(database, gui):
         return gui.show_error(NO_LOGIN_MSG)
 
     while True:
-        id_to_search = gui.show_user_id_search_request()
+        id_to_search = gui.show_id_search_request(
+            "User Search", "Input User ID you are looking for:"
+        )
 
         # If the user clicked cancel
         if id_to_search is False:
@@ -306,7 +308,9 @@ def go_to_update_user_page(database, gui):
         return gui.show_error(NO_LOGIN_MSG)
 
     while True:
-        id_to_update = gui.show_user_id_search_request()
+        id_to_update = gui.show_id_search_request(
+            "Update User", "Enter the ID of the user you wish to update:"
+        )
 
         # If the user clicked cancel
         if id_to_update is False:
@@ -343,68 +347,6 @@ def show_all_users(database, gui):
     user_list = list_users(database.get_all_users())
 
     return gui.show_user_search(user_list)
-
-
-def remove_user(database, gui):
-    """Gets a user to remove from the GUI and passes it to the database for
-    removal."""
-
-    if not database.get_login_status():
-        return gui.show_error(NO_LOGIN_MSG)
-
-    id_to_remove = get_remove_id_loop(database, gui)
-
-    while True:
-        password = gui.confirm_user_delete()
-
-        # if the user clicked cancel
-        if password is False:
-            return None
-
-        if password is True:
-            gui.show_error("No password entered!")
-
-            continue
-
-        if not validate.is_valid_password(password):
-            gui.show_error("Invalid password!")
-
-            continue
-
-        if not database.remove_user(id_to_remove, password):
-            gui.show_error("Invalid employee ID and or password!")
-
-            continue
-
-        return gui.show_success("User removed succesfully.")
-
-
-def get_remove_id_loop(database, gui):
-    """Loop to contiune asking for an user id to remove."""
-
-    while True:
-        id_to_remove = gui.show_user_id_search_request()
-
-        # if the user clicked cancel
-        if id_to_remove is False:
-            return None
-
-        if id_to_remove is True:
-            gui.show_error("No ID entered!")
-
-            continue
-
-        if not validate.is_valid_id(id_to_remove):
-            gui.show_error("Invalid user ID!")
-
-            continue
-
-        if not database.search_for_user(id_to_remove):
-            gui.show_error("Invalid user ID!")
-
-            continue
-
-        return id_to_remove
 
 
 def list_users(user_data):

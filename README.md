@@ -13,11 +13,11 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-add remove functions for all objects
-
 reduce lines in modules look at validate.py for example, is_valid = False --> return is_valid...just return False or True
 
 protect against SQL race condition, options -> thread lock? queue? connection pool?
+
+add option to choose directory --> saves directory for next boot
 
 search for bugs
 

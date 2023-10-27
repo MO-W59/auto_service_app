@@ -91,7 +91,9 @@ def go_to_edit_part_page(database, gui, part_id=None):
 
     if part_id is None:
         while True:
-            part_id = gui.show_part_id_search_request()
+            part_id = gui.show_id_search_request(
+                "Search Part", "Input Part ID to edit:"
+            )
 
             # If user clicked cancel
             if part_id is False:

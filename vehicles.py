@@ -157,7 +157,7 @@ def go_to_edit_vehicle_page(database, gui, vin=None):
 
     if vin is None:
         while True:
-            vin = gui.show_vin_search_request()
+            vin = gui.show_id_search_request("Edit Vehicle", "Input VIN to edit:")
 
             # If the user clicked cancel
             if vin is False:
@@ -195,7 +195,7 @@ def search_repair_history(database, gui):
         return gui.show_error("You must be logged in to access this function.")
 
     while True:
-        vin_to_search = gui.show_vin_search_request()
+        vin_to_search = gui.show_id_search_request("Search History", "Input Repair ID ")
 
         # If the user clicked cancel
         if vin_to_search is False:

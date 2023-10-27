@@ -239,7 +239,7 @@ def add_part_to_repair(database, gui):
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
     while True:
-        part_to_add = gui.show_part_id_search_request_add()
+        part_to_add = gui.show_id_search_request("Add Part", "Input Part ID to add:")
 
         # if the user clicked the cancel button
         if part_to_add is False:
@@ -282,7 +282,9 @@ def remove_part_from_repair(database, gui):
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
     while True:
-        part_id_to_remove = gui.show_part_id_search_request_remove()
+        part_id_to_remove = gui.show_id_search_request(
+            "Remove Part", "Input a Part ID to remove:"
+        )
 
         # if the user hit the cancel button
         if part_id_to_remove is False:
@@ -367,7 +369,9 @@ def get_repair_data_loop(database, gui):
     """Loop to obtain a repair id from the user."""
 
     while True:
-        requested_repair_id = gui.show_repair_id_search_request()
+        requested_repair_id = gui.show_id_search_request(
+            "Search for Repair", "Input Repair ID:"
+        )
 
         # If the user clicked cancel
         if requested_repair_id is False:
@@ -427,7 +431,9 @@ def go_to_old_repair_page(database, gui):
         return gui.show_error(NO_LOGIN_MSG)
 
     while True:
-        repair_id = gui.show_repair_id_search_request()
+        repair_id = gui.show_id_search_request(
+            "Search Old Repair", "Input old Repair ID to search:"
+        )
 
         # If the user clicked cancel
         if repair_id is False:

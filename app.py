@@ -97,7 +97,9 @@ def setup_button_handlers():
         lambda: users.search_for_user(Database, Gui)
     )
     Gui.action_show_users.triggered.connect(lambda: users.show_all_users(Database, Gui))
-    Gui.action_remove_user.triggered.connect(lambda: users.remove_user(Database, Gui))
+    Gui.action_remove_user.triggered.connect(
+        lambda: Database.remove_row(Gui, "employees")
+    )
 
     # repair actions
     Gui.action_new_repair.triggered.connect(
@@ -112,6 +114,9 @@ def setup_button_handlers():
     Gui.action_display_old_repair.triggered.connect(
         lambda: repairs.go_to_old_repair_page(Database, Gui)
     )
+    Gui.action_remove_repair.triggered.connect(
+        lambda: Database.remove_row(Gui, "repairs")
+    )
 
     # part actions
     Gui.action_new_part.triggered.connect(
@@ -123,6 +128,7 @@ def setup_button_handlers():
     Gui.action_list_of_parts.triggered.connect(
         lambda: parts.go_to_list_of_parts_page(Database, Gui)
     )
+    Gui.action_remove_part.triggered.connect(lambda: Database.remove_row(Gui, "parts"))
 
     # customer actions
     Gui.action_new_customer.triggered.connect(
@@ -133,6 +139,9 @@ def setup_button_handlers():
     )
     Gui.action_list_of_customers.triggered.connect(
         lambda: customers.go_to_list_of_customers_page(Database, Gui)
+    )
+    Gui.action_remove_customer.triggered.connect(
+        lambda: Database.remove_row(Gui, "customers")
     )
 
     # vehicle actions
@@ -147,6 +156,9 @@ def setup_button_handlers():
     )
     Gui.action_list_of_vehicles.triggered.connect(
         lambda: vehicles.go_to_list_of_vehicles_page(Database, Gui)
+    )
+    Gui.action_remove_vehicle.triggered.connect(
+        lambda: Database.remove_row(Gui, "vehicles")
     )
 
 

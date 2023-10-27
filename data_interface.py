@@ -4,6 +4,7 @@
 import os
 import sqlite3
 from passlib.hash import sha512_crypt
+import validate
 
 
 class AppDatabase:
@@ -17,6 +18,7 @@ class AppDatabase:
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
         self.create_tables()
+        self.remove_row_distpatcher = self.create_remove_row_dispatcher()
 
     def create_tables(self):
         """This function will create the tables in the database if they do not already exist."""
@@ -100,6 +102,45 @@ class AppDatabase:
         )
 
         self.connection.commit()
+
+    def create_remove_row_dispatcher(self):
+        """Creates a dictionary of dictionaries used when removing a row from
+        a table."""
+
+        remove_dispatcher = {
+            "customers": {
+                "title": "Remove Customer",
+                "msg": "Input Customer ID to remove:",
+                "remover": self.remove_customer,
+                "search": self.get_customer_data,
+            },
+            "employees": {
+                "title": "Remove User",
+                "msg": "Input User ID to remove:",
+                "remover": self.remove_user,
+                "search": self.search_for_user,
+            },
+            "parts": {
+                "title": "Remove Part",
+                "msg": "Input Part ID to remove:",
+                "remover": self.remove_part,
+                "search": self.get_part_data,
+            },
+            "repairs": {
+                "title": "Remove Repair",
+                "msg": "Input Repair ID to remove:",
+                "remover": self.remove_repair,
+                "search": self.search_for_repair,
+            },
+            "vehicles": {
+                "title": "Remove Vehicle",
+                "msg": "Input VIN to remove:",
+                "remover": self.remove_vehicle,
+                "search": self.get_vehicle_data,
+            },
+        }
+
+        return remove_dispatcher
 
     def is_valid_login_query(self, input_user, input_pass):
         """This function searches the database for the queried user to see if
@@ -331,6 +372,20 @@ class AppDatabase:
 
         self.connection.commit()
 
+    def remove_repair(self, repair, password):
+        """Removes the passed repair id if passed password is correct."""
+
+        if self.is_current_users_password(password):
+            self.cursor.execute(
+                """DELETE FROM repairs WHERE repair_id = (?)""", (repair,)
+            )
+
+            self.connection.commit()
+
+            return True
+
+        return False
+
     def search_for_repair(self, repair_id):
         """This function will take the repair id passed to it and retrieve it from the database,
         then return that data to be displayed."""
@@ -527,6 +582,19 @@ class AppDatabase:
 
         self.connection.commit()
 
+    def remove_part(self, part, password):
+        """Removes the passed part id if the passed password is the current
+        users password."""
+
+        if self.is_current_users_password(password):
+            self.cursor.execute("""DELETE FROM parts WHERE part_id = (?)""", (part,))
+
+            self.connection.commit()
+
+            return True
+
+        return False
+
     def get_all_parts_in_database(self):
         """This function will return a list containing all parts in the database."""
 
@@ -591,6 +659,21 @@ class AppDatabase:
         ).fetchone()
 
         return customer_id["customer_id"]
+
+    def remove_customer(self, customer, password):
+        """Removes the passed customer id if the passed password is the current
+        users password."""
+
+        if self.is_current_users_password(password):
+            self.cursor.execute(
+                """DELETE FROM customers WHERE customer_id = (?)""", (customer,)
+            )
+
+            self.connection.commit()
+
+            return True
+
+        return False
 
     def get_customer_data(self, customer_id):
         """Returns customer data for the passed customer id from the database."""
@@ -662,6 +745,19 @@ class AppDatabase:
         )
 
         self.connection.commit()
+
+    def remove_vehicle(self, vin, password):
+        """Removes passed vehicle if the passed password is the current users
+        password."""
+
+        if self.is_current_users_password(password):
+            self.cursor.execute("""DELETE FROM vehicles WHERE vin = (?)""", (vin,))
+
+            self.connection.commit()
+
+            return True
+
+        return False
 
     def get_vehicle_data(self, vin):
         """Returns vehicle data based on vin."""
@@ -824,3 +920,72 @@ class AppDatabase:
             AND repair_completed_date IS NOT NULL""",
             (vin,),
         ).fetchall()
+
+    def remove_row(self, gui, target):
+        """Takes passed gui and table to reference the remove row dispatcher
+        and remove the input id from its applicable table."""
+
+        title = self.remove_row_distpatcher[target]["title"]
+        msg = self.remove_row_distpatcher[target]["msg"]
+        remover = self.remove_row_distpatcher[target]["remover"]
+
+        if not self.get_login_status():
+            return gui.show_error(
+                "You must be logged in to access this page or function."
+            )
+
+        id_to_remove = self.get_remove_id_loop(gui, target, title, msg)
+
+        if not id_to_remove:
+            return None
+
+        while True:
+            password = gui.confirm_delete(title)
+
+            # if the user clicked cancel
+            if password is False:
+                return None
+
+            if password is True:
+                gui.show_error("No password entered!")
+
+                continue
+
+            if not validate.is_valid_password(password):
+                gui.show_error("Invalid password!")
+
+                continue
+
+            if not remover(id_to_remove, password):
+                gui.show_error("Invalid ID/VIN and or password!")
+
+                continue
+
+            return gui.show_success("Removed succesfully.")
+
+    def get_remove_id_loop(self, gui, target, title, msg):
+        """Loop to contiune asking for an user id to remove."""
+
+        while True:
+            id_to_remove = gui.show_id_search_request(title, msg)
+
+            # if the user clicked cancel
+            if id_to_remove is False:
+                return None
+
+            if id_to_remove is True:
+                gui.show_error("No ID/VIN entered!")
+
+                continue
+
+            if not validate.is_valid_id(id_to_remove):
+                gui.show_error("Invalid ID/VIN!")
+
+                continue
+
+            if not self.remove_row_distpatcher[target]["search"](id_to_remove):
+                gui.show_error("Invalid ID/VIN!")
+
+                continue
+
+            return id_to_remove

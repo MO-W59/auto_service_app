@@ -1871,6 +1871,18 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.action_remove_user = QtGui.QAction(app_main_window)
         self.action_remove_user.setObjectName("action_remove_user")
 
+        self.action_remove_repair = QtGui.QAction(app_main_window)
+        self.action_remove_repair.setObjectName("action_remove_repair")
+
+        self.action_remove_part = QtGui.QAction(app_main_window)
+        self.action_remove_part.setObjectName("action_remove_part")
+
+        self.action_remove_customer = QtGui.QAction(app_main_window)
+        self.action_remove_customer.setObjectName("action_remove_customer")
+
+        self.action_remove_vehicle = QtGui.QAction(app_main_window)
+        self.action_remove_vehicle.setObjectName("action_remove_vehicle")
+
         self.menu_users.addAction(self.action_login)
         self.menu_users.addAction(self.action_logout)
         self.menu_users.addAction(self.action_new_user)
@@ -1883,16 +1895,20 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.menu_repairs.addAction(self.action_edit_repair)
         self.menu_repairs.addAction(self.action_active_repairs)
         self.menu_repairs.addAction(self.action_display_old_repair)
+        self.menu_repairs.addAction(self.action_remove_repair)
         self.menu_parts.addAction(self.action_new_part)
         self.menu_parts.addAction(self.action_edit_part)
         self.menu_parts.addAction(self.action_list_of_parts)
+        self.menu_parts.addAction(self.action_remove_part)
         self.menu_customers.addAction(self.action_new_customer)
         self.menu_customers.addAction(self.action_edit_customer)
         self.menu_customers.addAction(self.action_list_of_customers)
+        self.menu_customers.addAction(self.action_remove_customer)
         self.menu_vehicles.addAction(self.action_new_vehicle)
         self.menu_vehicles.addAction(self.action_edit_vehicle)
         self.menu_vehicles.addAction(self.action_get_repair_history)
         self.menu_vehicles.addAction(self.action_list_of_vehicles)
+        self.menu_vehicles.addAction(self.action_remove_vehicle)
         self.menu_bar.addAction(self.menu_users.menuAction())
         self.menu_bar.addAction(self.menu_repairs.menuAction())
         self.menu_bar.addAction(self.menu_parts.menuAction())
@@ -2436,6 +2452,20 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         self.action_remove_user.setText(_translate("app_main_window", "Remove User"))
 
+        self.action_remove_repair.setText(
+            _translate("app_main_window", "Remove Repair")
+        )
+
+        self.action_remove_part.setText(_translate("app_main_window", "Remove Part"))
+
+        self.action_remove_customer.setText(
+            _translate("app_main_window", "Remove Customer")
+        )
+
+        self.action_remove_vehicle.setText(
+            _translate("app_main_window", "Remove Vehicle")
+        )
+
         self.action_new_repair.setText(_translate("app_main_window", "New Repair"))
 
         self.action_edit_repair.setText(_translate("app_main_window", "Edit Repair"))
@@ -2506,109 +2536,14 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         success_window.setWindowTitle("Success")
         success_window.exec()
 
-    def show_user_id_search_request(self):
-        """This function will display an input box to the user to obtain the information
-        related to the input user id."""
+    def show_id_search_request(self, title, msg):
+        """Displays a input dialog to user for an id, is passed a title and
+        message to tell user what type of id to input."""
 
-        id_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Search Users", "Input User ID to search:"
-        )
+        input_id, ok_button = QtWidgets.QInputDialog.getText(self, title, msg)
 
-        if ok_button and id_to_search:
-            return id_to_search
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_part_id_search_request_add(self):
-        """This function will display an input box to the user to obtain the part id
-        to add to the current repair."""
-
-        id_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Add a part", "Input part id to add:"
-        )
-
-        if ok_button and id_to_search:
-            return id_to_search
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_part_id_search_request_remove(self):
-        """This function will prompt the user to input a part id to remove from
-        the current repair."""
-
-        id_to_remove, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Remove a part", "Input part id to remove:"
-        )
-
-        if ok_button and id_to_remove:
-            return id_to_remove
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_repair_id_search_request(self):
-        """This function will display an input box to the user to obtain the information
-        related to the input repair id"""
-
-        id_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Search for Repair", "Input repair ID:"
-        )
-
-        if ok_button and id_to_search:
-            return id_to_search
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_part_id_search_request(self):
-        """This function will display an input box to get a desired part_id."""
-
-        id_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Search for Part", "Input part ID:"
-        )
-
-        if ok_button and id_to_search:
-            return id_to_search
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_customer_id_search_request(self):
-        """Displays a message window to get a customer id from the user."""
-
-        id_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Search for Customer", "Input customer ID:"
-        )
-
-        if ok_button and id_to_search:
-            return id_to_search
-
-        if ok_button:
-            return True
-
-        return False
-
-    def show_vin_search_request(self):
-        """Shows a message box asking for a vin from the user."""
-
-        vin_to_search, ok_button = QtWidgets.QInputDialog.getText(
-            self, "Search for Vehicle", "Input vehicle VIN:"
-        )
-
-        if ok_button and vin_to_search:
-            return vin_to_search
+        if ok_button and input_id:
+            return input_id
 
         if ok_button:
             return True
@@ -2753,13 +2688,13 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         return False
 
-    def confirm_user_delete(self):
+    def confirm_delete(self, title):
         """Shows a password confirmation window to the user to remove a user."""
 
         password, ok_button = QtWidgets.QInputDialog.getText(
             self,
-            "Remove User",
-            "Enter password to remove user.",
+            title,
+            "Input password to confirm removal:",
             QtWidgets.QLineEdit.EchoMode.Password,
         )
 
