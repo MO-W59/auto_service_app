@@ -13,6 +13,7 @@ class AppDatabase:
     def __init__(self):
         self.is_logged_in = False
         self.current_user = None
+        # set directory to data folder in app path
         self.data_directory = os.path.dirname(os.path.realpath(__file__)) + "\\data\\"
         self.connection = sqlite3.connect(self.data_directory + "data.db")
         self.connection.row_factory = sqlite3.Row
@@ -21,7 +22,7 @@ class AppDatabase:
         self.remove_row_distpatcher = self.create_remove_row_dispatcher()
 
     def create_tables(self):
-        """This function will create the tables in the database if they do not already exist."""
+        """Creates the tables in the database if they do not already exist."""
 
         self.cursor.execute(
             """CREATE TABLE IF NOT EXISTS customers 
@@ -108,12 +109,12 @@ class AppDatabase:
         a table."""
 
         remove_dispatcher = {
-            "customers": {
-                "title": "Remove Customer",
-                "msg": "Input Customer ID to remove:",
-                "remover": self.remove_customer,
-                "search": self.get_customer_data,
-            },
+            "customers": {  # target table to match too
+                "title": "Remove Customer",  # title to pass to gui
+                "msg": "Input Customer ID to remove:",  # message to pass to gui
+                "remover": self.remove_customer,  # function to call for remove
+                "search": self.get_customer_data,  # function to call to search
+            },  # same below
             "employees": {
                 "title": "Remove User",
                 "msg": "Input User ID to remove:",
@@ -143,88 +144,95 @@ class AppDatabase:
         return remove_dispatcher
 
     def is_valid_login_query(self, input_user, input_pass):
-        """This function searches the database for the queried user to see if
+        """Searches the database for the queried user to see if
         the password matches, then sets the login status to true and sets
-        the current user variable to the matched users user id if the pior
+        the current user variable to the matched user's user id if the pior
         verfication was successful."""
 
+        # search for input users password
         user_data = self.cursor.execute(
-            """SELECT * FROM employees WHERE username = (?);""", (input_user,)
+            """SELECT employee_id, password FROM employees WHERE username = (?);""",
+            (input_user,),
         ).fetchone()
 
         if user_data is None:
-            return False
+            return False  # no user was found --> return false
 
         if sha512_crypt.verify(input_pass, user_data["password"]):
+            # password matches --> set current user and login status, return true
             self.set_current_user(user_data["employee_id"])
-
             self.set_login_status(True)
 
             return True
 
+        # password did not match --> not valid query return false
         return False
 
     def remove_user(self, employee_id, password):
         """Takes passed employee id and removes that employee from the database if
         the passed password is the correct password for that employee."""
 
+        # get password for passed id
         target_pass = self.cursor.execute(
             """SELECT password FROM employees WHERE employee_id = (?);""",
             (employee_id,),
         ).fetchone()
 
         if target_pass is None:
-            return False
+            return False  # no password found for that id (invalid id) --> return false
 
         if sha512_crypt.verify(password, target_pass["password"]):
+            # password matches --> remove user from database, return true
             self.cursor.execute(
                 """DELETE FROM employees WHERE employee_id = (?);""", (employee_id,)
             )
-
             self.connection.commit()
 
             return True
 
+        # password did not match --> return false
         return False
 
     def is_current_users_password(self, input_pass):
-        """This function will check if an input password matches the current users
+        """Checks if an input password matches the current users
         password in the database."""
 
-        user_data = self.cursor.execute(
-            """SELECT * FROM employees WHERE employee_id = (?);""",
+        # search for current user's password
+        user_pass = self.cursor.execute(
+            """SELECT password FROM employees WHERE employee_id = (?);""",
             (self.current_user,),
         ).fetchone()
 
-        if user_data == []:
-            return False
+        if user_pass is None:
+            return False  # no user was found for passed id (no current user)--> return false
 
-        if sha512_crypt.verify(input_pass, user_data["password"]):
-            return True
+        if sha512_crypt.verify(input_pass, user_pass["password"]):
+            return True  # is current users password --> return true
 
-        return False
+        return False  # password did not match --> return false
 
     def is_current_users_username(self, username):
         """Checks if the passed username is the username of the current logged in database user."""
 
+        # get username of current user
         current_username = self.cursor.execute(
             """SELECT username FROM employees WHERE employee_id = (?)""",
             (self.current_user,),
         ).fetchone()
 
         if current_username["username"] != username:
-            return False
+            return False  # passed username does not match --> return False
 
-        return True
+        return True  # matched --> return true
 
     def set_current_user(self, user_id):
-        """This function will set the databases current user as the passed user_id,
-        or switches to None if the user logged out."""
+        """Database's current user as the passed user_id, or switches to
+        None if the user logged out."""
 
         self.current_user = user_id
 
     def insert_user(self, user_data):
-        """This function takes a set of inputs for a new user and inputs it into
+        """Takes a set of inputs for a new user and inputs it into
         the database."""
 
         self.cursor.execute(
@@ -261,7 +269,7 @@ class AppDatabase:
         return self.is_logged_in
 
     def update_pass(self, new_pass):
-        """This function will update the users password in the data base."""
+        """Updates the users password in the database."""
 
         self.cursor.execute(
             """UPDATE employees SET password = (?) WHERE employee_id = (?);""",
@@ -274,7 +282,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_user_name(self, user_id, name):
-        """This fucntion will update a user's name in the database."""
+        """Updates a user's name in the database."""
 
         self.cursor.execute(
             """UPDATE employees SET name = (?) WHERE employee_id = (?);""",
@@ -287,7 +295,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_user_team(self, user_id, team):
-        """This function will update a user's team in the database."""
+        """Update a user's team in the database."""
 
         self.cursor.execute(
             """UPDATE employees SET team = (?) WHERE employee_id = (?);""",
@@ -300,7 +308,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_user_lane_or_section(self, user_id, lane_or_section):
-        """This function will update a user's lane or section in the database."""
+        """Update a user's lane or section in the database."""
 
         self.cursor.execute(
             """UPDATE employees SET lane_or_section = (?) WHERE employee_id = (?);""",
@@ -313,7 +321,7 @@ class AppDatabase:
         self.connection.commit()
 
     def search_for_user(self, user_id):
-        """This function will search the database for the requested id and return that users
+        """Searchs the database for the requested id and return that users
         data back to the app for display."""
 
         return self.cursor.execute(
@@ -324,7 +332,7 @@ class AppDatabase:
         """Checks the database to see if a username is already in use."""
 
         return self.cursor.execute(
-            """SELECT * FROM employees WHERE username = (?);""", (username,)
+            """SELECT username FROM employees WHERE username = (?);""", (username,)
         ).fetchall()
 
     def get_all_users(self):
@@ -342,7 +350,7 @@ class AppDatabase:
         ).fetchone()
 
     def insert_repair(self, repair_data):
-        """This function will insert a new repair into the database and call the functions
+        """Inserts a new repair into the database and call the functions
         need to add the repair to the valid employee's repair list."""
 
         self.cursor.execute(
@@ -375,6 +383,7 @@ class AppDatabase:
     def remove_repair(self, repair, password):
         """Removes the passed repair id if passed password is correct."""
 
+        # if password is valid delete the repair from the table --> return true for success
         if self.is_current_users_password(password):
             self.cursor.execute(
                 """DELETE FROM repairs WHERE repair_id = (?)""", (repair,)
@@ -387,25 +396,28 @@ class AppDatabase:
         return False
 
     def search_for_repair(self, repair_id):
-        """This function will take the repair id passed to it and retrieve it from the database,
-        then return that data to be displayed."""
+        """Takes the repair id passed to it and retrieves it from the database,
+        then returns that data to be displayed."""
 
         return self.cursor.execute(
             """SELECT * FROM repairs WHERE repair_id = (?);""", (repair_id,)
         ).fetchone()
 
     def get_all_active_repairs(self):
-        """This function will return all active repairs (no completion date)."""
+        """Returns all active repairs (no completion date)."""
 
         return self.cursor.execute(
             """SELECT * FROM repairs WHERE repair_completed_date IS NULL;"""
         ).fetchall()
 
     def get_repairs_assigned(self, employee_id):
-        """Returns all repair_ids assosiated with the passed employee id."""
+        """Returns all repair_ids assosiated with the passed employee id (No
+        completion data)."""
 
+        # get user data
         user = self.search_for_user(employee_id)
 
+        # get repair id where tech id matches passed id if user is tech
         if user["is_tech"] == 1:
             return self.cursor.execute(
                 """SELECT repair_id FROM repairs WHERE technician = (?)
@@ -413,6 +425,7 @@ class AppDatabase:
                 (employee_id,),
             ).fetchall()
 
+        # get repair id where writer id matches passed id if user is writer
         if user["is_writer"] == 1:
             return self.cursor.execute(
                 """SELECT repair_id FROM repairs WHERE service_writer = (?)
@@ -420,10 +433,11 @@ class AppDatabase:
                 (employee_id,),
             ).fetchall()
 
+        # passed id did not produce a result --> return false
         return None
 
     def update_repair_service_writer(self, repair_id, service_writer_id):
-        """This function will update the targted repair with a new service writer."""
+        """Updates the targted repair with a new service writer."""
 
         self.cursor.execute(
             """UPDATE repairs SET service_writer = (?) WHERE repair_id = (?);""",
@@ -436,7 +450,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_repair_tech(self, repair_id, tech_id):
-        """This function will update the targeted repair with a new technician."""
+        """Updates the targeted repair with a new technician."""
 
         self.cursor.execute(
             """UPDATE repairs SET technician = (?) WHERE repair_id = (?);""",
@@ -449,7 +463,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_total_repair_cost(self, repair_id, total_cost):
-        """This function will update the total repair cost of the targeted repair."""
+        """Updates the total repair cost of the targeted repair."""
 
         self.cursor.execute(
             """UPDATE repairs SET total_cost = (?) WHERE repair_id = (?);""",
@@ -462,7 +476,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_labor_cost(self, repair_id, labor_repair_cost):
-        """This function will update the labor cost of the targeted repair."""
+        """Updates the labor cost of the targeted repair."""
 
         labor_repair_cost = float(labor_repair_cost)
 
@@ -477,7 +491,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_repair_parts_cost(self, repair_id, parts_cost):
-        """This function will update the part cost of the targeted repair."""
+        """Updates the part cost of the targeted repair."""
 
         self.cursor.execute(
             """UPDATE repairs SET parts_cost = (?) WHERE repair_id = (?);""",
@@ -490,7 +504,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_repair_complete_date(self, repair_id, completion_date):
-        """This funcition will update the completion date of the targeted repair."""
+        """Updates the completion date of the targeted repair."""
 
         self.cursor.execute(
             """UPDATE repairs SET repair_completed_date = (?) WHERE repair_id = (?);""",
@@ -503,7 +517,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_repair_problem(self, repair_id, problem_description):
-        """This function will update the problem description of the targted repair."""
+        """Updates the problem description of the targted repair."""
 
         self.cursor.execute(
             """UPDATE repairs SET problem_description = (?) WHERE repair_id = (?);""",
@@ -516,7 +530,7 @@ class AppDatabase:
         self.connection.commit()
 
     def update_repair_description(self, repair_id, repair_description):
-        """This function will update the repair description of the targeted repair."""
+        """Updates the repair description of the targeted repair."""
 
         self.cursor.execute(
             """UPDATE repairs SET repair_description = (?) WHERE repair_id = (?);""",
@@ -529,7 +543,7 @@ class AppDatabase:
         self.connection.commit()
 
     def insert_part_listing(self, repair_id, part_id):
-        """This function will update the list of required parts for the repair."""
+        """Updates the list of required parts for the repair."""
 
         self.cursor.execute(
             """INSERT INTO part_listings (part_id, repair_id) VALUES (?, ?);""",
@@ -543,6 +557,7 @@ class AppDatabase:
         referening both a repair id and part id then fetching one listing
         for a listing id."""
 
+        # produce a listing id from passed repair and part ids
         listing_id = self.cursor.execute(
             """SELECT listing_id FROM part_listings 
                 WHERE part_id = (?) AND repair_id = (?)""",
@@ -550,8 +565,9 @@ class AppDatabase:
         ).fetchone()
 
         if listing_id is None:
-            return False
+            return False  # no such listing --> return false
 
+        # delete produced listing --> return true for success
         self.cursor.execute(
             """DELETE FROM part_listings WHERE listing_id = (?)""",
             (listing_id["listing_id"],),
@@ -569,7 +585,7 @@ class AppDatabase:
         ).fetchall()
 
     def insert_part(self, part_data):
-        """This function will insert a new part into the database."""
+        """Inserts a new part into the database."""
 
         self.cursor.execute(
             """INSERT INTO parts VALUES(?, ?, ?);""",
@@ -586,6 +602,7 @@ class AppDatabase:
         """Removes the passed part id if the passed password is the current
         users password."""
 
+        # if password is valid --> remove part from table, return true for success
         if self.is_current_users_password(password):
             self.cursor.execute("""DELETE FROM parts WHERE part_id = (?)""", (part,))
 
@@ -593,15 +610,16 @@ class AppDatabase:
 
             return True
 
+        # password invalid --> return false for failure
         return False
 
     def get_all_parts_in_database(self):
-        """This function will return a list containing all parts in the database."""
+        """Returns a list containing all parts in the database."""
 
         return self.cursor.execute("""SELECT * FROM parts;""").fetchall()
 
     def get_part_data(self, part_id):
-        """This function will return data for the passed part id."""
+        """Returns data for the passed part id."""
 
         return self.cursor.execute(
             """SELECT * FROM parts WHERE part_id = (?);""",
@@ -635,7 +653,8 @@ class AppDatabase:
         self.connection.commit()
 
     def insert_customer(self, customer_data):
-        """Takes the passed customer data and enters a new customer into the database."""
+        """Takes the passed customer data and enters a new customer into the database,
+        returns the new customer id based on name, address and phone."""
 
         self.cursor.execute(
             """INSERT INTO customers (name, address, phone_number) VALUES (?, ?, ?);""",
@@ -664,6 +683,7 @@ class AppDatabase:
         """Removes the passed customer id if the passed password is the current
         users password."""
 
+        # if password is valid --> remove customer from table, return true for success
         if self.is_current_users_password(password):
             self.cursor.execute(
                 """DELETE FROM customers WHERE customer_id = (?)""", (customer,)
@@ -673,6 +693,7 @@ class AppDatabase:
 
             return True
 
+        # invalid password --> return false for failure
         return False
 
     def get_customer_data(self, customer_id):
@@ -750,6 +771,7 @@ class AppDatabase:
         """Removes passed vehicle if the passed password is the current users
         password."""
 
+        # if valid password --> delete passed vin from table, return true for success
         if self.is_current_users_password(password):
             self.cursor.execute("""DELETE FROM vehicles WHERE vin = (?)""", (vin,))
 
@@ -757,6 +779,7 @@ class AppDatabase:
 
             return True
 
+        # password invalid --> return false for failure
         return False
 
     def get_vehicle_data(self, vin):
@@ -775,12 +798,13 @@ class AppDatabase:
     def vehicle_is_owned(self, vin):
         """Checks if a vin has a owner listed."""
 
+        # get owner of passed vin
         owner = self.cursor.execute(
             """SELECT owner FROM vehicles WHERE vin = (?);""", (vin,)
         ).fetchone()
 
         if owner["owner"] is not None:
-            return True
+            return True  # vehicle has listed owner --> return true
 
         return False
 
@@ -804,6 +828,7 @@ class AppDatabase:
     def remove_vehicle_owner(self, vin, customer_id):
         """Removes owner from passed vin."""
 
+        # get vehicle data
         vehicle = self.cursor.execute(
             """SELECT * FROM vehicles WHERE owner = (?) AND vin = (?)""",
             (
@@ -812,6 +837,7 @@ class AppDatabase:
             ),
         ).fetchone()
 
+        #  if vins and ids match --> set owner to none, return true for success
         if vehicle["vin"] == vin and vehicle["owner"] == int(customer_id):
             self.cursor.execute(
                 """UPDATE vehicles SET owner = (?) WHERE vin = (?);""",
@@ -822,6 +848,7 @@ class AppDatabase:
 
             return True
 
+        # vin did not have that owner listed --> return false for failure
         return False
 
     def update_vehicle_make(self, vin, new_make):
@@ -903,13 +930,16 @@ class AppDatabase:
     def has_active_repair(self, vin):
         """Searches if a passed vin has an active repair."""
 
+        # gets repair request for passed vin
         repair_request = self.cursor.execute(
             """SELECT repair_request FROM vehicles WHERE vin = (?);""", (vin,)
         ).fetchone()
 
+        # if none --> return false for no current repair assigned
         if repair_request["repair_request"] is None:
             return False
 
+        # has repair request --> return it
         return repair_request["repair_request"]
 
     def get_vehicle_repair_history(self, vin):
@@ -925,6 +955,7 @@ class AppDatabase:
         """Takes passed gui and table to reference the remove row dispatcher
         and remove the input id from its applicable table."""
 
+        # set the title, msg, and remover (function) variables based on passed target
         title = self.remove_row_distpatcher[target]["title"]
         msg = self.remove_row_distpatcher[target]["msg"]
         remover = self.remove_row_distpatcher[target]["remover"]
@@ -934,58 +965,70 @@ class AppDatabase:
                 "You must be logged in to access this page or function."
             )
 
+        # get an id to remove from user
         id_to_remove = self.get_remove_id_loop(gui, target, title, msg)
 
+        # user canceled at id --> return none
         if not id_to_remove:
             return None
 
         while True:
+            # get password
             password = gui.confirm_delete(title)
 
-            # if the user clicked cancel
+            # if the user clicked cancel --> return none
             if password is False:
                 return None
 
+            # user hit ok but no password
             if password is True:
                 gui.show_error("No password entered!")
 
                 continue
 
+            # if password does not meet the app requirements
             if not validate.is_valid_password(password):
                 gui.show_error("Invalid password!")
 
                 continue
 
+            # if remove function fails
             if not remover(id_to_remove, password):
                 gui.show_error("Invalid ID/VIN and or password!")
 
                 continue
 
+            # removal successful
             return gui.show_success("Removed succesfully.")
 
     def get_remove_id_loop(self, gui, target, title, msg):
         """Loop to contiune asking for an user id to remove."""
 
         while True:
+            # get id from user
             id_to_remove = gui.show_id_search_request(title, msg)
 
             # if the user clicked cancel
             if id_to_remove is False:
                 return None
 
+            # if user hit ok but put in no id
             if id_to_remove is True:
                 gui.show_error("No ID/VIN entered!")
 
                 continue
 
+            # if id does not match app requirements
             if not validate.is_valid_id(id_to_remove):
                 gui.show_error("Invalid ID/VIN!")
 
                 continue
 
+            # if no row found for input id
             if not self.remove_row_distpatcher[target]["search"](id_to_remove):
                 gui.show_error("Invalid ID/VIN!")
 
                 continue
 
+            # return valid id
             return id_to_remove

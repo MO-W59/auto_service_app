@@ -17,8 +17,8 @@ import customers
 
 
 def setup_button_handlers():
-    """This function connects all the UI buttons (radio buttons not included)
-    with their repective functions."""
+    """Connects all the UI buttons and action buttons to proper
+    functions in other modules."""
 
     # submit, add, remove buttons
     # user buttons
@@ -176,12 +176,14 @@ class MainWindow(UiGarageTrackerMainWindow):
         """Event handler for key press events. Escape exits the program, return calls the
         current index then is matched with proper module function."""
 
+        # if user hits escape button --> close program
         if event.key() == QtCore.Qt.Key.Key_Escape.value:
             self.close()
 
+        # if user hits enter
         if event.key() == QtCore.Qt.Key.Key_Return.value:
+            # match index to current page's submit button
             index = Gui.widget_stack.currentIndex()
-
             match index:
                 case 0:
                     users.login_submit(Database, Gui)
@@ -224,6 +226,8 @@ def setup_text_handlers():
     """Sets up the handling for events on the edit repair QTextEdit objects
     (repair description and problem description)"""
 
+    # if the text in the edit repair description text browsers change
+    # connect to gui and set proper class attribute to true
     Gui.edit_repair_problem_description_input_box.textChanged.connect(
         lambda: Gui.set_repair_problem_has_changed(True)
     )
@@ -239,8 +243,7 @@ Database = AppDatabase()
 
 
 def main():
-    """Main function of the program, calls setup of button handlers, shows the main app window
-    and instucts system to exit when GUI is closed."""
+    """Calls button and text box change handlers, shows gui, and setups up app exit."""
 
     setup_button_handlers()
     setup_text_handlers()

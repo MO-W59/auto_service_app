@@ -4,75 +4,63 @@ import string
 
 
 def is_valid_phone_number(phone_number):
-    """This function will validate a passed phone number."""
+    """Validates a passed phone number."""
 
     valid_numbers = string.digits
     numbers = []
     numbers[:0] = phone_number
-    is_valid = True
 
     if len(numbers) != 12:
-        is_valid = False
+        return False
 
-        return is_valid
-
+    # check for xxx-xxx-xxxx format
     if numbers[3] != "-" or numbers[7] != "-":
-        is_valid = False
-
-        return is_valid
+        return False
 
     for number in numbers:
-        if number in (numbers[3], numbers[7]):
+        if number in (numbers[3], numbers[7]):  # skip "-" locations
             continue
 
         if number not in valid_numbers:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def is_valid_address(address):
-    """This function will validate a passed address."""
+    """Validates a passed address."""
 
     valid_characters = string.ascii_letters + " " + "," + "." + string.digits
     characters = []
     characters[:0] = address
-    is_valid = True
 
     if len(characters) > 500:
-        is_valid = False
-
-        return is_valid
+        return False
 
     for character in characters:
         if character not in valid_characters:
-            is_valid = False
+            return False
 
-            return is_valid
-
-    return is_valid
+    return True
 
 
 def is_valid_name(name):
-    """This function will validate a passed name."""
+    """Validates a passed name."""
 
     valid_characters = string.ascii_letters + " " + string.digits
-    is_valid = True
 
     if len(name) > 50:
-        is_valid = False
-
-        return is_valid
+        return False
 
     for character in name:
         if character not in valid_characters:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def is_valid_id(passed_id):
-    """This function will validate a passed id."""
+    """Validates a passed id."""
 
     valid_characters = string.ascii_letters + string.digits
 
@@ -92,7 +80,7 @@ def is_valid_id(passed_id):
 
 
 def is_valid_vin(vin):
-    """This function will validate a passed vin number."""
+    """Validates a passed vin number."""
 
     valid_characters = string.ascii_letters + string.digits
 
@@ -107,68 +95,56 @@ def is_valid_vin(vin):
 
 
 def is_valid_team(team):
-    """This function will validate a passed team."""
+    """Validates a passed team."""
 
     valid_teams = string.ascii_uppercase
-    is_valid = True
 
     if len(team) > 1:
-        is_valid = False
-
-        return is_valid
+        return False
 
     if team not in valid_teams:
-        is_valid = False
+        return False
 
-    return is_valid
+    return True
 
 
 def is_valid_lane(lane):
-    """This function will validate a passed lane."""
+    """Validates a passed lane."""
 
     valid_lanes = string.digits
-    is_valid = True
 
     try:
         lane = int(lane)
 
     except ValueError:
-        is_valid = False
-
-        return is_valid
+        return False
 
     if lane < 0:
-        is_valid = False
-
-        return is_valid
+        return False
 
     if str(lane) not in valid_lanes:
-        is_valid = False
+        return False
 
-    return is_valid
+    return True
 
 
 def is_valid_description(description):
-    """This function will validate a passed description."""
+    """Validates a passed description."""
 
     valid_characters = string.ascii_letters + "?" + " " + "," + "." + string.digits
-    is_valid = True
 
     if len(description) > 5000:
-        is_valid = False
-
-        return is_valid
+        return False
 
     for character in description:
         if character not in valid_characters:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def is_valid_dollar_amount(value):
-    """This function will validate a passed value to check if it is a valid
-    dollar amount."""
+    """Validates a passed value to check if it is a valid dollar amount."""
 
     try:
         value = float(value)
@@ -183,39 +159,33 @@ def is_valid_dollar_amount(value):
 
 
 def is_valid_password(password):
-    """This function will validate a passed password."""
+    """Validates a passed password."""
 
     valid_characters = string.ascii_letters + string.digits + string.punctuation
-    is_valid = True
 
     if not password or len(password) > 20 or len(password) < 4:
-        is_valid = False
-
-        return is_valid
+        return False
 
     for character in password:
         if character not in valid_characters:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def is_valid_username(username):
-    """This function will validate a passed username."""
+    """Validates a passed username."""
 
     valid_characters = string.ascii_letters + string.digits
-    is_valid = True
 
     if len(username) > 20 or len(username) < 4:
-        is_valid = False
-
-        return is_valid
+        return False
 
     for character in username:
         if character not in valid_characters:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def is_valid_year(year):
@@ -223,21 +193,19 @@ def is_valid_year(year):
 
     valid_digits = string.digits
 
-    is_valid = True
-
     if len(year) != 4:
-        is_valid = False
+        return False
 
     for digit in year:
         if digit not in valid_digits:
-            is_valid = False
+            return False
 
-    return is_valid
+    return True
 
 
 def new_user(gui, test_data):
-    """Ensures all passed data for a new user id valid, returns errors if any, and
-    returns errors, is_tech, is_writer and lane/section information for the user."""
+    """Ensures all passed data for a new user is valid, returns errors if any, and
+    returns is_tech, is_writer and lane/section information for the user."""
 
     if (
         not is_valid_username(test_data["username"])

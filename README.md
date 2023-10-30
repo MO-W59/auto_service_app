@@ -13,23 +13,15 @@ Directory is currently hard coded to local data folder.
 
 vvv----- TODO list -----vvv
 
-reduce lines in modules look at validate.py for example, is_valid = False --> return is_valid...just return False or True
+In depth review --> shortening, docstrings, comments, bug hunt
 
-protect against SQL race condition, options -> thread lock? queue? connection pool?
-
-add option to choose directory --> saves directory for next boot
-
-search for bugs
-
-review doc strings
-
-review naming conventions
-
-place comments where needed because you didnt do it at time of writing, also spell check stuff
+---Long Term---
 
 reimplement OOP style for objects? --> large rewrite/redesign
 
 Improve visuals of the UI
+
+SQLite documentation --> "locking mechanism might not work correctly if the database file is kept on an NFS filesystem." thus if wanting multipe mahcines to access the database a different database is recommended.
 
 
 

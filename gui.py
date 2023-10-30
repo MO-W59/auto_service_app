@@ -25,10 +25,10 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 
 
 class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
-    """This class defines the contents of the apps GUI."""
+    """Defines the contents of the apps GUI."""
 
     def setup_ui(self, app_main_window):
-        """This function sets up the GUI window and contents."""
+        """Sets up the GUI window and contents."""
         super().__init__()
 
         app_main_window.setObjectName("app_main_window")
@@ -2517,8 +2517,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         self.action_update_user.setText(_translate("app_main_window", "Update User"))
 
     def show_error(self, error):
-        """This function will display the passed error message to the user in a
-        separate window."""
+        """Displays the passed error message to the user in a separate window."""
 
         error_window = QtWidgets.QMessageBox()
         error_window.setIcon(QtWidgets.QMessageBox.Icon.Critical)
@@ -2527,8 +2526,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         error_window.exec()
 
     def show_success(self, message):
-        """This function will display the passed error message to the user in a
-        separate window."""
+        """Displays the passed success message to the user in a separate window."""
 
         success_window = QtWidgets.QMessageBox()
         success_window.setIcon(QtWidgets.QMessageBox.Icon.NoIcon)
@@ -2542,16 +2540,19 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
 
         input_id, ok_button = QtWidgets.QInputDialog.getText(self, title, msg)
 
+        # if user hits ok and there is an id entered --> return id
         if ok_button and input_id:
             return input_id
 
+        # if user hits ok --> return true
         if ok_button:
             return True
 
+        # otherwise user hit cancel or escaped
         return False
 
     def show_user_search(self, information_to_display):
-        """This function will display the passed user data to the user."""
+        """Displays the passed user data to the user."""
 
         result_window = QtWidgets.QMessageBox()
         result_window.setIcon(QtWidgets.QMessageBox.Icon.NoIcon)
@@ -2569,28 +2570,30 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         result_window.exec()
 
     def update_active_repair_list(self, list_of_repairs):
-        """This function will display the active repairs repair data to the user."""
+        """Displays the active repairs repair data to the user."""
 
         self.active_repairs_list_text_browser.setText(list_of_repairs)
 
     def update_user_update_displays(self, user_data):
-        """This function will take the information retrived from the database and update
+        """Takes the information retrived from the database and update
         labels displaying the requested user information."""
 
         self.update_user_user_id_display_label.setText(str(user_data["employee_id"]))
         self.update_user_name_display_label.setText(user_data["name"])
         self.update_user_team_display_label.setText(user_data["team"])
 
-        if user_data["is_tech"] == 1:
+        if user_data["is_tech"] == 1:  # 1 = true in this case, no bool type for sqlite
             self.update_user_section_display_label.setText(user_data["lane_or_section"])
             self.update_user_lane_display_label.setText("N/A")
 
-        if user_data["is_writer"] == 1:
+        if (
+            user_data["is_writer"] == 1
+        ):  # 1 = true in this case, no bool type for sqlite
             self.update_user_lane_display_label.setText(user_data["lane_or_section"])
             self.update_user_section_display_label.setText("N/A")
 
     def update_edit_repair_displays(self, repair_data):
-        """This function will update the displays located on the edit display page to
+        """Updates the displays located on the edit display page to
         that of the requested repair."""
 
         self.edit_repair_service_id_display_label.setText(
@@ -2618,7 +2621,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
     def update_old_repair_displays(self, repair_data, parts_list):
-        """This function will update the old repair page with the repair data passed to it."""
+        """Updates the old repair page with the repair data passed to it."""
 
         self.old_repair_repair_id_display_label.setText(repair_data["repair_id"])
         self.old_repair_total_cost_display_label.setText(
@@ -2645,7 +2648,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         )
 
     def update_edit_part_page(self, part_data):
-        """This function will update the edit part page display data."""
+        """Updates the edit part page display data."""
 
         self.edit_part_id_display_label.setText(part_data["part_id"])
         self.edit_part_part_cost_input_box.setText(f"{part_data['part_cost']:,.2f}")
@@ -2677,15 +2680,18 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self,
             "Repair Complete",
             "Enter password to confirm repair complete.",
-            QtWidgets.QLineEdit.EchoMode.Password,
+            QtWidgets.QLineEdit.EchoMode.Password,  # hide input values
         )
 
+        # if ok and user input a password --> return password
         if ok_button and password:
             return password
 
+        # if just ok is clicked --> return true
         if ok_button:
             return True
 
+        # otherwise user hit cancel or escaped --> return false
         return False
 
     def confirm_delete(self, title):
@@ -2695,15 +2701,18 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
             self,
             title,
             "Input password to confirm removal:",
-            QtWidgets.QLineEdit.EchoMode.Password,
+            QtWidgets.QLineEdit.EchoMode.Password,  # hide input values
         )
 
+        # if ok and user input a password --> return password
         if ok_button and password:
             return password
 
+        # if just ok is clicked --> return true
         if ok_button:
             return True
 
+        # otherwise user hit cancel or escaped --> return false
         return False
 
     def reset_login_page(self):
@@ -2726,7 +2735,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         for radio_button in [
             self.new_user_tech_radio_button,
             self.new_user_service_writer_radio_button,
-        ]:
+        ]:  # ungroup radio buttons, uncheck, then regroup
             radio_button.setAutoExclusive(False)
             radio_button.setChecked(False)
             radio_button.setAutoExclusive(True)
@@ -2751,7 +2760,7 @@ class UiGarageTrackerMainWindow(QtWidgets.QMainWindow):
         for radio_button in [
             self.update_user_tech_radio_button,
             self.update_user_service_writer_radio_button,
-        ]:
+        ]:  # ungroup radio buttons, uncheck, then regroup
             radio_button.setAutoExclusive(False)
             radio_button.setChecked(False)
             radio_button.setAutoExclusive(True)
