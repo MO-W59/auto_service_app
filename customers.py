@@ -8,11 +8,13 @@ NO_LOGIN_MSG = "You must be logged in to access this page."
 def new_customer_submit(database, gui):
     """Gets new customer data and passes it to the database for storage."""
 
+    # Get inputs from GUI
     name = gui.new_customer_name_input_box.text()
     address = gui.new_customer_address_input_box.toPlainText()
     phone = gui.new_customer_phone_input_box.text()
     errors = ""
 
+    # Validate --> add error if invalid
     if not validate.is_valid_name(name):
         errors += "Invalid name!"
 
@@ -22,17 +24,21 @@ def new_customer_submit(database, gui):
     if not validate.is_valid_phone_number(phone):
         errors += "\n\nInvalid phone number!"
 
+    # Show errors and return
     if errors != "":
         return gui.show_error(errors)
 
+    # Use inputs to make customer
     customer_data = {
         "name": name,
         "address": address,
         "phone": phone,
     }
 
+    # Pass to database for insert
     customer_id = database.insert_customer(customer_data)
 
+    # Reset page, show success, go to edit customer page of the new customer
     gui.reset_new_customer_page()
 
     gui.show_success("New customer input succesfully.")
@@ -43,12 +49,14 @@ def new_customer_submit(database, gui):
 def edit_customer_submit(database, gui):
     """Gets new information for a customer and passes it to the database for storage."""
 
+    # get inputs from GUI
     customer_id = gui.edit_customer_id_display_label.text()
     name = gui.edit_customer_name_input_box.text()
     address = gui.edit_customer_address_input_box.toPlainText()
     phone = gui.edit_customer_phone_input_box.text()
     errors = ""
 
+    # Validate inputs --> add errors if invalid
     if gui.edit_customer_change_name_check_box.isChecked():
         if not validate.is_valid_name(name):
             errors += "Invalid name!\n\n"
@@ -61,9 +69,11 @@ def edit_customer_submit(database, gui):
         if not validate.is_valid_phone_number(phone):
             errors += "Invalid phone!\n\n"
 
+    # Show errors and return
     if errors != "":
         return gui.show_error(errors)
 
+    # Update items based on checkboxes
     if gui.edit_customer_change_name_check_box.isChecked():
         database.update_customer_name(customer_id, name)
 
@@ -73,6 +83,7 @@ def edit_customer_submit(database, gui):
     if gui.edit_customer_change_phone_check_box.isChecked():
         database.update_customer_phone(customer_id, phone)
 
+    # Show success, get updated data, update/reset page
     gui.show_success("Customer update successful.")
 
     customer_data = database.get_customer_data(customer_id)
@@ -89,8 +100,10 @@ def edit_customer_submit(database, gui):
 def add_vehicle_to_customer_button(database, gui):
     """Gets a vin and passes it to the database to add to a customers vehicle list."""
 
+    # Get id from GUI based on the current customer being edited
     customer_id = gui.edit_customer_id_display_label.text()
 
+    # until user enters a valid vin in the database, or hits cancel run loop
     while True:
         vin_to_add = gui.show_id_search_request("Search VIN", "Input VIN to add:")
 
@@ -115,6 +128,7 @@ def add_vehicle_to_customer_button(database, gui):
 
         break
 
+    # add vehicle owner in database, get updated data, make list and display list/success
     database.add_vehicle_owner(vin_to_add, customer_id)
 
     vehicle_data = database.get_owned_vehicles(customer_id)
