@@ -23,6 +23,8 @@ reimplement OOP style for objects? --> large rewrite/redesign
 
 Improve visuals of the UI
 
+Rather than using one stacked widgit would it be better to use multiple windows instead?
+
 SQLite documentation --> "locking mechanism might not work correctly if the database file is kept on an NFS filesystem." thus if wanting multipe mahcines to access the database a different database is recommended.
 
 

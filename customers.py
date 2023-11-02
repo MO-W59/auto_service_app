@@ -144,8 +144,10 @@ def remove_vehicle_from_customer_button(database, gui):
     """Gets a vin from the user and passes it to the database to remove it to that
     customers vehicle list."""
 
+    # Get id from GUI based on the current customer being edited
     customer_id = gui.edit_customer_id_display_label.text()
 
+    # until the user enters a valid vin or hits cancel run the loop
     while True:
         vin_to_remove = gui.show_id_search_request("Remove Vehicle", "Input VIN:")
 
@@ -163,6 +165,7 @@ def remove_vehicle_from_customer_button(database, gui):
 
             continue
 
+        # Remove vehicle owner, if ids dont match customer didnt have ownership
         if not database.remove_vehicle_owner(vin_to_remove, customer_id):
             gui.show_error("Customer does not have ownership of that vehicle.")
 
@@ -170,6 +173,7 @@ def remove_vehicle_from_customer_button(database, gui):
 
         break
 
+    # Get new vehicle data for customer, make list, display and show success
     vehicle_data = database.get_owned_vehicles(customer_id)
 
     list_of_vehicles = construct_vehicles_list(vehicle_data)
@@ -198,13 +202,13 @@ def go_to_edit_customer_page(database, gui, customer_id=None):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
-    if customer_id is None:
-        while True:
+    if customer_id is None:  # Function was not called after new customer submit
+        while True:  # until a valid id is entered or user hits cancel, run loop
             customer_id = gui.show_id_search_request(
                 "Search Customer", "Input Customer ID:"
             )
 
-            # if the user clicked cancel
+            # If the user clicked cancel
             if customer_id is False:
                 return None
 
@@ -221,9 +225,10 @@ def go_to_edit_customer_page(database, gui, customer_id=None):
                 continue
 
             break
-    else:
+    else:  # Function was called by new customer submit --> use passed id
         customer_data = database.get_customer_data(customer_id)
 
+    # Get vehicle data, make list, update page with customer data and vehicle list, go to page
     vehicle_data = database.get_owned_vehicles(customer_id)
 
     list_of_vehicles = construct_vehicles_list(vehicle_data)

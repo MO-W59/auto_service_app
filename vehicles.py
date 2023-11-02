@@ -8,6 +8,7 @@ NO_LOGIN_MSG = "You must be logged in to access this page."
 def new_vehicle_submit(database, gui):
     """Gets information for a new vehicle and passes it to the database for storage."""
 
+    # Get new vehicle info from GUI
     vin = gui.new_vehicle_vin_input_box.text()
     make = gui.new_vehicle_make_input_box.text()
     model = gui.new_vehicle_model_input_box.text()
@@ -16,6 +17,7 @@ def new_vehicle_submit(database, gui):
     engine = gui.new_vehicle_engine_input_box.text()
     errors = ""
 
+    # validate for proper format, types ect
     if not validate.is_valid_vin(vin):
         errors += "Invalid vin!\n\n"
 
@@ -34,12 +36,15 @@ def new_vehicle_submit(database, gui):
     if not validate.is_valid_id(engine):
         errors += "Invalid engine!\n\n"
 
+    # Show any errors collected and return
     if errors != "":
         return gui.show_error(errors)
 
+    # Check if input vin is in use, show error and return
     if database.get_vehicle_data(vin):
         return gui.show_error("There is a vehicle with this VIN already!")
 
+    # Construct vehicle
     vehicle_data = {
         "vin": vin,
         "model": model,
@@ -51,6 +56,7 @@ def new_vehicle_submit(database, gui):
         "owner": None,
     }
 
+    # Pass vehicle to database, reset page, show success, go to edit page for that vin
     database.insert_vehicle(vehicle_data)
 
     gui.reset_new_vehicle_page()
@@ -63,6 +69,7 @@ def new_vehicle_submit(database, gui):
 def edit_vehicle_submit(database, gui):
     """Gets new information for a vehicle and passes it to the database for storage."""
 
+    # Get vin from gui, setup dispatcher
     current_vin = gui.edit_vehicle_vin_display_label.text()
     checkbox_dispatcher = edit_vehicle_dispatcher(database, gui)
     errors = ""
@@ -74,18 +81,15 @@ def edit_vehicle_submit(database, gui):
                 errors += checkbox["error"]
 
     # if errors display and return
-
     if errors != "":
         return gui.show_error(errors)
 
     # run through dispatcher for updates
-
     for checkbox in checkbox_dispatcher.values():
         if checkbox["checked"]():
             checkbox["updater"](current_vin, checkbox["input"]())
 
     # show success, reset checkboxes
-
     gui.reset_edit_vehicle_page()
 
     return gui.show_success("Vehicle update successful.")
@@ -97,13 +101,13 @@ def edit_vehicle_dispatcher(database, gui):
     and error message to use when updating user information."""
 
     checkbox_dispatcher = {
-        gui.edit_vehicle_change_make_check_box: {
-            "checked": gui.edit_vehicle_change_make_check_box.isChecked,
-            "validator": validate.is_valid_name,
-            "input": gui.edit_vehicle_make_input_box.text,
-            "error": "Invalid make!\n\n",
-            "updater": database.update_vehicle_make,
-        },
+        gui.edit_vehicle_change_make_check_box: {  # Check box on page
+            "checked": gui.edit_vehicle_change_make_check_box.isChecked,  # Holds checked status
+            "validator": validate.is_valid_name,  # Holds function to validate related input
+            "input": gui.edit_vehicle_make_input_box.text,  # Holds function to get input
+            "error": "Invalid make!\n\n",  # Holds error message if input is invalid
+            "updater": database.update_vehicle_make,  # Holds function to update database with input
+        },  # All below same as above
         gui.edit_vehicle_change_model_check_box: {
             "checked": gui.edit_vehicle_change_model_check_box.isChecked,
             "validator": validate.is_valid_name,
@@ -155,7 +159,9 @@ def go_to_edit_vehicle_page(database, gui, vin=None):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
+    # User requested page
     if vin is None:
+        # Until user inputs a valid vin or hits cancel, run the loop
         while True:
             vin = gui.show_id_search_request("Edit Vehicle", "Input VIN to edit:")
 
@@ -177,9 +183,11 @@ def go_to_edit_vehicle_page(database, gui, vin=None):
 
             break
 
+    # New vehicle submit requested page
     else:
         vehicle_data = database.get_vehicle_data(vin)
 
+    # Reset/update page
     gui.reset_edit_vehicle_page()
 
     gui.update_edit_vehicle_page(vehicle_data)
@@ -194,6 +202,7 @@ def search_repair_history(database, gui):
     if not database.get_login_status():
         return gui.show_error("You must be logged in to access this function.")
 
+    # Until user inputs valid vin or hits cancel, run the loop
     while True:
         vin_to_search = gui.show_id_search_request("Search History", "Input Repair ID ")
 
@@ -215,6 +224,7 @@ def search_repair_history(database, gui):
 
         break
 
+    # Search database for input vin and display
     repair_history = database.get_vehicle_repair_history(vin_to_search)
 
     repair_info = f"VIN : {vin_to_search}\n\n--- Pior Repair IDs ---\n\n"

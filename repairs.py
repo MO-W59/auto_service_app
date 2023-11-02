@@ -9,6 +9,7 @@ NO_LOGIN_MSG = "You must be logged in to access this page."
 def new_repair_submit(database, gui):
     """Gets information for a new repair and passes it to the database for storage."""
 
+    # Get values from gui inputs
     writer_id = gui.new_repair_service_id_input_box.text()
     tech_id = gui.new_repair_tech_id_input_box.text()
     vin = gui.new_repair_vin_input_box.text()
@@ -16,6 +17,7 @@ def new_repair_submit(database, gui):
     problem_description = gui.new_repair_description_input_box.toPlainText()
     errors = ""
 
+    # Search for invalid values, add to errors if invalid
     if not validate.is_valid_id(writer_id):
         errors += "Invalid service writer id.\n\n"
 
@@ -28,19 +30,22 @@ def new_repair_submit(database, gui):
     if not validate.is_valid_description(problem_description):
         errors += "Invalid problem description.\n\n"
 
+    # Invalid values were found, show errors and return
     if errors != "":
         return gui.show_error(errors)
 
-    constructing_suffix = []
-    constructing_suffix[:0] = drop_off_date
-    repair_id_suffix = ""
+    # Repair id is a combination of vin and drop off date --> 12345678901234vin + YYYYMMDD
+    constructing_suffix = []  # Empty list
+    constructing_suffix[:0] = drop_off_date  # Copy drop off date values
+    repair_id_suffix = ""  # Empty string
 
-    while "/" in constructing_suffix:
+    while "/" in constructing_suffix:  # Remove all slashes from date
         constructing_suffix.remove("/")
 
-    repair_id_suffix = repair_id_suffix.join(constructing_suffix)
-    repair_id = vin + repair_id_suffix
+    repair_id_suffix = repair_id_suffix.join(constructing_suffix)  # combine to string
+    repair_id = vin + repair_id_suffix  # 12345678901234vin + YYYYMMDD
 
+    # Ensure data constraints are met or add to errors
     if (
         database.search_for_user(tech_id)["is_tech"] != 1
         or database.search_for_user(writer_id)["is_writer"] != 1
@@ -59,9 +64,11 @@ def new_repair_submit(database, gui):
     if database.search_for_repair(repair_id):
         errors += "That Repair ID is already in use.\n\n"
 
+    # Found violated constraint show errors and return
     if errors != "":
         return gui.show_error(errors)
 
+    # Construct a repair from validated inputs
     repair_data = {
         "repair_id": repair_id,
         "total_cost": 0.0,
@@ -74,6 +81,7 @@ def new_repair_submit(database, gui):
         "vin": vin,
     }
 
+    # Insert repair, updated vehicle active repair, reset page and show success
     database.insert_repair(repair_data)
 
     database.update_vehicle_active_repair(vin, repair_id)
@@ -82,6 +90,7 @@ def new_repair_submit(database, gui):
 
     gui.show_success("New repair input successfuly.")
 
+    # Go to edit page of the new repair
     return go_to_edit_repair_page(database, gui, repair_id)
 
 
@@ -92,40 +101,38 @@ def edit_repair_submit(database, gui):
     repair_id = gui.edit_repair_repair_id_display_label.text()
     errors = ""
 
-    # run through dispatcher for errors
-
+    # Run through dispatcher for errors
     for checkbox in checkbox_dispatcher.values():
         if checkbox["checked"]():
             if not checkbox["validator"](checkbox["input"]()):
                 errors += checkbox["error"]
 
-    # if errors display and return
-
+    # If errors display and return
     if errors != "":
         return gui.show_error(errors)
 
-    # ensure passed employee ids apply to their roles, if error display and return
-
+    # Ensure passed employee ids apply to their roles, if error display and return
     change_writer_checkbox = checkbox_dispatcher[gui.change_writer_check_box]
     change_tech_checkbox = checkbox_dispatcher[gui.change_tech_check_box]
+    writer_input = change_writer_checkbox["input"]()
+    tech_input = change_tech_checkbox["input"]()
 
     if (
         change_tech_checkbox["checked"]()
-        and database.search_for_user(change_tech_checkbox["input"]())["is_tech"] != 1
+        and database.search_for_user(tech_input)["is_tech"] != 1
         or change_tech_checkbox["checked"]()
-        and database.search_for_user(change_writer_checkbox["input"]())["is_writer"]
-        != 1
+        and database.search_for_user(writer_input)["is_writer"] != 1
     ):
         return gui.show_error(
             "Employee ID entered that does not match their role (tech/writer).\n\n"
         )
 
-    # if checked update via dispatch
-
+    # If checked update via dispatch
     for checkbox in checkbox_dispatcher.values():
         if checkbox["checked"]():
             checkbox["updater"](repair_id, checkbox["input"]())
 
+    # Calculate total cost, update database, show success reset/update page
     total_cost = calculate_total_cost(repair_id, database)
 
     database.update_total_repair_cost(repair_id, total_cost)
@@ -145,13 +152,13 @@ def edit_repair_dispatcher(database, gui):
     and error messages to use when updating repair data."""
 
     checkbox_dispatcher = {
-        gui.change_writer_check_box: {
-            "checked": gui.change_writer_check_box.isChecked,
-            "validator": validate.is_valid_id,
-            "input": gui.edit_repair_service_id_input_box.text,
-            "error": "Invalid service writer ID!\n\n",
-            "updater": database.update_repair_service_writer,
-        },
+        gui.change_writer_check_box: {  # Checkbox on gui
+            "checked": gui.change_writer_check_box.isChecked,  # Status of check box
+            "validator": validate.is_valid_id,  # Validation function for related value
+            "input": gui.edit_repair_service_id_input_box.text,  # Input for related value
+            "error": "Invalid service writer ID!\n\n",  # Error for related value
+            "updater": database.update_repair_service_writer,  # Update function for related value
+        },  # Same as above for those below
         gui.change_tech_check_box: {
             "checked": gui.change_tech_check_box.isChecked,
             "validator": validate.is_valid_id,
@@ -190,8 +197,10 @@ def finish_repair_submit(database, gui):
     then has the database update employee assignments and moves the user to view the completed
     repair page in the gui."""
 
+    # Uses the displayed repair id as the id to submit
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
+    # Until user has entered a vaild password or hits cancel run the loop
     while True:
         pass_confirm = gui.confirm_repair_complete()
 
@@ -214,6 +223,7 @@ def finish_repair_submit(database, gui):
 
         break
 
+    # Set completion date as the current date, updated database, show success, reset/update page
     compelted_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
     database.update_repair_complete_date(repair_id, compelted_date)
@@ -224,11 +234,12 @@ def finish_repair_submit(database, gui):
 
     database.update_vehicle_active_repair(repair_data["vehicle"])
 
+    gui.reset_edit_repair_page_finish()
+
+    # Display information on old repair page and go to that page
     parts_list = construct_repair_parts_list(repair_id, database)
 
     gui.update_old_repair_displays(repair_data, parts_list)
-
-    gui.reset_edit_repair_page_finish()
 
     return gui.widget_stack.setCurrentIndex(7)
 
@@ -236,8 +247,10 @@ def finish_repair_submit(database, gui):
 def add_part_to_repair(database, gui):
     """Gets a part as input and sends it to the database to add to the current repair."""
 
+    # Use displayed repair id
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
+    # Until user inputs a valid part id or hits cancel, run the loop
     while True:
         part_to_add = gui.show_id_search_request("Add Part", "Input Part ID to add:")
 
@@ -257,15 +270,18 @@ def add_part_to_repair(database, gui):
 
         break
 
+    # Make a new part listing in the database and make updated parts list
     database.insert_part_listing(repair_id, part_to_add)
     parts_list = construct_repair_parts_list(repair_id, database)
 
+    # Update costs in database
     parts_cost = calculate_parts_cost(repair_id, database)
     database.update_repair_parts_cost(repair_id, parts_cost)
 
     total_cost = calculate_total_cost(repair_id, database)
     database.update_total_repair_cost(repair_id, total_cost)
 
+    # Get updated repair data, update page with data and parts list, show success
     repair_data = database.search_for_repair(repair_id)
 
     gui.update_edit_repair_displays(repair_data)
@@ -276,11 +292,13 @@ def add_part_to_repair(database, gui):
 
 
 def remove_part_from_repair(database, gui):
-    """Gets information on what part to remoe from the repair then passes
+    """Gets information on what part to remove from the repair then passes
     that information to the database for update."""
 
+    # Use displayed repair id
     repair_id = gui.edit_repair_repair_id_display_label.text()
 
+    # Until user inputs a valid part id or hits cancel, run the loop
     while True:
         part_id_to_remove = gui.show_id_search_request(
             "Remove Part", "Input a Part ID to remove:"
@@ -300,6 +318,7 @@ def remove_part_from_repair(database, gui):
 
             continue
 
+        # remove part listing --> returns false if listing was not found
         if not database.drop_part_listing(repair_id, part_id_to_remove):
             gui.show_error("Repair does not have that part currently listed.")
 
@@ -307,16 +326,20 @@ def remove_part_from_repair(database, gui):
 
         break
 
+    # Make updated parts list
     parts_list = construct_repair_parts_list(repair_id, database)
 
+    # Update costs
     parts_cost = calculate_parts_cost(repair_id, database)
     database.update_repair_parts_cost(repair_id, parts_cost)
 
     total_cost = calculate_total_cost(repair_id, database)
     database.update_total_repair_cost(repair_id, total_cost)
 
+    # Get updated repair data
     repair_data = database.search_for_repair(repair_id)
 
+    # update displays
     gui.update_edit_repair_displays(repair_data)
     gui.edit_repair_list_of_parts_text_browser.setText(parts_list)
 
@@ -329,10 +352,12 @@ def go_to_new_repair_page(database, gui):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
+    # Set drop of date display on page to current date
     drop_off_date = datetime.datetime.today().strftime("%Y/%m/%d")
 
     gui.new_repair_current_date_display.setText(drop_off_date)
 
+    # Reset page
     gui.reset_new_repair_page()
 
     return gui.widget_stack.setCurrentIndex(4)
@@ -345,15 +370,19 @@ def go_to_edit_repair_page(database, gui, requested_repair_id=None):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
+    # This page was requested by user, run get repair id loop
     if requested_repair_id is None:
         repair_data = get_repair_data_loop(database, gui)
 
+        # If user hit cancel return
         if repair_data is None:
             return None
 
+    # Page was requested by new repair submit
     else:
         repair_data = database.search_for_repair(requested_repair_id)
 
+    # Display repair data, parts list, reset page
     gui.update_edit_repair_displays(repair_data)
 
     parts_list = construct_repair_parts_list(repair_data["repair_id"], database)
@@ -368,6 +397,7 @@ def go_to_edit_repair_page(database, gui, requested_repair_id=None):
 def get_repair_data_loop(database, gui):
     """Loop to obtain a repair id from the user."""
 
+    # until user enters valid repair id or hits cancel, run the loop
     while True:
         requested_repair_id = gui.show_id_search_request(
             "Search for Repair", "Input Repair ID:"
@@ -430,6 +460,7 @@ def go_to_old_repair_page(database, gui):
     if not database.get_login_status():
         return gui.show_error(NO_LOGIN_MSG)
 
+    # Until user inputs a valid completed repair or hits cancel, run the loop
     while True:
         repair_id = gui.show_id_search_request(
             "Search Old Repair", "Input old Repair ID to search:"
@@ -458,6 +489,7 @@ def go_to_old_repair_page(database, gui):
 
         break
 
+    # Display information of valid completed repair
     list_of_parts = construct_repair_parts_list(repair_id, database)
 
     gui.update_old_repair_displays(repair_data, list_of_parts)
