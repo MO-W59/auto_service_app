@@ -15,7 +15,11 @@ Directory is currently hard coded to local data folder using SQLite (this has so
 
 vvv----- TODO list -----vvv
 
-In depth review --> shortening, docstrings, comments, bug hunt
+-- Bugs -- 
+
+User can force invalid lane or section by inputing value in opposite input and checking the related boxes/radio button
+
+User can avoid lane or section input by using opposite radio button and inputing an invalid value
 
 ---Long Term---
 

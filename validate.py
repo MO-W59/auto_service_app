@@ -49,7 +49,7 @@ def is_valid_name(name):
 
     valid_characters = string.ascii_letters + " " + string.digits
 
-    if len(name) > 50:
+    if len(name) > 50 or len(name) < 1:
         return False
 
     for character in name:
@@ -99,7 +99,7 @@ def is_valid_team(team):
 
     valid_teams = string.ascii_uppercase
 
-    if len(team) > 1:
+    if len(team) != 1:
         return False
 
     if team not in valid_teams:
