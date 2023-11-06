@@ -34,7 +34,7 @@ def is_valid_address(address):
     characters = []
     characters[:0] = address
 
-    if len(characters) > 500:
+    if len(characters) > 500 or len(characters) < 1:
         return False
 
     for character in characters:

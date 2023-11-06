@@ -21,6 +21,12 @@ User can force invalid lane or section by inputing value in opposite input and c
 
 User can avoid lane or section input by using opposite radio button and inputing an invalid value
 
+crash when inputing a repair vin that is not in database with no owner
+
+crash when inputing repair
+
+crash when removing vehicle from owner if they dont have ownsership
+
 ---Long Term---
 
 reimplement OOP style for objects? --> large rewrite/redesign
