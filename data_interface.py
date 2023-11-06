@@ -349,6 +349,26 @@ class AppDatabase:
             """SELECT employee_id FROM employees WHERE username = (?)""", (username,)
         ).fetchone()
 
+    def is_tech_or_writer(self, user_id, role):
+        """Returns true if the passed role matches the employee id in the database"""
+
+        # Get roles for id
+        roles = self.cursor.execute(
+            """SELECT is_tech, is_writer FROM employees WHERE employee_id = (?)""",
+            (user_id,),
+        ).fetchone()
+
+        # If the GUI is claiming tech and database has 1 for tech, it is a tech
+        if role == "tech" and roles["is_tech"] == 1:
+            return True
+
+        # If the GUI is claiming writer and database has 1 for writer, it is a writer
+        if role == "writer" and roles["is_writer"] == 1:
+            return True
+
+        # Otherwise passed roll did not match database
+        return False
+
     def insert_repair(self, repair_data):
         """Inserts a new repair into the database and call the functions
         need to add the repair to the valid employee's repair list."""
@@ -385,11 +405,20 @@ class AppDatabase:
 
         # if password is valid delete the repair from the table --> return true for success
         if self.is_current_users_password(password):
+            # Get vin to change active repair to none for that vin
+            vin = self.cursor.execute(
+                """SELECT vehicle FROM repairs WHERE repair_id = (?)""", (repair,)
+            ).fetchone()
+
             self.cursor.execute(
                 """DELETE FROM repairs WHERE repair_id = (?)""", (repair,)
             )
 
             self.connection.commit()
+
+            self.update_vehicle_active_repair(
+                vin["vehicle"]
+            )  # None for repair id is default
 
             return True
 
@@ -798,13 +827,16 @@ class AppDatabase:
     def vehicle_is_owned(self, vin):
         """Checks if a vin has a owner listed."""
 
-        # get owner of passed vin
+        # Get owner of passed vin
         owner = self.cursor.execute(
             """SELECT owner FROM vehicles WHERE vin = (?);""", (vin,)
         ).fetchone()
 
+        if owner is None:
+            return False  # Indicates vin not in database
+
         if owner["owner"] is not None:
-            return True  # vehicle has listed owner --> return true
+            return True  # Vehicle has listed owner --> return true
 
         return False
 
@@ -828,7 +860,7 @@ class AppDatabase:
     def remove_vehicle_owner(self, vin, customer_id):
         """Removes owner from passed vin."""
 
-        # get vehicle data
+        # Get vehicle data
         vehicle = self.cursor.execute(
             """SELECT * FROM vehicles WHERE owner = (?) AND vin = (?)""",
             (
@@ -837,7 +869,10 @@ class AppDatabase:
             ),
         ).fetchone()
 
-        #  if vins and ids match --> set owner to none, return true for success
+        if vehicle is None:
+            return False  # Invalid vin or invalid owner, false for failure
+
+        #  If vins and ids match --> set owner to none, return true for success
         if vehicle["vin"] == vin and vehicle["owner"] == int(customer_id):
             self.cursor.execute(
                 """UPDATE vehicles SET owner = (?) WHERE vin = (?);""",
@@ -848,7 +883,7 @@ class AppDatabase:
 
             return True
 
-        # vin did not have that owner listed --> return false for failure
+        # Vin did not have that owner listed --> return false for failure
         return False
 
     def update_vehicle_make(self, vin, new_make):
@@ -930,16 +965,19 @@ class AppDatabase:
     def has_active_repair(self, vin):
         """Searches if a passed vin has an active repair."""
 
-        # gets repair request for passed vin
+        # Gets repair request for passed vin
         repair_request = self.cursor.execute(
             """SELECT repair_request FROM vehicles WHERE vin = (?);""", (vin,)
         ).fetchone()
 
-        # if none --> return false for no current repair assigned
+        if repair_request is None:
+            return False  # Indicates vin not in database.
+
+        # If none --> return false for no current repair assigned
         if repair_request["repair_request"] is None:
             return False
 
-        # has repair request --> return it
+        # Has repair request --> return it
         return repair_request["repair_request"]
 
     def get_vehicle_repair_history(self, vin):

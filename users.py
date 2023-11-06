@@ -51,7 +51,7 @@ def new_user_submit(database, gui):
         "is_writer": None,
     }
 
-    # Validate via the validate module
+    # Validate all user data via the validate module
     test_data = validate.new_user(gui, test_data)
 
     # If there are errors in the returned data show and return
@@ -147,7 +147,7 @@ def update_user_submit(database, gui):
     # Get inputs from GUI and setup dispatcher
     input_pass = gui.update_user_password_input_box.text()
     target_id = gui.update_user_user_id_display_label.text()
-    checkbox_dispatcher = update_user_dispatcher(database, gui)
+    checkbox_dispatcher = update_user_dispatcher(database, gui, target_id)
     errors = ""
 
     # Validate password (No checkbox so not in dispatcher)
@@ -188,7 +188,7 @@ def update_user_submit(database, gui):
     return gui.show_user_search(information_to_display)
 
 
-def update_user_dispatcher(database, gui):
+def update_user_dispatcher(database, gui, target_id):
     """Creates the dictionary of dictionaries that contain the checkbox checked value in
     question, related validate function, related update function, related input variable
     and error message to use when updating user information."""
@@ -215,6 +215,7 @@ def update_user_dispatcher(database, gui):
                     (
                         gui.update_user_tech_radio_button.isChecked(),
                         gui.update_user_change_section_check_box.isChecked(),
+                        database.is_tech_or_writer(target_id, "tech"),
                     )
                 )
             ),
@@ -230,6 +231,7 @@ def update_user_dispatcher(database, gui):
                     (
                         gui.update_user_service_writer_radio_button.isChecked(),
                         gui.update_user_change_lane_check_box.isChecked(),
+                        database.is_tech_or_writer(target_id, "writer"),
                     )
                 )
             ),
