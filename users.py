@@ -160,6 +160,8 @@ def update_user_submit(database, gui):
             if not checkbox["validator"](checkbox["input"]()):
                 errors += checkbox["error"]
 
+    errors += verify_user_role(database, gui, target_id)
+
     # If errors display errors and return
     if errors != "":
         return gui.show_error(errors)
@@ -243,6 +245,26 @@ def update_user_dispatcher(database, gui, target_id):
     }
 
     return checkbox_dispatcher
+
+
+def verify_user_role(database, gui, target_id):
+    """Takes passed id and verifies its role selections in the GUI matches the database,
+    otherwise returns an error string."""
+    errors = ""
+
+    if (  # If user checked any items for techs and that user is not a tech
+        gui.update_user_change_section_check_box.isChecked()
+        or gui.update_user_tech_radio_button.isChecked()
+    ) and not database.is_tech_or_writer(target_id, "tech"):
+        errors += "This user is not a technician!\n\n"  # Add this error
+
+    if (  # If user checked any items for writers and that user is not a writer
+        gui.update_user_service_writer_radio_button.isChecked()
+        or gui.update_user_change_lane_check_box.isChecked()
+    ) and not database.is_tech_or_writer(target_id, "writer"):
+        errors += "This user is not a service writer!\n\n"  # Add this error
+
+    return errors
 
 
 def go_to_login_page(gui):

@@ -17,7 +17,7 @@ vvv----- TODO list -----vvv
 
 -- Bugs -- 
 
-None currently tracked
+Not currently tracking any bugs.
 
 ---Long Term---
 
